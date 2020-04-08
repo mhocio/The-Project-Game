@@ -1,4 +1,4 @@
-package pl.mini.projectgame;
+package pl.mini.projectgame.models;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -69,5 +69,6 @@ public class Team {
         }
         return leader;
     }
+
 
 }
