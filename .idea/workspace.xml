@@ -1,20 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="GradleLocalSettings">
-    <option name="projectSyncType">
-      <map>
-        <entry key="$PROJECT_DIR$/../Java/IDEA/2019_Rozwiazanie_Software-Engineer-Intern_Poznan" value="PREVIEW" />
-      </map>
-    </option>
+  <component name="ChangeListManager">
+    <list default="true" id="84f0785d-1bc3-4ca5-8276-a5b147f152ac" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1YrYEe48drT8FWRHXCiqO7LwMm5" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.4218391" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="JUnit.GameMasterConfigurationTests">
+    <configuration name="GameMasterConfigurationTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="The-Project-Game" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.mini.projectgame.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pl.mini.projectgame" />
+      <option name="MAIN_CLASS_NAME" value="pl.mini.projectgame.GameMasterConfigurationTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ProjectGameApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="The-Project-Game" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.mini.projectgame.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="SPRING_BOOT_MAIN_CLASS" value="pl.mini.projectgame.ProjectGameApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="ProjectGameApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="project-game" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="pl.mini.projectgame.ProjectGameApplication" />
@@ -22,8 +68,82 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.GameMasterConfigurationTests" />
+        <item itemvalue="Spring Boot.ProjectGameApplication (1)" />
+      </list>
+    </recent_temporary>
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="84f0785d-1bc3-4ca5-8276-a5b147f152ac" name="Default Changelist" comment="" />
+      <created>1586542009302</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1586542009302</updated>
+      <workItem from="1586542011753" duration="47000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state width="1742" height="423" key="GridCell.Tab.0.bottom" timestamp="1586542219323">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state width="1742" height="423" key="GridCell.Tab.0.bottom/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542219323" />
+    <state width="1742" height="423" key="GridCell.Tab.0.center" timestamp="1586542219311">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state width="1742" height="423" key="GridCell.Tab.0.center/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542219311" />
+    <state width="1742" height="423" key="GridCell.Tab.0.left" timestamp="1586542219308">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state width="1742" height="423" key="GridCell.Tab.0.left/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542219308" />
+    <state width="1742" height="423" key="GridCell.Tab.0.right" timestamp="1586542219314">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state width="1742" height="423" key="GridCell.Tab.0.right/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542219314" />
+    <state width="1742" height="423" key="GridCell.Tab.1.bottom" timestamp="1586542219346">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state width="1742" height="423" key="GridCell.Tab.1.bottom/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542219346" />
+    <state width="1742" height="423" key="GridCell.Tab.1.center" timestamp="1586542219336">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state width="1742" height="423" key="GridCell.Tab.1.center/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542219336" />
+    <state width="1742" height="423" key="GridCell.Tab.1.left" timestamp="1586542219335">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state width="1742" height="423" key="GridCell.Tab.1.left/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542219335" />
+    <state width="1742" height="423" key="GridCell.Tab.1.right" timestamp="1586542219340">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state width="1742" height="423" key="GridCell.Tab.1.right/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542219340" />
+    <state x="2448" y="-239" key="SettingsEditor" timestamp="1586542111041">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state x="2448" y="-239" key="SettingsEditor/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542111041" />
+    <state x="2625" y="75" width="670" height="675" key="run.anything.popup" timestamp="1586542191371">
+      <screen x="1680" y="-540" width="2560" height="1440" />
+    </state>
+    <state x="2625" y="75" width="670" height="675" key="run.anything.popup/0.0.1680.1050/1680.-540.2560.1440@1680.-540.2560.1440" timestamp="1586542191371" />
   </component>
 </project>
