@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import java.lang.Math;
+import pl.mini.projectgame.models.*;
 
 
 public class GameMasterConfiguration {
@@ -59,7 +60,7 @@ public class GameMasterConfiguration {
         
         ret += "predefinedGoalPositions: ";
         for (Position pos: predefinedGoalPositions) {
-            ret += "( " + pos.x + ", " + pos.y + " ), ";
+            ret += "( " + pos.getX() + ", " + pos.getY() + " ), ";
         }
         ret += "\n";
         
