@@ -42,7 +42,7 @@ public class CommunicationServer {
     }
 
     private void listen() {
-
+        logger.info("Server is listening on port 8080...");
         while(true) {
             try {
                 if(!serverSocket.isClosed()) {

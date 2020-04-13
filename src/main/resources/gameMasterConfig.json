@@ -1,0 +1,19 @@
+{
+    "shamProbability": 0.3,
+    "maxTeamSize": 11,
+    "maxPieces": 5,
+    "predefinedGoalPositions": [
+        {"x": 15, "y": 15}, {"x": 20, "y": 20}, {"x": 25, "y": 25}
+    ],
+    "boardWidth": 12,
+     "boardTaskHeight": 6,
+     "boardGoalHeight": 30,
+
+     "DelayDestroyPiece": 100,
+     "DelayNextPiecePlace": 200,
+     "DelayMove": 300, 
+     "DelayDiscover": 400,
+     "DelayTest": 500,
+     "DelayPick": 600,
+     "DelayPlace": 700
+}
