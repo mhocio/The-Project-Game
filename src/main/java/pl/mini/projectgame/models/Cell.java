@@ -7,7 +7,6 @@ package pl.mini.projectgame.models;
 public class Cell {
     private Position position;
     private BoardObject content;
-    private Object lock;
 
     public Cell(Position position) {
         this.position = position;
