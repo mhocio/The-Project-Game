@@ -22,6 +22,10 @@ public class Team {
         LEADER,MEMBER
     }
 
+    public int getSize(){
+        return size;
+    }
+
     public Hashtable getPlayers(){
         return players;
     }
@@ -63,7 +67,7 @@ public class Team {
         Player leader=null;
         for (Map.Entry entry : players.entrySet()) {
             if (TeamRole.LEADER.equals(entry.getValue())) {
-                leader = entry.getKey();
+                leader =(Player)entry.getKey();
                 break;
             }
         }
