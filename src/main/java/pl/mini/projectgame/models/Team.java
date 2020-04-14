@@ -65,6 +65,7 @@ public class Team {
         if(this.getSize()==0)
             throw new EmptyTeamException("This team is empty!");
         // pick next member to be the leader
+        //TODO send message to GM about leader change
         if(this.getLeader()==null){
             this.setPlayerRole((Player) players.keySet().toArray()[0],TeamRole.LEADER);
         }
