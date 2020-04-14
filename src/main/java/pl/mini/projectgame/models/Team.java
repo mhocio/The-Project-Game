@@ -1,13 +1,14 @@
 package pl.mini.projectgame.models;
 
-import pl.mini.projectgame.exceptions.InvalidTeamSizeException;
+import pl.mini.projectgame.exceptions.EmptyTeamException;
+import pl.mini.projectgame.exceptions.FullTeamException;
+import pl.mini.projectgame.exceptions.TeamSquadChangeException;
 
 import java.util.Hashtable;
 import java.util.Map;
 
 public class Team {
     private TeamColor teamColor;
-    //public TeamRole teamRole;
     private int size;
     private Hashtable<Player, TeamRole> players;
 
@@ -34,23 +35,39 @@ public class Team {
     }
 
     public void addPlayer(Player player)
-            throws InvalidTeamSizeException {
+            throws TeamSquadChangeException, FullTeamException {
         if (this.getSize() == 4)
-            throw new InvalidTeamSizeException("This team is full!");
+            throw new FullTeamException("This team is full!");
         if (player != null && !players.containsKey(player)) {
-            players.put(player, TeamRole.MEMBER);
-            size++;
+            // first player is the team leader
+            if(size==0)
+                players.put(player, TeamRole.LEADER);
+            else
+                players.put(player, TeamRole.MEMBER);
+
+            if(players.containsKey(player))
+                size++;
+            else
+                throw new TeamSquadChangeException("Adding the member failed!");
         }
     }
 
     public void removePlayer(Player player)
-        throws InvalidTeamSizeException{
+        throws TeamSquadChangeException, EmptyTeamException {
         if (player != null && players.containsKey(player)) {
             players.remove(player);
-            size--;
+            if(!players.containsKey(player)) {
+                size--;
+            }
+            else
+                throw new TeamSquadChangeException("Removing the member failed!");
         }
         if(this.getSize()==0)
-            throw new InvalidTeamSizeException("This team is empty!");
+            throw new EmptyTeamException("This team is empty!");
+        // pick next member to be the leader
+        if(this.getLeader()==null){
+            this.setPlayerRole((Player) players.keySet().toArray()[0],TeamRole.LEADER);
+        }
     }
 
     public TeamColor getColor() {
@@ -61,11 +78,11 @@ public class Team {
         teamColor = color;
     }
 
-    public TeamRole getRole(Player player) {
+    public TeamRole getPlayerRole(Player player) {
         return players.get(player);
     }
 
-    public void setRole(Player player, TeamRole role) {
+    public void setPlayerRole(Player player, TeamRole role) {
         if (players.containsKey(player)) {
             if (role == TeamRole.LEADER && this.getLeader() != null)
                 players.replace(this.getLeader(), TeamRole.MEMBER);
