@@ -8,8 +8,6 @@ import pl.mini.projectgame.models.*;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @Getter
@@ -26,8 +24,8 @@ public class GameMaster {
     private GameMasterConfiguration configuration;
     private int blueTeamGoals;
     private int redTeamGoals;
-    private List<UUID> teamRedUuids;
-    private List<UUID> teamBlueUuids;
+    private Team redTeam;
+    private Team blueTeam;
     private int currentPieces;
     private Board GMboard;
 
