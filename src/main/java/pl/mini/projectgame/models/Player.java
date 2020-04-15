@@ -23,6 +23,8 @@ public class Player implements BoardObject {
         this.playerState = PlayerState.Initializing;
 
     }
+    
+    public Player() {}
 
     public Team team;
 
