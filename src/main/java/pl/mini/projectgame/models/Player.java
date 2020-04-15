@@ -19,7 +19,7 @@ import pl.mini.projectgame.models.*;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Player implements BoardObject {
+public class Player extends BoardObject {
 
     public enum ActionType {
         MOVE, PICKUP, TEST, PLACE, DESTROY, SEND;
@@ -40,7 +40,6 @@ public class Player implements BoardObject {
     private ActionType lastAction;
     private Direction lastDirection;
     private Piece piece;
-    private Position position;
     private Board board;
     private UUID playerUuid;
     private PlayerState playerState;

@@ -1,5 +1,5 @@
 package pl.mini.projectgame.models;
 
-public class Goal implements BoardObject {
+public class Goal extends BoardObject {
 
 }
