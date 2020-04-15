@@ -14,7 +14,8 @@ public class GameMasterConfigurationTests {
         File file = new File(
                 ProjectGameApplication.class.getClassLoader().getResource("gameMasterTestConfiguration.json").getFile()
         );
-        GameMasterConfiguration configFromFile = new GameMasterConfiguration(file.getPath());
+        GameMasterConfiguration configFromFile = new GameMasterConfiguration();
+        configFromFile.configureFromFile(file.getPath());
 
         return configFromFile;
     }
