@@ -12,7 +12,6 @@ import java.util.UUID;
 
 import pl.mini.projectgame.models.*;
 
-
 public class Player implements BoardObject {
 
     public Player(Team _team,InetAddress _ipAddress,int _portNumber,String _playerName){
@@ -24,7 +23,9 @@ public class Player implements BoardObject {
 
     }
     
-    public Player() {}
+    public Player() {
+        this.playerUuid = UUID.randomUUID();
+    }
 
     public Team team;
 
@@ -178,6 +179,5 @@ public class Player implements BoardObject {
         Player p=(Player)o;
         return p.playerUuid == this.playerUuid;
     }
-
 }
 
