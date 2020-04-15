@@ -18,7 +18,6 @@ import pl.mini.projectgame.models.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @EqualsAndHashCode
 public class Player implements BoardObject {
 
