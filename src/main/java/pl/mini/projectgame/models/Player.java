@@ -1,5 +1,6 @@
 package pl.mini.projectgame.models;
 
+import lombok.EqualsAndHashCode;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.RequestHandledEvent;
@@ -12,21 +13,39 @@ import java.util.UUID;
 
 import pl.mini.projectgame.models.*;
 
-
+@EqualsAndHashCode
 public class Player implements BoardObject {
 
     public Player(Team _team,InetAddress _ipAddress,int _portNumber,String _playerName){
         this.playerUuid = UUID.randomUUID();
+        this.ready = false;
         this.ipAddress = _ipAddress;
         this.portNumber = _portNumber;
         this.playerName = _playerName;
         this.playerState = PlayerState.Initializing;
 
     }
+
+    public Player(Team team, String playerName) {
+        this.ready = false;
+        this.playerUuid = UUID.randomUUID();
+        this.team = team;
+        this.playerName = playerName;
+    }
     
     public Player() {}
 
     public Team team;
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    private boolean ready;
 
     private InetAddress ipAddress;
 
@@ -160,24 +179,11 @@ public class Player implements BoardObject {
         lastAction=ActionType.Test;
     }
 
-    private void placePiece(){
+    public boolean placePiece(){
         lastAction=ActionType.Place;
+        if(!piece.getIsGood()){ piece = null; return false; }
+        if(board.getCells().get(position).getContent().containsKey(Goal.class)) { piece = null; return false; }
+        piece = null; return false;
     }
-
-    @Override
-    public int hashCode(){
-        return this.playerUuid.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o){
-        if(this == o)
-            return true;
-        if(o == null || !(o instanceof Player))
-            return false;
-        Player p=(Player)o;
-        return p.playerUuid == this.playerUuid;
-    }
-
 }
 

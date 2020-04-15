@@ -5,7 +5,9 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.models.Message;
 
 import java.io.*;
@@ -27,10 +29,10 @@ public class CommunicationServer {
     private Set<Socket> connections;
     private Thread listeningThread;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-//    private GameMaster gameMaster;
+    private GameMaster gameMaster;
 
-    public CommunicationServer(/*@Autowired GameMaster master*/) throws IOException {
-//        gameMaster = master;
+    public CommunicationServer(@Autowired GameMaster master) throws IOException {
+        gameMaster = master;
 
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
@@ -77,7 +79,8 @@ public class CommunicationServer {
                         logger.warn("Could not process client's message!");
                         continue;
                     }
-//                message = gameMaster.processAndReturn(message);
+
+                    message = gameMaster.processAndReturn(message);
                     objectMapper.writeValue(out, message);
                     out.flush();
                 }

@@ -1,26 +1,31 @@
 package pl.mini.projectgame;
 
-import org.springframework.context.event.EventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.support.RequestHandledEvent;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.util.List;
 import java.util.Random;
 import lombok.Setter;
 import lombok.Getter;
 
-@Component
 @Getter
 @Setter
+@Component
 public class GameMaster {
 
     private int portNumber;
     private InetAddress ipAddress;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public enum GameMasterStatus {
-        active, finished, idle;
+        ACTIVE, FINISHED, IDLE;
     }
 
     private GameMasterConfiguration configuration;
@@ -29,24 +34,23 @@ public class GameMaster {
     private Team redTeam;
     private Team blueTeam;
     private int currentPieces;
-    private Board GMboard;
+    private Board masterBoard;
+
+    @Autowired
+    public GameMaster(GameMasterConfiguration config) {
+        configuration = config;
+        loadConfiguration(configuration);
+    }
 
     public void startGame()
     {
         System.out.println("The game has been started.");
     }
 
-    @EventListener
-    private void listen(RequestHandledEvent e)
-    {
-        System.out.println("RequestHandledEvent");
-        System.out.println(e);
-    }
-
     public void loadConfiguration(GameMasterConfiguration configuration)
     {
         configuration = new GameMasterConfiguration();
-        var board = new Board(configuration.boardWidth, configuration.boardGoalHeight, configuration.boardTaskHeight);
+        masterBoard = new Board(configuration.boardWidth, configuration.boardGoalHeight, configuration.boardTaskHeight);
 
 //        shamProbability = 0.5;
 //        maxTeamSize = 4;
@@ -75,15 +79,15 @@ public class GameMaster {
         Random random = new Random();
         var piece = new Piece();
 
-        target.setY(random.nextInt() % GMboard.getTaskAreaHeight() + GMboard.getGoalAreaHeight());
-        target.setX(random.nextInt(GMboard.getWidth()));
+        target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
+        target.setX(random.nextInt(masterBoard.getWidth()));
 
-        while(GMboard.getCells().get(target).getContent().getClass().equals(Player.class)){
-            target.setY(random.nextInt() % GMboard.getTaskAreaHeight() + GMboard.getGoalAreaHeight());
-            target.setX(random.nextInt(GMboard.getWidth()));
+        while(masterBoard.getCells().get(target).getContent().containsKey(Player.class)){
+            target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
+            target.setX(random.nextInt(masterBoard.getWidth()));
         }
 
-        GMboard.updateCell(piece, target);
+        masterBoard.getCells().get(target).addContent(Piece.class, piece);
 
         System.out.println("New piece has been put.");
     }
@@ -98,4 +102,52 @@ public class GameMaster {
         System.out.println("Message handled.");
     }
 
+    public synchronized Message processAndReturn(Message request) {
+
+        Message response;
+
+        try {
+            Method method = this.getClass().getMethod("action" + request.getAction(), Message.class);
+            response = (Message)method.invoke(this, request);
+
+        } catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException ex1) {
+            logger.warn(ex1.getMessage());
+
+            var msg = new Message();
+            msg.setAction("error");
+            return msg;
+        }
+        return response;
+    }
+
+    private Message actionConnect(Message message) {
+
+        var player = new Player();
+
+        Message response = new Message();
+        response.setAction(message.getAction());
+
+        return response;
+    }
+
+    private Message actionPlace(Message message) {
+        if(message.getPlayer().placePiece())
+            message.getPlayer().getTeam().addPoints(1);
+        Message response = new Message();
+        response.setAction(message.getAction());
+        response.setStatus(Message.Status.OK);
+        response.setPlayer(message.getPlayer());
+        //TODO send the new score to all players message
+        return response;
+    }
+
+    private Message actionReady(Message message) {
+        //TODO edge case - disconnection before the start of the game
+        message.getPlayer().setReady(true);
+        Message response = new Message();
+        response.setAction(message.getAction());
+        response.setStatus(Message.Status.OK);
+        response.setPlayer(message.getPlayer());
+        return response;
+    }
 }

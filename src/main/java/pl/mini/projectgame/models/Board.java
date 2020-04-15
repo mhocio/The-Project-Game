@@ -42,20 +42,15 @@ public class Board {
     public synchronized void movePlayer(Player player, Position source, Position target)
             throws DeniedMoveException {
 
-        if(!cells.get(source).getContent().equals(player)) {
+        if(!cells.get(source).getContent().containsValue(player)) {
             throw new DeniedMoveException("Requested object is not in the specified position!");
         }
 
-        if(cells.get(target).getContent().getClass().equals(Player.class)) {
+        if(cells.get(target).getContent().containsKey(Player.class)) {
             throw new DeniedMoveException("Target cell is occupied by another player!");
         }
 
-        updateCell(player, target);
-        updateCell(null, source);
+        cells.get(target).addContent(Player.class, player);
+        cells.get(source).removeContent(Player.class);
     }
-
-    public synchronized void updateCell(BoardObject object, Position position) {
-        cells.get(position).setContent(object);
-    }
-
 }

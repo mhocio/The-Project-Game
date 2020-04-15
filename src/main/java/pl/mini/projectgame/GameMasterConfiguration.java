@@ -11,9 +11,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import java.lang.Math;
+
+import org.springframework.stereotype.Component;
 import pl.mini.projectgame.models.*;
 
-
+@Component
 public class GameMasterConfiguration {
 
     double shamProbability;
