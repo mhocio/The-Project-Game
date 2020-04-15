@@ -4,9 +4,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.RequestHandledEvent;
 import jdk.jshell.spi.ExecutionControl;
+import pl.mini.projectgame.exceptions.DeniedMoveException;
+import pl.mini.projectgame.models.*;
 
+import javax.xml.xpath.XPath;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.lang.UnsupportedOperationException;
 
@@ -25,6 +29,8 @@ public class GameMaster {
     private int redTeamGoals;
     private List<UUID> teamRedUuids;
     private List<UUID> teamBlueUuids;
+    private int currentPieces;
+    private Board GMboard;
 
     public void startGame()
     {
@@ -37,22 +43,49 @@ public class GameMaster {
         System.out.println(e);
     }
 
-    public GameMasterConfiguration loadConfiguration()
+    public void loadConfiguration(GameMasterConfiguration configuration)
     {
+        configuration = new GameMasterConfiguration();
+        var board = new Board(configuration.boardWidth, configuration.boardGoalHeight, configuration.boardTaskHeight);
+
+//        shamProbability = 0.5;
+//        maxTeamSize = 4;
+
+//        DelayDestroyPiece = 2950;
+//        DelayNextPiecePlace = 3000;
+//        DelayMove = 100;
+//        DelayDiscover = 500;
+//        DelayTest = 1000;
+//        DelayPick = 100;
+//        DelayPlace = 100;
+
         System.out.println("Configuration loaded.");
+
     }
 
-    public void saveConfiguration()
-    {
-        System.out.println("Configuration saved.");
+//    public void saveConfiguration()
+//    {
+//        System.out.println("Configuration saved.");
+//    }
+
+    private void putNewPiece(Board board, Position target) throws DeniedMoveException {
+        Random random = new Random();
+        var piece = new Piece();
+
+        target.setX(random.nextInt(board.getAreaWidth()) + goalAreaHeight);
+        target.setY(random.nextInt(board.getAreaWidth));
+
+        if(board.get(cells).get(target).getContent().getClass().equals(Player.class)){
+            throw new DeniedMoveException("Can't put piece, target cell is occupied by another player!");
+        }
+        else {
+            board.updateCell(piece, target);
+        }
+
+        System.out.println("New piece has been put.");
     }
 
-    private void putNewPiece()
-    {
-        System.out.println("New piece put.");
-    }
-
-    private void printBoard()
+    private void printBoard(Board board)
     {
         System.out.println("Board printed.");
     }
