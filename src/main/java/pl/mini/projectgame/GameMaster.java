@@ -8,6 +8,8 @@ import pl.mini.projectgame.models.*;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Random;
+import lombok.Setter;
+import lombok.Getter;
 
 @Component
 @Getter
