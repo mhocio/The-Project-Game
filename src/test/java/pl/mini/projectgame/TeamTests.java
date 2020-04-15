@@ -12,6 +12,7 @@ import pl.mini.projectgame.models.Team;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+
 @SpringBootTest
 public class TeamTests {
     Team team;
