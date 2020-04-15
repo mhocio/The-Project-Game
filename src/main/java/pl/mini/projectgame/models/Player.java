@@ -18,7 +18,6 @@ import pl.mini.projectgame.models.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @EqualsAndHashCode
 public class Player implements BoardObject {
 
@@ -34,6 +33,7 @@ public class Player implements BoardObject {
         Initializing, Active, Completed;
     }
 
+    //TODO add JsonIgnore
     private Team team;
     private InetAddress ipAddress;
     private int portNumber;
@@ -59,5 +59,7 @@ public class Player implements BoardObject {
         this.team = team;
         this.playerName = playerName;
     }
+
+    public Player() {}
 }
 

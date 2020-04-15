@@ -37,12 +37,14 @@ public class GameMaster {
     private int currentPieces;
     private MasterBoard masterBoard;
     private GameMasterConfiguration configuration;
+    private List<Piece> pieces;
 
     @Autowired
     public GameMaster(GameMasterConfiguration config, MasterBoard board) {
         lastTeamWasRed = false;
         configuration = config;
         masterBoard = board;
+        pieces = new ArrayList<>();
     }
 
     public void startGame() {
@@ -98,6 +100,11 @@ public class GameMaster {
         System.out.println("Message handled.");
     }
 
+    /**
+     * @author buensons
+     * @param request - message to be passed by CommunicationServer
+     * @return Message - response message to be returned to the CommunicationServer
+     */
     public synchronized Message processAndReturn(Message request) {
 
         Message response;
@@ -116,6 +123,11 @@ public class GameMaster {
         return response;
     }
 
+    /**
+     * @author buensons
+     * @param message - message to be passed by processAndReturn method
+     * @return Message - response message to be returned to processAndReturn method
+     */
     private Message actionConnect(Message message) {
 
         Message response = new Message();
@@ -141,11 +153,40 @@ public class GameMaster {
         return response;
     }
 
+    /**
+     * @author buensons
+     * @param message - message to be passed by processAndReturn method
+     * @return Message - response message to be returned to processAndReturn method
+     */
     private Message actionDiscover(Message message) {
         Message response = new Message();
 
-        List<Cell> cells = new ArrayList<>();
+        List<Field> fields = new ArrayList<>();
         Cell current = masterBoard.getCellByPosition(message.getPosition());
+
+        for(int x = -1; x < 1; x++) {
+            for(int y = -1; y < 1; y++) {
+                var position = new Position(
+                        current.getPosition().getX() + x,
+                        current.getPosition().getY() + y);
+
+                if(position.equals(current.getPosition())) continue;
+
+                var currentCell = masterBoard.getCellByPosition(position);
+                int minDistance = Integer.MAX_VALUE;
+
+                for(Piece piece : pieces) {
+                    int distance = currentCell.calulateDistance(piece.getPosition());
+                    if(distance < minDistance) minDistance = distance;
+                }
+
+                currentCell.setDistance(minDistance);
+                fields.add(new Field(currentCell));
+            }
+        }
+        response.setAction(message.getAction());
+        response.setPosition(message.getPosition());
+        response.setFields(fields);
 
         return response;
     }

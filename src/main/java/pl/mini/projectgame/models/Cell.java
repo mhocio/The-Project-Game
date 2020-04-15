@@ -14,6 +14,7 @@ import java.util.Map;
 @Setter
 public class Cell {
     private Position position;
+    private int distance;
     private Map<Class<? extends BoardObject>, BoardObject> content;
 
     public Cell(Position position) {
@@ -27,5 +28,9 @@ public class Cell {
 
     public void removeContent(Class<? extends BoardObject> boardClass) {
         content.remove(boardClass);
+    }
+
+    public int calulateDistance(Position piecePosition) {
+        return Math.abs(position.getX() - piecePosition.getX()) + Math.abs(position.getY() - piecePosition.getY());
     }
 }

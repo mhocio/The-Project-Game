@@ -5,5 +5,5 @@ package pl.mini.projectgame.models;
  */
 
 public interface BoardObject {
-
+    Position getPosition();
 }
