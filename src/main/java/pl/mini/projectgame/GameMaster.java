@@ -3,18 +3,16 @@ package pl.mini.projectgame;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.RequestHandledEvent;
-import jdk.jshell.spi.ExecutionControl;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
-
-import javax.xml.xpath.XPath;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import java.lang.UnsupportedOperationException;
 
 @Component
+@Getter
+@Setter
 public class GameMaster {
 
     private int portNumber;
@@ -38,7 +36,8 @@ public class GameMaster {
     }
 
     @EventListener
-    private void listen(RequestHandledEvent e) {
+    private void listen(RequestHandledEvent e)
+    {
         System.out.println("RequestHandledEvent");
         System.out.println(e);
     }
@@ -68,12 +67,13 @@ public class GameMaster {
 //        System.out.println("Configuration saved.");
 //    }
 
-    private void putNewPiece(Board board, Position target) throws DeniedMoveException {
+    private void putNewPiece(Board board, Position target) throws DeniedMoveException
+    {
         Random random = new Random();
         var piece = new Piece();
 
-        target.setX(random.nextInt(board.getAreaWidth()) + goalAreaHeight);
-        target.setY(random.nextInt(board.getAreaWidth));
+        target.setX(random.nextInt(board.get(taskAreaHeight) + board.get(goalAreaHeight));
+        target.setY(random.nextInt(board.get(width)));
 
         if(board.get(cells).get(target).getContent().getClass().equals(Player.class)){
             throw new DeniedMoveException("Can't put piece, target cell is occupied by another player!");
