@@ -38,6 +38,7 @@ hs_err_pid*
 .idea/dictionaries
 .idea/vcs.xml
 .idea/jsLibraryMappings.xml
+.idea/
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids
@@ -61,6 +62,7 @@ hs_err_pid*
 
 # IntelliJ
 /out/
+target/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/

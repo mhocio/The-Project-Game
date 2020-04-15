@@ -11,7 +11,7 @@ import java.lang.UnsupportedOperationException;
 import java.util.UUID;
 
 
-public class Player {
+public class Player implements BoardObject {
 
     public Player(Team _team,InetAddress _ipAddress,int _portNumber,String _playerName){
         this.playerUuid = UUID.randomUUID();
@@ -176,3 +176,4 @@ public class Player {
     }
 
 }
+
