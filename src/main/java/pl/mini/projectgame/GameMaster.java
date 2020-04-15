@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @Getter
@@ -67,20 +68,22 @@ public class GameMaster {
 //        System.out.println("Configuration saved.");
 //    }
 
-    private void putNewPiece(Board board, Position target) throws DeniedMoveException
+    private void putNewPiece() throws DeniedMoveException
     {
+        var target = new Position();
+
         Random random = new Random();
         var piece = new Piece();
 
-        target.setX(random.nextInt(board.get(taskAreaHeight) + board.get(goalAreaHeight));
-        target.setY(random.nextInt(board.get(width)));
+        target.setY(random.nextInt() % GMboard.getTaskAreaHeight() + GMboard.getGoalAreaHeight());
+        target.setX(random.nextInt(GMboard.getWidth()));
 
-        if(board.get(cells).get(target).getContent().getClass().equals(Player.class)){
-            throw new DeniedMoveException("Can't put piece, target cell is occupied by another player!");
+        while(GMboard.getCells().get(target).getContent().getClass().equals(Player.class)){
+            target.setY(random.nextInt() % GMboard.getTaskAreaHeight() + GMboard.getGoalAreaHeight());
+            target.setX(random.nextInt(GMboard.getWidth()));
         }
-        else {
-            board.updateCell(piece, target);
-        }
+
+        GMboard.updateCell(piece, target);
 
         System.out.println("New piece has been put.");
     }
