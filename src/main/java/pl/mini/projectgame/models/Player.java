@@ -10,6 +10,8 @@ import java.util.List;
 import java.lang.UnsupportedOperationException;
 import java.util.UUID;
 
+import pl.mini.projectgame.models.Piece;
+
 
 public class Player implements BoardObject {
 
