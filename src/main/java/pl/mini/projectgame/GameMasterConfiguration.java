@@ -1,5 +1,7 @@
 package pl.mini.projectgame;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -11,9 +13,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import java.lang.Math;
+
+import org.springframework.stereotype.Component;
 import pl.mini.projectgame.models.*;
 
-
+@Getter
+@Setter
+@Component
 public class GameMasterConfiguration {
 
     double shamProbability;

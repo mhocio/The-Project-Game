@@ -1,31 +1,31 @@
 package pl.mini.projectgame.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author buensons
  */
 
+@Getter
+@Setter
 public class Cell {
     private Position position;
-    private BoardObject content;
+    private Map<Class<? extends BoardObject>, BoardObject> content;
 
     public Cell(Position position) {
         this.position = position;
-        content = null;
+        content = new HashMap<>();
     }
 
-    public Position getPosition() {
-        return position;
+    public void addContent(Class<? extends BoardObject> boardClass, BoardObject object) {
+        content.put(boardClass, object);
     }
 
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    public BoardObject getContent() {
-        return content;
-    }
-
-    public void setContent(BoardObject content) {
-        this.content = content;
+    public void removeContent(Class<? extends BoardObject> boardClass) {
+        content.remove(boardClass);
     }
 }
