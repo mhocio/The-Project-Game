@@ -10,7 +10,7 @@ import java.util.List;
 import java.lang.UnsupportedOperationException;
 import java.util.UUID;
 
-@Component
+
 public class Player {
 
     public Player(Team _team,InetAddress _ipAddress,int _portNumber,String _playerName){
@@ -37,6 +37,10 @@ public class Player {
     }
 
     public Direction lastDirection;
+
+    private enum Direction {
+        Up,Down,Left,Right;
+    }
 
     public Piece piece;
 
