@@ -6,6 +6,4 @@ package pl.mini.projectgame.models;
 
 public interface BoardObject {
 
-    public Position getPosition();
-
 }
