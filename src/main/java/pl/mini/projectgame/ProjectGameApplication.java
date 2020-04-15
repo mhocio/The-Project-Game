@@ -24,7 +24,8 @@ public class ProjectGameApplication {
 		File file = new File(
 				ProjectGameApplication.class.getClassLoader().getResource("gameMasterConfig.json").getFile()
 		);
-		GameMasterConfiguration configFromFile = new GameMasterConfiguration(file.getPath());
+		GameMasterConfiguration configFromFile = new GameMasterConfiguration();
+		configFromFile.configureFromFile(file.getPath());
 		System.out.println(configFromFile); // use Logger instead
 	}
 }
