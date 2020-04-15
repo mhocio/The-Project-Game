@@ -23,15 +23,15 @@ import pl.mini.projectgame.models.*;
 public class Player implements BoardObject {
 
     public enum ActionType {
-        Move, Pickup, Test,Place,Destroy,Send;
+        MOVE, PICKUP, TEST, PLACE, DESTROY, SEND;
     }
 
     public enum Direction {
-        Up,Down,Left,Right;
+        UP, DOWN, LEFT, RIGHT;
     }
 
     public enum PlayerState {
-        Initializing, Active, Completed;
+        INITIALIZING, ACTIVE, COMPLETED;
     }
 
     private Team team;
@@ -46,18 +46,25 @@ public class Player implements BoardObject {
     private UUID playerUuid;
     private PlayerState playerState;
 
-    public Player(Team _team,InetAddress _ipAddress,int _portNumber,String _playerName){
+    public Player(Team _team, InetAddress _ipAddress, int _portNumber, String _playerName){
         this.playerUuid = UUID.randomUUID();
+        this.team = _team;
         this.ipAddress = _ipAddress;
         this.portNumber = _portNumber;
         this.playerName = _playerName;
-        this.playerState = PlayerState.Initializing;
+        this.playerState = PlayerState.INITIALIZING;
     }
 
     public Player(Team team, String playerName) {
         this.playerUuid = UUID.randomUUID();
         this.team = team;
         this.playerName = playerName;
+        this.playerState = PlayerState.INITIALIZING;
+    }
+  
+    public Player() {
+        this.playerUuid = UUID.randomUUID();
+        this.playerState = PlayerState.INITIALIZING;
     }
 }
 
