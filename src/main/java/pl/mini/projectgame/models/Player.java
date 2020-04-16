@@ -21,10 +21,6 @@ import pl.mini.projectgame.models.*;
 @EqualsAndHashCode
 public class Player extends BoardObject {
 
-    public enum ActionType {
-        MOVE, PICKUP, TEST, PLACE, DESTROY, SEND;
-    }
-
     public enum Direction {
         UP, DOWN, LEFT, RIGHT;
     }
@@ -33,7 +29,12 @@ public class Player extends BoardObject {
         INITIALIZING, ACTIVE, COMPLETED;
     }
 
+
+    private enum ActionType {
+        Move, Pickup, Test,Place,Destroy,Send;
+    }
     private Team team;
+    public Position position;
     private InetAddress ipAddress;
     private int portNumber;
     private String playerName;
@@ -43,6 +44,9 @@ public class Player extends BoardObject {
     private Board board;
     private UUID playerUuid;
     private PlayerState playerState;
+    private boolean ready = false;
+
+
 
     public Player(Team _team, InetAddress _ipAddress, int _portNumber, String _playerName){
         this.playerUuid = UUID.randomUUID();
@@ -63,6 +67,12 @@ public class Player extends BoardObject {
     public Player() {
         this.playerUuid = UUID.randomUUID();
         this.playerState = PlayerState.INITIALIZING;
+    }
+    public boolean placePiece(){
+        lastAction=ActionType.Place;
+        if(!piece.getIsGood()){ piece = null; return false; }
+        if(board.getCells().get(position).getContent().containsKey(Goal.class)) { piece = null; return false; }
+        piece = null; return false;
     }
 }
 

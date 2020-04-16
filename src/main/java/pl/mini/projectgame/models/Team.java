@@ -1,5 +1,7 @@
 package pl.mini.projectgame.models;
 
+import lombok.Getter;
+import lombok.Setter;
 import pl.mini.projectgame.exceptions.EmptyTeamException;
 import pl.mini.projectgame.exceptions.FullTeamException;
 import pl.mini.projectgame.exceptions.TeamSquadChangeException;
@@ -7,9 +9,12 @@ import pl.mini.projectgame.exceptions.TeamSquadChangeException;
 import java.util.Hashtable;
 import java.util.Map;
 
+@Getter
+@Setter
 public class Team {
     private TeamColor teamColor;
     private int size;
+    private long points;
     private Hashtable<Player, TeamRole> players;
 
     public Team() {
@@ -26,6 +31,13 @@ public class Team {
         LEADER, MEMBER
     }
 
+    private boolean isReady() {
+        for(Map.Entry<Player,TeamRole> entry : players.entrySet()) {
+            if(!entry.getKey().isReady()) return false;
+        }
+        return true;
+    }
+    public void addPoints(int num) { points += num; }
     public int getSize() {
         return size;
     }
