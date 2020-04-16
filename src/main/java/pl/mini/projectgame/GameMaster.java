@@ -203,23 +203,25 @@ public class GameMaster {
 
         Player player = message.getPlayer();
 
-        if(player != null) {
+        try {
             Piece piece = (Piece)masterBoard.getCellByPosition(player.getPosition()).getContent().get(Piece.class);
             var testResult = player.testPiece(piece);
-            message.setTest(testResult);
-
+            response.setTest(testResult);
+            // if player tests the first time
             if (testResult != null)
-                message.setStatus(Message.Status.OK);
+                response.setStatus(Message.Status.OK);
             else
-                message.setStatus(Message.Status.DENIED);
+                response.setStatus(Message.Status.DENIED);
+            response.setAction(message.getAction());
         }
-        else
-            message.setStatus(Message.Status.DENIED);
+        catch(Exception e) {
+            logger.warn(e.toString());
+            response.setAction("error");
+            response.setTest(null);
+        }
 
-        response.setAction(message.getAction());
-
+        response.setPlayer(player);
         return response;
-
     }
 }
 
