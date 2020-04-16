@@ -8,6 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+
 public class Piece extends BoardObject {
     private UUID pieceUuid;
     private Boolean isGood;
