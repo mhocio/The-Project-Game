@@ -150,8 +150,11 @@ public class GameMaster {
         return response;
     }
     private Message actionPlace(Message message) {
-        if(message.getPlayer().placePiece())
+        if(message.getPlayer().placePiece()) {
             message.getPlayer().getTeam().addPoints(1);
+            //TODO delete goal from this field
+        }
+        //@mhocio wanted some bad status idk
         Message response = new Message();
         response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
