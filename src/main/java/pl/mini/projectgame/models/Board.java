@@ -1,10 +1,13 @@
 package pl.mini.projectgame.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.mini.projectgame.GameMasterConfiguration;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
+import pl.mini.projectgame.utilities.PositionKeyDeserializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +19,7 @@ import java.util.Map;
 @Setter
 public class Board {
 
+    @JsonDeserialize(keyUsing = PositionKeyDeserializer.class)
     protected Map<Position, Cell> cells;
     protected int width, height;
     protected int goalAreaHeight;

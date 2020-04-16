@@ -1,5 +1,6 @@
 package pl.mini.projectgame.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,26 +15,32 @@ public class Player extends BoardObject {
     //TODO add JsonIgnore
 
     public enum ActionType {
-        MOVE, PICKUP, TEST, PLACE, DESTROY, SEND;
+        MOVE, PICKUP, TEST, PLACE, DESTROY, SEND
     }
 
     public enum Direction {
-        UP, DOWN, LEFT, RIGHT;
+        UP, DOWN, LEFT, RIGHT
     }
 
     public enum PlayerState {
-        INITIALIZING, ACTIVE, COMPLETED;
+        INITIALIZING, ACTIVE, COMPLETED
     }
 
     private Team team;
+
+    @JsonIgnore
     private InetAddress ipAddress;
+    @JsonIgnore
     private int portNumber;
     private String playerName;
+    @JsonIgnore
     private ActionType lastAction;
+    @JsonIgnore
     private Direction lastDirection;
     private Piece piece;
     private Board board;
     private UUID playerUuid;
+    @JsonIgnore
     private PlayerState playerState;
 
 

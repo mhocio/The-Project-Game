@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
 
@@ -44,6 +45,8 @@ public class GameMaster {
         lastTeamWasRed = false;
         configuration = config;
         masterBoard = board;
+        blueTeam = new Team();
+        redTeam = new Team();
         pieces = new ArrayList<>();
     }
 
@@ -109,7 +112,10 @@ public class GameMaster {
         Message response;
 
         try {
-            Method method = this.getClass().getMethod("action" + request.getAction(), Message.class);
+            Method method = this.getClass().getDeclaredMethod(
+                    "action" + StringUtils.capitalize(request.getAction()),
+                    Message.class);
+
             response = (Message) method.invoke(this, request);
 
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex1) {
@@ -164,8 +170,8 @@ public class GameMaster {
         try {
             Position playerPosition = message.getPosition();
 
-            for (int x = -1; x < 1; x++) {
-                for (int y = -1; y < 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
                     var position = new Position(
                             playerPosition.getX() + x,
                             playerPosition.getY() + y);
@@ -187,6 +193,9 @@ public class GameMaster {
                         int distance = currentCell.calculateDistance(piece.getPosition());
                         if (distance < minDistance) minDistance = distance;
                     }
+
+                    // if there is no pieces on the board
+                    minDistance = minDistance == Integer.MAX_VALUE ? -1 : minDistance;
 
                     currentCell.setDistance(minDistance);
                     fields.add(new Field(currentCell));

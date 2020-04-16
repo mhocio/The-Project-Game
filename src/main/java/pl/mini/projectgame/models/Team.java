@@ -1,5 +1,6 @@
 package pl.mini.projectgame.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.mini.projectgame.exceptions.EmptyTeamException;
 import pl.mini.projectgame.exceptions.FullTeamException;
 import pl.mini.projectgame.exceptions.TeamSquadChangeException;
@@ -9,7 +10,11 @@ import java.util.Map;
 
 public class Team {
     private TeamColor teamColor;
+
+    @JsonIgnore
     private int size;
+
+    @JsonIgnore
     private Hashtable<Player, TeamRole> players;
 
     public Team() {

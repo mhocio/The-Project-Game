@@ -2,10 +2,11 @@ package pl.mini.projectgame.server;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,9 +16,7 @@ import pl.mini.projectgame.models.Message;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.nio.CharBuffer;
 
 @RunWith(SpringRunner.class)
@@ -49,23 +48,32 @@ public class CommunicationServerTests {
         in.close();
         out.close();
         client.close();
-        server.close();
     }
 
     @Test
-    public void serverShouldEchoTheMessage() throws IOException {
+    public void serverShouldReturnErrorMessage() throws IOException {
 
-        Message expected = new Message();
-        expected.setAction("setup");
+        Message test = new Message();
+        test.setAction("thisShouldNotWork");
 
-        mapper.writeValue(out, expected);
+        mapper.writeValue(out, test);
         out.flush();
 
         CharBuffer cb = CharBuffer.allocate(1024);
         int ret = in.read(cb);
         cb.flip();
 
-        Message actual = mapper.readValue(cb.toString(), Message.class);
-        Assert.assertEquals(expected, actual);
+        Message response = mapper.readValue(cb.toString(), Message.class);
+        Assert.assertEquals("error", response.getAction());
+    }
+
+    @Test
+    public void serverShouldHaveAtLeastOneConnection() throws IOException {
+        Assert.assertFalse(server.getConnections().isEmpty());
+    }
+
+    @Test
+    public void serverShouldListenForConnections() {
+        Assert.assertNotEquals(null, server.getListeningThread());
     }
 }
