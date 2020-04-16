@@ -65,7 +65,6 @@ public class GameMaster {
 //        DelayPlace = 100;
 
         System.out.println("Configuration loaded.");
-
     }
 
 //    public void saveConfiguration()
@@ -176,7 +175,7 @@ public class GameMaster {
                 int minDistance = Integer.MAX_VALUE;
 
                 for(Piece piece : pieces) {
-                    int distance = currentCell.calulateDistance(piece.getPosition());
+                    int distance = currentCell.calculateDistance(piece.getPosition());
                     if(distance < minDistance) minDistance = distance;
                 }
 

@@ -1,7 +1,6 @@
 package pl.mini.projectgame.models;
 
-
-public class Piece implements BoardObject {
+public class Piece extends BoardObject {
 
     public Piece() {
 

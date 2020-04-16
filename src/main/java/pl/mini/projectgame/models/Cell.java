@@ -30,7 +30,7 @@ public class Cell {
         content.remove(boardClass);
     }
 
-    public int calulateDistance(Position piecePosition) {
+    public int calculateDistance(Position piecePosition) {
         return Math.abs(position.getX() - piecePosition.getX()) + Math.abs(position.getY() - piecePosition.getY());
     }
 }

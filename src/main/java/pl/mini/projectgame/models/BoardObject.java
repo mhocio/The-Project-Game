@@ -1,9 +1,14 @@
 package pl.mini.projectgame.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author buensons
  */
 
-public interface BoardObject {
-    Position getPosition();
+@Getter
+@Setter
+public abstract class BoardObject {
+    private Position position;
 }
