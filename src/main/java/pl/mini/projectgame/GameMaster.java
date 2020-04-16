@@ -149,4 +149,29 @@ public class GameMaster {
 
         return response;
     }
+
+    private Message actionTest(Message message){
+        Message response=new Message();
+
+        Player player = message.getPlayer();
+
+        if(player != null) {
+            Piece piece = masterBoard.getCellByPosition(player.getPosition()).getContent().get(Piece.class);
+            var testResult = player.testPiece(piece);
+            message.setTest(testResult);
+
+            if (testResult != null)
+                message.setStatus(Message.Status.OK);
+            else
+                message.setStatus(Message.Status.DENIED);
+        }
+        else
+            message.setStatus(Message.Status.DENIED);
+
+        response.setAction(message.getAction());
+
+        return response;
+
+    }
 }
+
