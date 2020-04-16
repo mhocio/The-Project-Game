@@ -75,7 +75,7 @@ public class GameMaster {
         var target = new Position();
 
         Random random = new Random();
-        var piece = new Piece();
+        var piece = new Piece(configuration.getShamProbability());
 
         target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
         target.setX(random.nextInt(masterBoard.getWidth()));
