@@ -119,7 +119,7 @@ public class GameMaster {
             response = (Message) method.invoke(this, request);
 
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex1) {
-            logger.warn(ex1.getMessage());
+            logger.warn(ex1.toString());
 
             var msg = new Message();
             msg.setAction("error");
@@ -144,7 +144,7 @@ public class GameMaster {
             player = new Player(team, message.getPlayer().getPlayerName());
             team.addPlayer(player);
         } catch (Exception e) {
-            logger.warn(e.getMessage());
+            logger.warn(e.toString());
 
             response = new Message();
             response.setAction("error");
@@ -251,6 +251,53 @@ public class GameMaster {
 
             response = new Message();
             response.setAction("error");
+            response.setStatus(Message.Status.DENIED);
+            response.setPosition(null);
+            return response;
+        }
+
+        response.setAction(message.getAction());
+        response.setPlayer(player);
+        response.setPosition(target);
+        response.setStatus(Message.Status.OK);
+
+        return response;
+    }
+
+    private Message actionMove(Message message) {
+
+        Message response = new Message();
+        var player = message.getPlayer();
+        var source = player.getPosition();
+        var target = new Position();
+
+        switch (message.getDirection()) {
+            case UP:
+                target.setX(source.getX());
+                target.setY(source.getY() + 1);
+                break;
+            case DOWN:
+                target.setX(source.getX());
+                target.setY(source.getY() - 1);
+                break;
+            case LEFT:
+                target.setX(source.getX() - 1);
+                target.setY(source.getY());
+                break;
+            case RIGHT:
+                target.setX(source.getX() + 1);
+                target.setY(source.getY());
+                break;
+        }
+
+        try {
+            masterBoard.movePlayer(player, source, target);
+        } catch (Exception e) {
+            System.out.println("target: " + target);
+            System.out.println("source: " + source);
+            System.out.println("player: " + player);
+            logger.warn(e.toString());
+            response = new Message();
             response.setStatus(Message.Status.DENIED);
             response.setPosition(null);
             return response;

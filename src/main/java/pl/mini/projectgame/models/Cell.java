@@ -1,7 +1,9 @@
 package pl.mini.projectgame.models;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +14,8 @@ import java.util.Map;
 
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 public class Cell {
     private Position position;
     private int distance;

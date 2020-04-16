@@ -1,6 +1,7 @@
 package pl.mini.projectgame.models;
 
 import lombok.*;
+import java.util.Objects;
 
 /**
  * @author buensons
@@ -11,7 +12,9 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 @NoArgsConstructor
+@ToString
 public class Position {
+
     private Integer x;
     private Integer y;
 
