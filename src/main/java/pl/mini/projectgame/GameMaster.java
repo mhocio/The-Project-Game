@@ -152,7 +152,7 @@ public class GameMaster {
     private Message actionPlace(Message message) {
         if(message.getPlayer().placePiece()) {
             message.getPlayer().getTeam().addPoints(1);
-            //TODO delete goal from this field
+            masterBoard.getCellByPosition(message.getPlayer().getPosition()).removeContent(Goal.class);
         }
         //@mhocio wanted some bad status idk
         Message response = new Message();
