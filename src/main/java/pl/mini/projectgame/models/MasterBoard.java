@@ -1,5 +1,7 @@
 package pl.mini.projectgame.models;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.mini.projectgame.GameMasterConfiguration;
@@ -15,6 +17,11 @@ public class MasterBoard extends Board {
 
     public Cell getCellByPosition(Position position) {
         return cells.get(position);
+    }
+
+    public synchronized void addBoardObject(BoardObject object, Position position)
+    {
+        cells.get(position).addContent(object.getClass(), object);
     }
 
     public synchronized void movePlayer(Player player, Position source, Position target)

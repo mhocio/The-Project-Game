@@ -1,9 +1,6 @@
 package pl.mini.projectgame.models;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.RequestHandledEvent;
@@ -20,6 +17,7 @@ import pl.mini.projectgame.models.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class Player implements BoardObject {
 
     public enum ActionType {

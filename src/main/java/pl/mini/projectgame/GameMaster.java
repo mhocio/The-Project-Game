@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
 
@@ -101,24 +102,6 @@ public class GameMaster {
         System.out.println("Message handled.");
     }
 
-    public synchronized Message processAndReturn(Message request) {
-
-        Message response;
-
-        try {
-            Method method = this.getClass().getMethod("action" + request.getAction(), Message.class);
-            response = (Message)method.invoke(this, request);
-
-        } catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException ex1) {
-            logger.warn(ex1.getMessage());
-
-            var msg = new Message();
-            msg.setAction("error");
-            return msg;
-        }
-        return response;
-    }
-
     private Message actionConnect(Message message) {
 
         Message response = new Message();
@@ -140,6 +123,71 @@ public class GameMaster {
         response.setPlayer(player);
         response.setStatus(Message.Status.OK);
 
+        return response;
+    }
+
+    private Message actionMove(Message message) {
+
+        Message response = new Message();
+        var player = message.getPlayer();
+        var source = player.getPosition();
+        var target = new Position();
+
+        switch (message.getDirection()) {
+            case UP:
+                target.setX(source.getX());
+                target.setY(source.getY() + 1);
+                break;
+            case DOWN:
+                target.setX(source.getX());
+                target.setY(source.getY() - 1);
+                break;
+            case LEFT:
+                target.setX(source.getX() - 1);
+                target.setY(source.getY());
+                break;
+            case RIGHT:
+                target.setX(source.getX() + 1);
+                target.setY(source.getY());
+                break;
+        }
+
+        try {
+            masterBoard.movePlayer(player, source, target);
+        } catch (Exception e) {
+            System.out.println("target: " + target);
+            System.out.println("source: " + source);
+            System.out.println("player: " + player);
+            logger.warn(e.toString());
+            response = new Message();
+            response.setStatus(Message.Status.DENIED);
+            response.setPosition(null);
+            return response;
+        }
+
+        response.setAction(message.getAction());
+        response.setPlayer(player);
+        response.setPosition(target);
+        response.setStatus(Message.Status.OK);
+
+        return response;
+    }
+
+    public synchronized Message processAndReturn(Message request) {
+
+        Message response;
+
+        try {
+            Method method = this.getClass().getDeclaredMethod("action" + StringUtils.capitalize(request.getAction()), Message.class);
+            response = (Message)method.invoke(this, request);
+
+        } catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException ex1) {
+            logger.warn(ex1.toString());
+
+            var msg = new Message();
+            msg.setAction("error");
+            return msg;
+        }
         return response;
     }
 }

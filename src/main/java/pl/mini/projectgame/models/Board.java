@@ -2,6 +2,7 @@ package pl.mini.projectgame.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.mini.projectgame.GameMasterConfiguration;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
@@ -14,6 +15,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
+@ToString
 public class Board {
 
     protected Map<Position, Cell> cells;
