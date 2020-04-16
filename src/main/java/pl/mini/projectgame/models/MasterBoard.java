@@ -28,6 +28,10 @@ public class MasterBoard extends Board {
             throw new DeniedMoveException("Target cell is occupied by another player!");
         }
 
+        if(!cells.containsKey(target)) {
+            throw new DeniedMoveException("You tried to move outside of board bounds!");
+        }
+
         cells.get(target).addContent(Player.class, player);
         cells.get(source).removeContent(Player.class);
     }

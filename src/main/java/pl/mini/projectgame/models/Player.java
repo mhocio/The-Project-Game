@@ -32,7 +32,6 @@ public class Player extends BoardObject {
     private ActionType lastAction;
     private Direction lastDirection;
     private Piece piece;
-    private Position position;
     private Board board;
     private UUID playerUuid;
     private PlayerState playerState;

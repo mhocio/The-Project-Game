@@ -159,33 +159,98 @@ public class GameMaster {
      */
     private Message actionDiscover(Message message) {
         Message response = new Message();
-
         List<Field> fields = new ArrayList<>();
-        Cell current = masterBoard.getCellByPosition(message.getPosition());
 
-        for(int x = -1; x < 1; x++) {
-            for(int y = -1; y < 1; y++) {
-                var position = new Position(
-                        current.getPosition().getX() + x,
-                        current.getPosition().getY() + y);
+        try {
+            Position playerPosition = message.getPosition();
 
-                if(position.equals(current.getPosition())) continue;
+            for (int x = -1; x < 1; x++) {
+                for (int y = -1; y < 1; y++) {
+                    var position = new Position(
+                            playerPosition.getX() + x,
+                            playerPosition.getY() + y);
 
-                var currentCell = masterBoard.getCellByPosition(position);
-                int minDistance = Integer.MAX_VALUE;
+                    if (position.equals(playerPosition)) continue;
 
-                for(Piece piece : pieces) {
-                    int distance = currentCell.calculateDistance(piece.getPosition());
-                    if(distance < minDistance) minDistance = distance;
+                    if(position.getX() >= masterBoard.getWidth()
+                            || position.getX() < 0
+                            || position.getY() < masterBoard.getGoalAreaHeight()
+                            || position.getY() >= masterBoard.getGoalAreaHeight() + masterBoard.getTaskAreaHeight()) {
+
+                        continue;
+                    }
+
+                    var currentCell = masterBoard.getCellByPosition(position);
+                    int minDistance = Integer.MAX_VALUE;
+
+                    for (Piece piece : pieces) {
+                        int distance = currentCell.calculateDistance(piece.getPosition());
+                        if (distance < minDistance) minDistance = distance;
+                    }
+
+                    currentCell.setDistance(minDistance);
+                    fields.add(new Field(currentCell));
                 }
-
-                currentCell.setDistance(minDistance);
-                fields.add(new Field(currentCell));
             }
+        } catch(Exception e) {
+            logger.warn(e.getMessage());
+            response.setAction("error");
+            return response;
         }
+
         response.setAction(message.getAction());
         response.setPosition(message.getPosition());
         response.setFields(fields);
+
+        return response;
+    }
+
+    private Message actionMove(Message message) {
+
+        Message response = new Message();
+        Player player;
+        Position target;
+
+        try {
+            player = message.getPlayer();
+            var source = player.getPosition();
+            target = new Position();
+
+            switch (message.getDirection()) {
+                case UP:
+                    target.setX(source.getX());
+                    target.setY(source.getY() + 1);
+                    break;
+                case DOWN:
+                    target.setX(source.getX());
+                    target.setY(source.getY() - 1);
+                    break;
+                case LEFT:
+                    target.setX(source.getX() - 1);
+                    target.setY(source.getY());
+                    break;
+                case RIGHT:
+                    target.setX(source.getX() + 1);
+                    target.setY(source.getY());
+                    break;
+                default:
+            }
+            masterBoard.movePlayer(player, source, target);
+
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+
+            response = new Message();
+            response.setAction("error");
+            response.setStatus(Message.Status.DENIED);
+            response.setPosition(null);
+            return response;
+        }
+
+        response.setAction(message.getAction());
+        response.setPlayer(player);
+        response.setPosition(target);
+        response.setStatus(Message.Status.OK);
 
         return response;
     }
