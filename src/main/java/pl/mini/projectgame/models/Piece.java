@@ -13,9 +13,9 @@ public class Piece implements BoardObject {
     private Boolean isGood;
     private HashSet<Player> testedPlayers;
 
-    public Piece() {
+    public Piece(double shamProbability) {
         pieceUuid=UUID.randomUUID();
-        if(Math.random()<0.25)
+        if(Math.random()<shamProbability)
             isGood=false;
         else
             isGood=true;
