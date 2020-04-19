@@ -43,6 +43,8 @@ public class Player extends BoardObject {
     private Board board;
     private UUID playerUuid;
     private PlayerState playerState;
+    private boolean ready = false;
+    private boolean host = false;
 
     public Player(Team _team, InetAddress _ipAddress, int _portNumber, String _playerName){
         this.playerUuid = UUID.randomUUID();
@@ -63,6 +65,14 @@ public class Player extends BoardObject {
     public Player() {
         this.playerUuid = UUID.randomUUID();
         this.playerState = PlayerState.INITIALIZING;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public boolean isHost() {
+        return host;
     }
 }
 
