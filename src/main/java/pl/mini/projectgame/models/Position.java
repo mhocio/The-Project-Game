@@ -11,23 +11,21 @@ import java.util.Objects;
 @Getter
 @Setter
 @AllArgsConstructor
+@EqualsAndHashCode
 @NoArgsConstructor
-@ToString
 public class Position {
     private int x;
     private int y;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Position position = (Position) o;
-        return x == position.x &&
-                y == position.y;
+    public Position(String key) {
+        String[] args = key.split("-");
+        x = Integer.parseInt(args[0]);
+        y = Integer.parseInt(args[1]);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(x, y);
+    public String toString() {
+        return x + "-" + y;
     }
+
 }

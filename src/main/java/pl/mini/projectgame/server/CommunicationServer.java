@@ -3,6 +3,7 @@ package pl.mini.projectgame.server;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,9 @@ public class CommunicationServer {
 
     private ServerSocket serverSocket;
     private ObjectMapper objectMapper;
+    @Getter
     private Set<Socket> connections;
+    @Getter
     private Thread listeningThread;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private GameMaster gameMaster;
@@ -59,15 +62,29 @@ public class CommunicationServer {
     }
 
     private void handle(Socket socket) {
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            Message message;
+        BufferedReader in;
+        BufferedWriter out;
+        Message message;
 
-            while(true) {
-                if(in.ready()) {
+        try {
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        } catch(IOException e) {
+            logger.warn(e.getMessage());
+            try {
+                connections.remove(socket);
+                socket.close();
+            } catch (IOException ex) {
+                logger.warn(ex.getMessage());
+            }
+            return;
+        }
+
+        while(true) {
+            try {
+                if (in.ready()) {
                     CharBuffer cb = CharBuffer.allocate(1024);
-                    if(in.read(cb) < 0) {
+                    if (in.read(cb) < 0) {
                         logger.warn("Error while reading InputStream!");
                         continue;
                     }
@@ -76,6 +93,10 @@ public class CommunicationServer {
                     message = objectMapper.readValue(cb.toString(), Message.class);
 
                     if (message == null) {
+                        message = new Message();
+                        message.setAction("error");
+                        objectMapper.writeValue(out, message);
+                        out.flush();
                         logger.warn("Could not process client's message!");
                         continue;
                     }
@@ -84,10 +105,11 @@ public class CommunicationServer {
                     objectMapper.writeValue(out, message);
                     out.flush();
                 }
+            } catch (IOException e) {
+                logger.warn(e.getMessage());
+                connections.remove(socket);
+                Thread.currentThread().interrupt();
             }
-
-        } catch(IOException e) {
-            logger.warn(e.getMessage());
         }
     }
 

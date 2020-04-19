@@ -38,12 +38,16 @@ public class GameMaster {
     private int currentPieces;
     private MasterBoard masterBoard;
     private GameMasterConfiguration configuration;
+    private List<Piece> pieces;
 
     @Autowired
     public GameMaster(GameMasterConfiguration config, MasterBoard board) {
         lastTeamWasRed = false;
         configuration = config;
         masterBoard = board;
+        blueTeam = new Team();
+        redTeam = new Team();
+        pieces = new ArrayList<>();
     }
 
     public void startGame() {
@@ -106,7 +110,6 @@ public class GameMaster {
         try {
             Method method = this.getClass().getDeclaredMethod("action" + StringUtils.capitalize(request.getAction()), Message.class);
             response = (Message) method.invoke(this, request);
-
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex1) {
             logger.warn(ex1.toString());
 
@@ -143,10 +146,50 @@ public class GameMaster {
     }
 
     private Message actionDiscover(Message message) {
+        List<Field> fields = new ArrayList<>();
         Message response = new Message();
+        try {
+            Position playerPosition = message.getPosition();
 
-        List<Cell> cells = new ArrayList<>();
-        Cell current = masterBoard.getCellByPosition(message.getPosition());
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    var position = new Position(
+                            playerPosition.getX() + x,
+                            playerPosition.getY() + y);
+
+                    if (position.equals(playerPosition)) continue;
+
+                    if(position.getX() >= masterBoard.getWidth()
+                            || position.getX() < 0
+                            || position.getY() < masterBoard.getGoalAreaHeight()
+                            || position.getY() >= masterBoard.getGoalAreaHeight() + masterBoard.getTaskAreaHeight()) {
+
+                        continue;
+                    }
+
+                    var currentCell = masterBoard.getCellByPosition(position);
+                    int minDistance = Integer.MAX_VALUE;
+
+                    for (Piece piece : pieces) {
+                        int distance = currentCell.calculateDistance(piece.getPosition());
+                        if (distance < minDistance) minDistance = distance;
+                    }
+
+                    // if there is no pieces on the board
+                    minDistance = minDistance == Integer.MAX_VALUE ? -1 : minDistance;
+                    currentCell.setDistance(minDistance);
+                    fields.add(new Field(currentCell));
+                }
+            }
+        } catch(Exception e) {
+            logger.warn(e.getMessage());
+            response.setAction("error");
+            return response;
+        }
+
+        response.setAction(message.getAction());
+        response.setPosition(message.getPosition());
+        response.setFields(fields);
 
         return response;
     }
