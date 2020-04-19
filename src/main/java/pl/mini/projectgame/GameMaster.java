@@ -200,10 +200,8 @@ public class GameMaster {
 
     private Message actionTest(Message message){
         Message response=new Message();
-
-        Player player = message.getPlayer();
-
         try {
+            Player player = message.getPlayer();
             Piece piece = (Piece)masterBoard.getCellByPosition(player.getPosition()).getContent().get(Piece.class);
             var testResult = player.testPiece(piece);
             response.setTest(testResult);
@@ -213,6 +211,7 @@ public class GameMaster {
             else
                 response.setStatus(Message.Status.DENIED);
             response.setAction(message.getAction());
+            response.setPlayer(player);
         }
         catch(Exception e) {
             logger.warn(e.toString());
@@ -220,7 +219,6 @@ public class GameMaster {
             response.setTest(null);
         }
 
-        response.setPlayer(player);
         return response;
     }
 }
