@@ -16,16 +16,5 @@ public class ProjectGameApplication {
 		SpringApplication app = new SpringApplication(ProjectGameApplication.class);
 		app.setWebApplicationType(WebApplicationType.NONE);
 		ConfigurableApplicationContext ctx = app.run(args);
-
-		GameMasterConfiguration defaultConfig = new GameMasterConfiguration();
-		System.out.println(defaultConfig); // use Logger instead
-
-		// Please check for null
-		File file = new File(
-				ProjectGameApplication.class.getClassLoader().getResource("gameMasterConfig.json").getFile()
-		);
-		GameMasterConfiguration configFromFile = new GameMasterConfiguration();
-		configFromFile.configureFromFile(file.getPath());
-		System.out.println(configFromFile); // use Logger instead
 	}
 }
