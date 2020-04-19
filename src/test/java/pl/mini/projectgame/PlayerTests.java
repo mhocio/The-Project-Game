@@ -25,6 +25,7 @@ public class PlayerTests {
     @Test
     void testCorrectPiece(){
         Piece piece=new Piece(0.5);
+        player.testPiece(piece);
         assertTrue(piece.getTestedPlayers().contains(player));
     }
 
@@ -32,6 +33,6 @@ public class PlayerTests {
     void testPieceAgain(){
         Piece piece=new Piece(0.5);
         player.testPiece(piece);
-        assertTrue(piece.getTestedPlayers().contains(player));
+        assertNull(player.testPiece(piece));
     }
 }
