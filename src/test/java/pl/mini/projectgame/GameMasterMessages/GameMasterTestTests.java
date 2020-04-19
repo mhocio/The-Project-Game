@@ -29,8 +29,7 @@ public class GameMasterTestTests {
 
         player.setPosition(new Position(1,1));
 
-        gameMaster.getMasterBoard().getCellByPosition(player.getPosition()).removeContent(Player.class);
-        gameMaster.getMasterBoard().getCellByPosition(player.getPosition()).removeContent(Piece.class);
+        gameMaster.getMasterBoard().getCellByPosition(player.getPosition()).getContent().clear();
 
         gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
         gameMaster.getMasterBoard().addBoardObject(piece, player.getPosition());
