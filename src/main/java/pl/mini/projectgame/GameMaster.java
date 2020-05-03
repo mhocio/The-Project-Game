@@ -71,11 +71,6 @@ public class GameMaster {
 
     }
 
-//    public void saveConfiguration()
-//    {
-//        System.out.println("Configuration saved.");
-//    }
-
     private void putNewPiece() throws DeniedMoveException {
         var target = new Position();
 
@@ -197,11 +192,24 @@ public class GameMaster {
     private Message actionMove(Message message) {
 
         Message response = new Message();
-        var player = message.getPlayer();
-        var source = player.getPosition();
-        var target = new Position();
+        Position target = new Position();
 
-        switch (message.getDirection()) {
+        Player player;
+        Message.Direction direction;
+        Position source;
+
+        try {
+            player = message.getPlayer();
+            direction = message.getDirection();
+            source = player.getPosition();
+
+        } catch (Exception e) {
+            logger.warn(e.toString());
+            response.setAction("error");
+            return response;
+        }
+
+        switch (direction) {
             case UP:
                 target.setX(source.getX());
                 target.setY(source.getY() + 1);
@@ -223,9 +231,6 @@ public class GameMaster {
         try {
             masterBoard.movePlayer(player, source, target);
         } catch (Exception e) {
-            System.out.println("target: " + target);
-            System.out.println("source: " + source);
-            System.out.println("player: " + player);
             logger.warn(e.toString());
             response = new Message();
             response.setStatus(Message.Status.DENIED);
@@ -237,6 +242,7 @@ public class GameMaster {
         response.setPlayer(player);
         response.setPosition(target);
         response.setStatus(Message.Status.OK);
+
 
         return response;
     }
