@@ -75,7 +75,7 @@ public class GameMaster {
         var target = new Position();
 
         Random random = new Random();
-        var piece = new Piece();
+        var piece = new Piece(configuration.getShamProbability());
 
         target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
         target.setX(random.nextInt(masterBoard.getWidth()));
@@ -243,6 +243,30 @@ public class GameMaster {
         response.setPosition(target);
         response.setStatus(Message.Status.OK);
 
+
+        return response;
+    }
+
+    private Message actionTest(Message message){
+        Message response=new Message();
+        try {
+            Player player = message.getPlayer();
+            Piece piece = (Piece)masterBoard.getCellByPosition(player.getPosition()).getContent().get(Piece.class);
+            var testResult = player.testPiece(piece);
+            response.setTest(testResult);
+            // if player tests the first time
+            if (testResult != null)
+                response.setStatus(Message.Status.OK);
+            else
+                response.setStatus(Message.Status.DENIED);
+            response.setAction(message.getAction());
+            response.setPlayer(player);
+        }
+        catch(Exception e) {
+            logger.warn(e.toString());
+            response.setAction("error");
+            response.setTest(null);
+        }
 
         return response;
     }
