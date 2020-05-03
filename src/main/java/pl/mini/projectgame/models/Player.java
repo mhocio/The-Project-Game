@@ -73,6 +73,16 @@ public class Player extends BoardObject {
 
     public boolean isHost() {
         return host;
+
+    public Boolean testPiece(Piece piece){
+        lastAction=ActionType.TEST;
+        if(piece == null || piece.getTestedPlayers().contains(this)){
+            return null;
+        }
+        else{
+            piece.getTestedPlayers().add(this);
+            return piece.getIsGood();
+        }
     }
 }
 

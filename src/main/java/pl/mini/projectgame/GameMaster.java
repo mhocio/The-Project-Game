@@ -38,12 +38,16 @@ public class GameMaster {
     private int currentPieces;
     private MasterBoard masterBoard;
     private GameMasterConfiguration configuration;
+    private List<Piece> pieces;
 
     @Autowired
     public GameMaster(GameMasterConfiguration config, MasterBoard board) {
         lastTeamWasRed = false;
         configuration = config;
         masterBoard = board;
+        blueTeam = new Team();
+        redTeam = new Team();
+        pieces = new ArrayList<>();
     }
 
     public void startGame() {
@@ -68,16 +72,11 @@ public class GameMaster {
 
     }
 
-//    public void saveConfiguration()
-//    {
-//        System.out.println("Configuration saved.");
-//    }
-
     private void putNewPiece() throws DeniedMoveException {
         var target = new Position();
 
         Random random = new Random();
-        var piece = new Piece();
+        var piece = new Piece(configuration.getShamProbability());
 
         target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
         target.setX(random.nextInt(masterBoard.getWidth()));
@@ -107,7 +106,6 @@ public class GameMaster {
         try {
             Method method = this.getClass().getDeclaredMethod("action" + StringUtils.capitalize(request.getAction()), Message.class);
             response = (Message) method.invoke(this, request);
-
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex1) {
             logger.warn(ex1.toString());
 
@@ -144,10 +142,50 @@ public class GameMaster {
     }
 
     private Message actionDiscover(Message message) {
+        List<Field> fields = new ArrayList<>();
         Message response = new Message();
+        try {
+            Position playerPosition = message.getPosition();
 
-        List<Cell> cells = new ArrayList<>();
-        Cell current = masterBoard.getCellByPosition(message.getPosition());
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    var position = new Position(
+                            playerPosition.getX() + x,
+                            playerPosition.getY() + y);
+
+                    if (position.equals(playerPosition)) continue;
+
+                    if(position.getX() >= masterBoard.getWidth()
+                            || position.getX() < 0
+                            || position.getY() < masterBoard.getGoalAreaHeight()
+                            || position.getY() >= masterBoard.getGoalAreaHeight() + masterBoard.getTaskAreaHeight()) {
+
+                        continue;
+                    }
+
+                    var currentCell = masterBoard.getCellByPosition(position);
+                    int minDistance = Integer.MAX_VALUE;
+
+                    for (Piece piece : pieces) {
+                        int distance = currentCell.calculateDistance(piece.getPosition());
+                        if (distance < minDistance) minDistance = distance;
+                    }
+
+                    // if there is no pieces on the board
+                    minDistance = minDistance == Integer.MAX_VALUE ? -1 : minDistance;
+                    currentCell.setDistance(minDistance);
+                    fields.add(new Field(currentCell));
+                }
+            }
+        } catch(Exception e) {
+            logger.warn(e.getMessage());
+            response.setAction("error");
+            return response;
+        }
+
+        response.setAction(message.getAction());
+        response.setPosition(message.getPosition());
+        response.setFields(fields);
 
         return response;
     }
@@ -155,11 +193,24 @@ public class GameMaster {
     private Message actionMove(Message message) {
 
         Message response = new Message();
-        var player = message.getPlayer();
-        var source = player.getPosition();
-        var target = new Position();
+        Position target = new Position();
 
-        switch (message.getDirection()) {
+        Player player;
+        Message.Direction direction;
+        Position source;
+
+        try {
+            player = message.getPlayer();
+            direction = message.getDirection();
+            source = player.getPosition();
+
+        } catch (Exception e) {
+            logger.warn(e.toString());
+            response.setAction("error");
+            return response;
+        }
+
+        switch (direction) {
             case UP:
                 target.setX(source.getX());
                 target.setY(source.getY() + 1);
@@ -181,9 +232,6 @@ public class GameMaster {
         try {
             masterBoard.movePlayer(player, source, target);
         } catch (Exception e) {
-            System.out.println("target: " + target);
-            System.out.println("source: " + source);
-            System.out.println("player: " + player);
             logger.warn(e.toString());
             response = new Message();
             response.setStatus(Message.Status.DENIED);
@@ -195,6 +243,31 @@ public class GameMaster {
         response.setPlayer(player);
         response.setPosition(target);
         response.setStatus(Message.Status.OK);
+
+
+        return response;
+    }
+
+    private Message actionTest(Message message){
+        Message response=new Message();
+        try {
+            Player player = message.getPlayer();
+            Piece piece = (Piece)masterBoard.getCellByPosition(player.getPosition()).getContent().get(Piece.class);
+            var testResult = player.testPiece(piece);
+            response.setTest(testResult);
+            // if player tests the first time
+            if (testResult != null)
+                response.setStatus(Message.Status.OK);
+            else
+                response.setStatus(Message.Status.DENIED);
+            response.setAction(message.getAction());
+            response.setPlayer(player);
+        }
+        catch(Exception e) {
+            logger.warn(e.toString());
+            response.setAction("error");
+            response.setTest(null);
+        }
 
         return response;
     }

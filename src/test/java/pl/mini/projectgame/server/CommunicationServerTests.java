@@ -49,23 +49,30 @@ public class CommunicationServerTests {
         in.close();
         out.close();
         client.close();
-        server.close();
     }
 
     @Test
-    public void serverShouldEchoTheMessage() throws IOException {
-
-        Message expected = new Message();
-        expected.setAction("setup");
-
-        mapper.writeValue(out, expected);
+    public void serverShouldReturnErrorMessage() throws IOException {
+        Message test = new Message();
+        test.setAction("thisShouldNotWork");
+        mapper.writeValue(out, test);
         out.flush();
 
         CharBuffer cb = CharBuffer.allocate(1024);
         int ret = in.read(cb);
         cb.flip();
 
-        Message actual = mapper.readValue(cb.toString(), Message.class);
-        Assert.assertEquals(expected, actual);
+        Message response = mapper.readValue(cb.toString(), Message.class);
+        Assert.assertEquals("error", response.getAction());
+    }
+
+    @Test
+    public void serverShouldHaveAtLeastOneConnection() throws IOException {
+        Assert.assertFalse(server.getConnections().isEmpty());
+    }
+
+    @Test
+    public void serverShouldListenForConnections() {
+        Assert.assertNotEquals(null, server.getListeningThread());
     }
 }
