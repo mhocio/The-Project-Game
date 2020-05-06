@@ -74,6 +74,7 @@ public class Player extends BoardObject {
         if(!piece.getIsGood()){ piece = null; return false; }
         if(board.getCells().get(position).getContent().containsKey(Goal.class)) { piece = null; return false; }
         piece = null; return false;
+    }
 
     public Boolean testPiece(Piece piece){
         lastAction=ActionType.TEST;
