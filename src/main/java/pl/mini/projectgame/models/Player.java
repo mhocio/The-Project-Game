@@ -31,7 +31,7 @@ public class Player extends BoardObject {
 
 
     private enum ActionType {
-        Move, Pickup, Test,Place,Destroy,Send;
+        MOVE, PICKUP, TEST, PLACE, DESTROY, SEND;
     }
     private Team team;
     public Position position;
