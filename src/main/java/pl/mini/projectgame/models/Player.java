@@ -72,7 +72,7 @@ public class Player extends BoardObject {
     public boolean placePiece(){
         lastAction=ActionType.PLACE;
         if(!piece.getIsGood()){ piece = null; return false; }
-        if(board.getCells().get(position).getContent().containsKey(Goal.class)) { piece = null; return false; }
+        if(board.getCells().get(position).getContent().containsKey(Goal.class)) { piece = null; return true; }
         piece = null; return false;
     }
 
