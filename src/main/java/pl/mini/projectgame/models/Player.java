@@ -68,11 +68,22 @@ public class Player extends BoardObject {
         this.playerUuid = UUID.randomUUID();
         this.playerState = PlayerState.INITIALIZING;
     }
+  
     public boolean placePiece(){
         lastAction=ActionType.Place;
         if(!piece.getIsGood()){ piece = null; return false; }
         if(board.getCells().get(position).getContent().containsKey(Goal.class)) { piece = null; return false; }
         piece = null; return false;
+
+    public Boolean testPiece(Piece piece){
+        lastAction=ActionType.TEST;
+        if(piece == null || piece.getTestedPlayers().contains(this)){
+            return null;
+        }
+        else{
+            piece.getTestedPlayers().add(this);
+            return piece.getIsGood();
+        }
     }
 }
 

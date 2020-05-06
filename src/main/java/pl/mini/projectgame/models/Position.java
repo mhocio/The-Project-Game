@@ -1,9 +1,8 @@
 package pl.mini.projectgame.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.Objects;
 
 /**
  * @author buensons
@@ -12,8 +11,21 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@EqualsAndHashCode
 @NoArgsConstructor
 public class Position {
     private int x;
     private int y;
+
+    public Position(String key) {
+        String[] args = key.split("-");
+        x = Integer.parseInt(args[0]);
+        y = Integer.parseInt(args[1]);
+    }
+
+    @Override
+    public String toString() {
+        return x + "-" + y;
+    }
+
 }

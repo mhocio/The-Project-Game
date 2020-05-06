@@ -2,6 +2,7 @@ package pl.mini.projectgame.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.mini.projectgame.exceptions.EmptyTeamException;
 import pl.mini.projectgame.exceptions.FullTeamException;
 import pl.mini.projectgame.exceptions.TeamSquadChangeException;
@@ -15,6 +16,8 @@ public class Team {
     private TeamColor teamColor;
     private int size;
     private long points;
+  
+    @JsonIgnore
     private Hashtable<Player, TeamRole> players;
 
     public Team() {
@@ -24,7 +27,7 @@ public class Team {
     }
 
     public enum TeamColor {
-        RED, BLUE;
+        RED, BLUE
     }
 
     public enum TeamRole {
