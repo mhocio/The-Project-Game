@@ -29,7 +29,7 @@ public class GameMasterPickupTests {
     public void setup() {
         GameMasterConfiguration config = new GameMasterConfiguration();
         testBoard = new MasterBoard(config);
-        testBoard.getCellByPosition(new Position(1,1)).addContent(Piece.class,new Piece());
+        testBoard.getCellByPosition(new Position(1,1)).addContent(Piece.class,new Piece(0));
         gameMaster = new GameMaster(new GameMasterConfiguration(),testBoard);
         testMessage = new Message();
         Position testPosition = new Position(1,1);
