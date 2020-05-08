@@ -25,7 +25,7 @@ public class GameMaster {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public enum GameMasterStatus {
-        ACTIVE, FINISHED, IDLE;
+        ACTIVE, FINISHED, IDLE
     }
 
     private boolean lastTeamWasRed;
@@ -308,6 +308,52 @@ public class GameMaster {
         }
 
         this.startGame();
+        response.setStatus(Message.Status.OK);
+        return response;
+     }
+
+    private Message actionPickUp(Message message) {
+        try {
+                Piece pickupPiece=(Piece) masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
+                if(message.getPlayer().getPiece()==null) {
+                        message.getPlayer().setPiece(pickupPiece);
+                        masterBoard.getCellByPosition(message.getPosition()).removeContent(Piece.class);
+                }
+                else{
+                    Message response = new Message();
+                    response.setPosition(message.getPosition());
+                    response.setAction(message.getAction());
+                    response.setStatus(Message.Status.DENIED);
+                    response.setPlayer(message.getPlayer());
+                    return response;
+                }
+            }
+        catch (Exception e) {
+            logger.warn(e.toString());
+            Message response = new Message();
+            response.setPosition(message.getPosition());
+            response.setAction("error");
+            response.setStatus(Message.Status.DENIED);
+            return response;
+        }
+
+        Message response = new Message();
+        response.setAction(message.getAction());
+        response.setPosition(message.getPosition());
+        response.setStatus(Message.Status.OK);
+        response.setPlayer(message.getPlayer());
+        return response;
+    }
+
+    private Message actionSetup(Message message) {
+        Message response = new Message();
+
+        if(configuration == null ||  masterBoard == null ){
+            response.setAction(message.getAction());
+            response.setStatus(Message.Status.DENIED);
+            return response;
+        }
+        response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
         return response;
     }
