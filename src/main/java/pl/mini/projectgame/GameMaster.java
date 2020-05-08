@@ -51,6 +51,7 @@ public class GameMaster {
     }
 
     public void startGame() {
+        // TODO: send the info to each player about game start
         System.out.println("The game has been started.");
     }
 
@@ -270,6 +271,47 @@ public class GameMaster {
 
         return response;
     }
+
+    private Message actionStart(Message message) {
+        Message response = new Message();
+        response.setAction(message.getAction());
+        Player playerMessaged;
+
+        try {
+            playerMessaged = message.getPlayer();
+        } catch (Exception ex) {
+            response.setAction("error");
+            return response;
+        }
+
+        if (!playerMessaged.isHost()) {
+            response.setAction("error");
+            return response;
+        }
+
+        List<Player> players = new ArrayList<>();
+        redTeam.getPlayers().forEach((k, v) -> players.add((Player)k));
+        blueTeam.getPlayers().forEach((k, v) -> players.add((Player)k));
+
+        boolean allPlayersReady = true;
+
+        for (Player player : players) {
+            if (!player.isReady()) {
+                allPlayersReady = false;
+                break;
+            }
+        }
+
+        if (!allPlayersReady) {
+            response.setAction("error");
+            return response;
+        }
+
+        this.startGame();
+        response.setStatus(Message.Status.OK);
+        return response;
+     }
+
     private Message actionPickUp(Message message) {
         try {
                 Piece pickupPiece=(Piece) masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
