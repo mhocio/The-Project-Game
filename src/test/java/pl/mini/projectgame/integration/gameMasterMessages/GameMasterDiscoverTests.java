@@ -1,4 +1,4 @@
-package pl.mini.projectgame.GameMasterMessages;
+package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,7 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.models.Message;
-import pl.mini.projectgame.models.Player;
 import pl.mini.projectgame.models.Position;
 
 @RunWith(SpringRunner.class)

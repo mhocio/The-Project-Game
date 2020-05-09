@@ -1,4 +1,4 @@
-package pl.mini.projectgame;
+package pl.mini.projectgame.unit;
 
 import org.junit.Assert;
 import org.junit.Before;

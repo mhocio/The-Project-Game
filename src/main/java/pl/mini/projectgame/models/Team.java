@@ -20,6 +20,12 @@ public class Team {
         teamColor = null;
     }
 
+    public Team(TeamColor color) {
+        players = new Hashtable<Player, TeamRole>();
+        size = 0;
+        teamColor = color;
+    }
+
     public enum TeamColor {
         RED, BLUE
     }
@@ -32,7 +38,7 @@ public class Team {
         return size;
     }
 
-    public Hashtable getPlayers() {
+    public Hashtable<Player, TeamRole> getPlayers() {
         return players;
     }
 
@@ -93,6 +99,7 @@ public class Team {
         }
     }
 
+    @JsonIgnore
     public Player getLeader() {
         Player leader = null;
         for (Map.Entry entry : players.entrySet()) {

@@ -1,4 +1,4 @@
-package pl.mini.projectgame;
+package pl.mini.projectgame.unit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

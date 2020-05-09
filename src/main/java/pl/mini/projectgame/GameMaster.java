@@ -3,6 +3,7 @@ package pl.mini.projectgame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Random;
 import lombok.Setter;
 import lombok.Getter;
+import pl.mini.projectgame.server.CommunicationServer;
 
 @Component
 @Getter
@@ -38,21 +40,34 @@ public class GameMaster {
     private int currentPieces;
     private MasterBoard masterBoard;
     private GameMasterConfiguration configuration;
+    private CommunicationServer server;
     private List<Piece> pieces;
 
     @Autowired
-    public GameMaster(GameMasterConfiguration config, MasterBoard board) {
+    public GameMaster(GameMasterConfiguration config, MasterBoard board, @Lazy CommunicationServer server) {
+        this.server = server;
         lastTeamWasRed = false;
         configuration = config;
         masterBoard = board;
-        blueTeam = new Team();
-        redTeam = new Team();
+        blueTeam = new Team(Team.TeamColor.BLUE);
+        redTeam = new Team(Team.TeamColor.RED);
         pieces = new ArrayList<>();
     }
 
     public void startGame() {
         // TODO: send the info to each player about game start
-        System.out.println("The game has been started.");
+//        server.sendToEveryone(); with message containing initial board
+
+        logger.info("The game has started!");
+    }
+
+    public void finishGame() {
+        // TODO
+        Message message = new Message();
+        message.setAction("finish");
+        server.sendToEveryone(message);
+        server.close();
+        logger.info("Game finished");
     }
 
     public void loadConfiguration() {
@@ -129,7 +144,6 @@ public class GameMaster {
         } catch (Exception e) {
             logger.warn(e.toString());
 
-            response = new Message();
             response.setAction("error");
             return response;
         }
@@ -315,6 +329,9 @@ public class GameMaster {
     private Message actionPickUp(Message message) {
         try {
                 Piece pickupPiece=(Piece) masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
+
+                if(pickupPiece == null) throw new DeniedMoveException("there is no piece at given position");
+
                 if(message.getPlayer().getPiece()==null) {
                         message.getPlayer().setPiece(pickupPiece);
                         masterBoard.getCellByPosition(message.getPosition()).removeContent(Piece.class);
@@ -349,7 +366,7 @@ public class GameMaster {
         Message response = new Message();
 
         if(configuration == null ||  masterBoard == null ){
-            response.setAction(message.getAction());
+            response.setAction("error");
             response.setStatus(Message.Status.DENIED);
             return response;
         }

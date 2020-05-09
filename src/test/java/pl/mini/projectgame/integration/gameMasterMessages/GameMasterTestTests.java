@@ -1,4 +1,4 @@
-package pl.mini.projectgame.GameMasterMessages;
+package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

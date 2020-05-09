@@ -1,9 +1,6 @@
 package pl.mini.projectgame.models;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.RequestHandledEvent;
@@ -18,7 +15,7 @@ import pl.mini.projectgame.models.*;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@ToString
 public class Player extends BoardObject {
 
     public enum ActionType {
@@ -84,6 +81,17 @@ public class Player extends BoardObject {
             piece.getTestedPlayers().add(this);
             return piece.getIsGood();
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return this.playerUuid.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj.getClass() != Player.class) return false;
+        return this.playerUuid.equals(((Player) obj).playerUuid);
     }
 }
 

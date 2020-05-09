@@ -1,9 +1,10 @@
-package pl.mini.projectgame;
+package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
 
