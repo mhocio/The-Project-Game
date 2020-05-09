@@ -1,19 +1,17 @@
-package pl.mini.projectgame.GameMasterMessages;
+package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.junit4.SpringRunner;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.models.Message;
-import pl.mini.projectgame.models.Player;
 import pl.mini.projectgame.models.Position;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ComponentScan
 public class GameMasterDiscoverTests {
@@ -23,7 +21,7 @@ public class GameMasterDiscoverTests {
 
     private Message testMessage;
 
-    @Before
+    @BeforeEach
     public void setup() {
         testMessage = new Message();
         testMessage.setAction("discover");

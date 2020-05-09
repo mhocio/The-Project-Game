@@ -17,32 +17,37 @@ import java.net.Socket;
 import java.nio.CharBuffer;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author buensons
  */
 
+// TODO logging to a file
+
 @Service
 public class CommunicationServer {
 
-    private ServerSocket serverSocket;
-    private ObjectMapper objectMapper;
-    @Getter
-    private Set<Socket> connections;
     @Getter
     private Thread listeningThread;
+    @Getter
+    private Set<Socket> connections;
+    private ServerSocket serverSocket;
+    private ObjectMapper objectMapper;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private GameMaster gameMaster;
 
-    public CommunicationServer(@Autowired GameMaster master) throws IOException {
-        gameMaster = master;
-
+    public CommunicationServer(@Autowired GameMaster gameMaster) throws IOException {
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
         objectMapper = new ObjectMapper(jsonFactory);
         serverSocket = new ServerSocket(8080);
         connections = new HashSet<>();
+        this.gameMaster = gameMaster;
+
         listeningThread = new Thread(this::listen);
+        listeningThread.setName("Listening");
         listeningThread.start();
     }
 
@@ -53,7 +58,10 @@ public class CommunicationServer {
                 if(!serverSocket.isClosed()) {
                     Socket client = serverSocket.accept();
                     connections.add(client);
-                    new Thread(() -> handle(client)).start();
+                    var thread = new Thread(() -> handle(client));
+                    thread.setName("Handle for " + client.getInetAddress().toString());
+                    thread.start();
+                    logger.info("New player connected from " + client.getInetAddress().toString());
                 }
             } catch (IOException e) {
                 logger.warn(e.getMessage());
@@ -123,7 +131,7 @@ public class CommunicationServer {
         });
     }
 
-    public void close() throws IOException {
+    public void close() {
         connections.forEach(socket -> {
             try {
                 socket.close();
@@ -131,8 +139,11 @@ public class CommunicationServer {
                 logger.warn(e.getMessage());
             }
         });
-
         listeningThread.interrupt();
-        serverSocket.close();
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            logger.warn(e.toString());
+        }
     }
 }

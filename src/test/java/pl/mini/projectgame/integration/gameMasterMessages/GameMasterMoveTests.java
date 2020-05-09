@@ -1,16 +1,21 @@
-package pl.mini.projectgame;
+package pl.mini.projectgame.integration.gameMasterMessages;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GameMasterMoveTests {
 
     @Autowired
@@ -18,6 +23,11 @@ public class GameMasterMoveTests {
 
     Message message;
     Player player;
+
+    @AfterAll
+    void cleanUp() {
+        gameMaster.getMasterBoard().getCells().forEach((k,v) -> v.setContent(new HashMap<>()));
+    }
 
     @BeforeEach
     void initTeam() {
