@@ -47,6 +47,7 @@ public class GameMaster {
     @Autowired
     public GameMaster(GameMasterConfiguration config, MasterBoard board, @Lazy CommunicationServer server) {
         this.server = server;
+        playerMap = new HashMap<>();
         lastTeamWasRed = false;
         configuration = config;
         masterBoard = board;
