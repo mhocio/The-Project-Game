@@ -1,7 +1,8 @@
-package pl.mini.projectgame;
+package pl.mini.projectgame.unit;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.mini.projectgame.models.Piece;
 import pl.mini.projectgame.models.Player;
@@ -9,6 +10,7 @@ import pl.mini.projectgame.models.Player;
 import static org.junit.Assert.*;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PlayerTests {
     static Player player;
 

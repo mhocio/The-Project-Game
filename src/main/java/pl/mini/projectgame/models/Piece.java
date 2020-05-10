@@ -1,7 +1,11 @@
 package pl.mini.projectgame.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
@@ -10,7 +14,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-
+@NoArgsConstructor
 public class Piece extends BoardObject {
     private UUID pieceUuid;
     private Boolean isGood;
@@ -24,5 +28,4 @@ public class Piece extends BoardObject {
             isGood = true;
         testedPlayers = new HashSet<>();
     }
-
 }

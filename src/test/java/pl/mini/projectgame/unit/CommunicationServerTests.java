@@ -1,28 +1,28 @@
-package pl.mini.projectgame.server;
+package pl.mini.projectgame.unit;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import org.junit.*;
-import org.junit.runner.RunWith;
+
+import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.junit4.SpringRunner;
 import pl.mini.projectgame.models.Message;
+import pl.mini.projectgame.server.CommunicationServer;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.nio.CharBuffer;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ComponentScan
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CommunicationServerTests {
 
     private Socket client;
@@ -33,7 +33,7 @@ public class CommunicationServerTests {
     @Autowired
     private CommunicationServer server;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         client = new Socket(InetAddress.getLocalHost().getHostName(), 8080);
         out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
@@ -44,7 +44,7 @@ public class CommunicationServerTests {
         mapper = new ObjectMapper(jsonFactory);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws IOException {
         in.close();
         out.close();

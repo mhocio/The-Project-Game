@@ -1,5 +1,7 @@
 package pl.mini.projectgame.models;
 
+import lombok.Getter;
+import lombok.Setter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.mini.projectgame.exceptions.EmptyTeamException;
 import pl.mini.projectgame.exceptions.FullTeamException;
@@ -8,9 +10,13 @@ import pl.mini.projectgame.exceptions.TeamSquadChangeException;
 import java.util.Hashtable;
 import java.util.Map;
 
+@Getter
+@Setter
 public class Team {
     private TeamColor teamColor;
     private int size;
+    private long points;
+  
     @JsonIgnore
     private Hashtable<Player, TeamRole> players;
 
@@ -18,6 +24,12 @@ public class Team {
         players = new Hashtable<Player, TeamRole>();
         size = 0;
         teamColor = null;
+    }
+
+    public Team(TeamColor color) {
+        players = new Hashtable<Player, TeamRole>();
+        size = 0;
+        teamColor = color;
     }
 
     public enum TeamColor {
@@ -28,11 +40,18 @@ public class Team {
         LEADER, MEMBER
     }
 
+    private boolean isReady() {
+        for(Map.Entry<Player,TeamRole> entry : players.entrySet()) {
+            if(!entry.getKey().isReady()) return false;
+        }
+        return true;
+    }
+    public void addPoints(int num) { points += num; }
     public int getSize() {
         return size;
     }
 
-    public Hashtable getPlayers() {
+    public Hashtable<Player, TeamRole> getPlayers() {
         return players;
     }
 
@@ -93,6 +112,7 @@ public class Team {
         }
     }
 
+    @JsonIgnore
     public Player getLeader() {
         Player leader = null;
         for (Map.Entry entry : players.entrySet()) {

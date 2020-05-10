@@ -1,25 +1,40 @@
-package pl.mini.projectgame.GameMasterMessages;
+package pl.mini.projectgame.integration.gameMasterMessages;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import pl.mini.projectgame.GameMaster;
-import pl.mini.projectgame.models.Message;
-import pl.mini.projectgame.models.Piece;
-import pl.mini.projectgame.models.Player;
-import pl.mini.projectgame.models.Position;
+import pl.mini.projectgame.models.*;
+
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 
 @SpringBootTest
+@ComponentScan
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GameMasterTestTests {
+
     @Autowired
     private GameMaster gameMaster;
 
     Message message;
     Player player;
     Piece piece;
+
+    private Map<Position, Cell> cells;
+
+    @BeforeAll
+    void saveConfig() {
+        cells = gameMaster.getMasterBoard().getCells();
+    }
+
+    @AfterAll
+    void cleanUp() {
+        gameMaster.getMasterBoard().setCells(cells);
+    }
 
     @BeforeEach
     void initTestPiece() {

@@ -1,29 +1,29 @@
-package pl.mini.projectgame;
+package pl.mini.projectgame.unit;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.junit4.SpringRunner;
 import pl.mini.projectgame.GameMasterConfiguration;
 import pl.mini.projectgame.models.Board;
 import pl.mini.projectgame.models.Position;
 
 import java.util.Random;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ComponentScan
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BoardTests {
 
     @Autowired
     private GameMasterConfiguration configuration;
     private Board board;
 
-    @Before
+    @BeforeEach
     public void setup() {
         board = new Board(configuration);
     }

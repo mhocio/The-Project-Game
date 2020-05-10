@@ -1,9 +1,11 @@
-package pl.mini.projectgame.GameMasterMessages;
+package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,10 +14,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.models.Message;
 import pl.mini.projectgame.models.Player;
+import pl.mini.projectgame.models.Team;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ComponentScan
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GameMasterPlayerConnectionTests {
 
     @Autowired
@@ -24,7 +27,13 @@ public class GameMasterPlayerConnectionTests {
     private Message testMessage;
     private Player player;
 
-    @Before
+    @AfterAll
+    void cleanUp() {
+        gameMaster.setBlueTeam(new Team(Team.TeamColor.BLUE));
+        gameMaster.setRedTeam(new Team(Team.TeamColor.RED));
+    }
+
+    @BeforeEach
     public void setup() {
         testMessage = new Message();
         player = new Player();
