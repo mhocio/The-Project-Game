@@ -23,8 +23,6 @@ import java.util.concurrent.Executors;
  * @author buensons
  */
 
-// TODO logging to a file
-
 @Service
 public class CommunicationServer {
 
