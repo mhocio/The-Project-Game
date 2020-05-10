@@ -15,8 +15,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.CharBuffer;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,6 +32,8 @@ public class CommunicationServer {
     private Thread listeningThread;
     @Getter
     private Set<Socket> connections;
+    @Getter
+    private Map<UUID, Socket> conn;
     private ServerSocket serverSocket;
     private ObjectMapper objectMapper;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -44,6 +45,7 @@ public class CommunicationServer {
         objectMapper = new ObjectMapper(jsonFactory);
         serverSocket = new ServerSocket(8080);
         connections = new HashSet<>();
+        conn = new HashMap<>();
         this.gameMaster = gameMaster;
 
         listeningThread = new Thread(this::listen);
@@ -110,6 +112,11 @@ public class CommunicationServer {
                     }
 
                     message = gameMaster.processAndReturn(message);
+
+                    if(message.getAction().equals("connect")) {
+                        conn.put(message.getPlayerUuid(), socket);
+                    }
+
                     objectMapper.writeValue(out, message);
                     out.flush();
                 }
@@ -129,6 +136,15 @@ public class CommunicationServer {
                 logger.warn(e.getMessage());
             }
         });
+    }
+
+    public void sendToSpecific(Message message) {
+        try {
+            var socket = conn.get(message.getPlayerUuid());
+            objectMapper.writeValue(socket.getOutputStream(), message);
+        } catch (IOException e) {
+            logger.warn(e.getMessage());
+        }
     }
 
     public void close() {
