@@ -2,10 +2,12 @@ package pl.mini.projectgame.models;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-        import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @EqualsAndHashCode
 public class Field {
 

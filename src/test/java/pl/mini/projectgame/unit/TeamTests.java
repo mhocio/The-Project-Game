@@ -1,7 +1,8 @@
-package pl.mini.projectgame;
+package pl.mini.projectgame.unit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.mini.projectgame.exceptions.EmptyTeamException;
 import pl.mini.projectgame.exceptions.FullTeamException;
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TeamTests {
     Team team;
 
@@ -40,7 +42,7 @@ public class TeamTests {
     void testAddPlayer() throws TeamSquadChangeException, FullTeamException {
         Player toAdd=new Player();
         team.addPlayer(toAdd);
-        assertNotNull(team.getPlayers().containsKey(toAdd));
+        assertTrue(team.getPlayers().containsKey(toAdd));
     }
 
     @Test
@@ -79,7 +81,7 @@ public class TeamTests {
         team.addPlayer(new Player());
         Player toRemove=new Player();
         team.removePlayer(toRemove);
-        assertEquals(false,team.getPlayers().containsKey(toRemove));
+        assertFalse(team.getPlayers().containsKey(toRemove));
     }
 
     @Test

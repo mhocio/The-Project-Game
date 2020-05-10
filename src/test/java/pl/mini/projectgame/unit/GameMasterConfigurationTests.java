@@ -1,13 +1,17 @@
-package pl.mini.projectgame;
+package pl.mini.projectgame.unit;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
+import pl.mini.projectgame.GameMasterConfiguration;
+import pl.mini.projectgame.ProjectGameApplication;
 
 import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GameMasterConfigurationTests {
 
     GameMasterConfiguration createTestConfigFromFile() {
@@ -23,19 +27,19 @@ public class GameMasterConfigurationTests {
     @Test
     void testParserFromExistingFile_shamProbability() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.shamProbability, 0.7, 0.0);
+        assertEquals(configFromFile.getShamProbability(), 0.7, 0.0);
     }
 
     @Test
     void testParserFromExistingFile_maxTeamSize() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.maxTeamSize,  12);
+        assertEquals(configFromFile.getMaxTeamSize(),  12);
     }
 
     @Test
     void testParserFromExistingFile_maxPieces() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.maxPieces, 2);
+        assertEquals(configFromFile.getMaxPieces(), 2);
     }
 
     /* TODO: Position needs method equals
@@ -56,60 +60,60 @@ public class GameMasterConfigurationTests {
     @Test
     void testParserFromExistingFile_boardWidth() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.boardWidth, 20);
+        assertEquals(configFromFile.getBoardWidth(), 20);
     }
 
     @Test
     void testParserFromExistingFile_boardTaskHeight() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.boardTaskHeight, 10);
+        assertEquals(configFromFile.getBoardTaskHeight(), 10);
     }
 
     @Test
     void testParserFromExistingFile_boardGoalHeight() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.boardGoalHeight, 500);
+        assertEquals(configFromFile.getBoardGoalHeight(), 500);
     }
 
     @Test
     void testParserFromExistingFile_DelayDestroyPiece() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.DelayDestroyPiece, 1001);
+        assertEquals(configFromFile.getDelayDestroyPiece(), 1001);
     }
 
     @Test
     void testParserFromExistingFile_DelayNextPiecePlace() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.DelayNextPiecePlace, 2002);
+        assertEquals(configFromFile.getDelayNextPiecePlace(), 2002);
     }
 
     @Test
     void testParserFromExistingFile_DelayMove() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.DelayMove, 3003);
+        assertEquals(configFromFile.getDelayMove(), 3003);
     }
 
     @Test
     void testParserFromExistingFile_DelayDiscover() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.DelayDiscover, 4004);
+        assertEquals(configFromFile.getDelayDiscover(), 4004);
     }
 
     @Test
     void testParserFromExistingFile_DelayTest() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.DelayTest, 5005);
+        assertEquals(configFromFile.getDelayTest(), 5005);
     }
 
     @Test
     void testParserFromExistingFile_DelayPick() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.DelayPick, 6006);
+        assertEquals(configFromFile.getDelayPick(), 6006);
     }
 
     @Test
     void testParserFromExistingFile_DelayPlace() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.DelayPlace, 7007);
+        assertEquals(configFromFile.getDelayPlace(), 7007);
     }
 }
