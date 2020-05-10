@@ -54,6 +54,8 @@ public class GameMaster {
         blueTeam = new Team(Team.TeamColor.BLUE);
         redTeam = new Team(Team.TeamColor.RED);
         pieces = new ArrayList<>();
+        blueTeamGoals = config.getPredefinedGoalPositions().size();
+        redTeamGoals = blueTeamGoals;
     }
 
     public void startGame() {
