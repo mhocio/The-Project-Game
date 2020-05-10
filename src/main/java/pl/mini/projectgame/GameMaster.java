@@ -12,9 +12,8 @@ import pl.mini.projectgame.models.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+
 import lombok.Setter;
 import lombok.Getter;
 import pl.mini.projectgame.server.CommunicationServer;
@@ -29,6 +28,8 @@ public class GameMaster {
     public enum GameMasterStatus {
         ACTIVE, FINISHED, IDLE
     }
+
+    private Map<UUID, Player> playerMap;
 
     private boolean lastTeamWasRed;
     private int portNumber;
@@ -132,24 +133,23 @@ public class GameMaster {
     }
 
     private Message actionConnect(Message message) {
-
         Message response = new Message();
         Team team = lastTeamWasRed ? blueTeam : redTeam;
         lastTeamWasRed = !lastTeamWasRed;
         Player player;
 
         try {
-            player = new Player(team, message.getPlayer().getPlayerName());
+            player = new Player(team);
             team.addPlayer(player);
+            playerMap.put(player.getPlayerUuid(), player);
         } catch (Exception e) {
             logger.warn(e.toString());
-
             response.setAction("error");
             return response;
         }
 
         response.setAction(message.getAction());
-        response.setPlayer(player);
+        response.setPlayerUuid(player.getPlayerUuid());
         response.setStatus(Message.Status.OK);
 
         return response;
@@ -214,9 +214,9 @@ public class GameMaster {
         Position source;
 
         try {
-            player = message.getPlayer();
+            player = playerMap.get(message.getPlayerUuid());
             direction = message.getDirection();
-            source = player.getPosition();
+            source = message.getPosition();
 
         } catch (Exception e) {
             logger.warn(e.toString());
@@ -252,30 +252,27 @@ public class GameMaster {
             response.setPosition(null);
             return response;
         }
-
         response.setAction(message.getAction());
-        response.setPlayer(player);
         response.setPosition(target);
         response.setStatus(Message.Status.OK);
-
 
         return response;
     }
 
-    private Message actionTest(Message message){
+    private Message actionTest(Message message) {
         Message response=new Message();
         try {
-            Player player = message.getPlayer();
-            Piece piece = (Piece)masterBoard.getCellByPosition(player.getPosition()).getContent().get(Piece.class);
+            Player player = playerMap.get(message.getPlayerUuid());
+            Piece piece = (Piece)masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
             var testResult = player.testPiece(piece);
             response.setTest(testResult);
             // if player tests the first time
-            if (testResult != null)
+            if (testResult != null) {
                 response.setStatus(Message.Status.OK);
-            else
+            } else {
                 response.setStatus(Message.Status.DENIED);
+            }
             response.setAction(message.getAction());
-            response.setPlayer(player);
         }
         catch(Exception e) {
             logger.warn(e.toString());
@@ -287,26 +284,28 @@ public class GameMaster {
     }
 
     private Message actionPlace(Message message) {
-        if(message.getPlayer().placePiece()) {
-            message.getPlayer().getTeam().addPoints(1);
-            masterBoard.getCellByPosition(message.getPlayer().getPosition()).removeContent(Goal.class);
+
+        var player = playerMap.get(message.getPlayerUuid());
+
+        if(player.placePiece()) {
+            player.getTeam().addPoints(1);
+            masterBoard.getCellByPosition(message.getPosition()).removeContent(Goal.class);
         }
         //@mhocio wanted some bad status idk
         Message response = new Message();
         response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
-        response.setPlayer(message.getPlayer());
         //TODO send the new score to all players message
         return response;
     }
 
     private Message actionReady(Message message) {
         //TODO edge case - disconnection before the start of the game
-        message.getPlayer().setReady(true);
+
+        playerMap.get(message.getPlayerUuid()).setReady(true);
         Message response = new Message();
         response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
-        response.setPlayer(message.getPlayer());
         return response;
     }
     
@@ -316,7 +315,7 @@ public class GameMaster {
         Player playerMessaged;
 
         try {
-            playerMessaged = message.getPlayer();
+            playerMessaged = playerMap.get(message.getPlayerUuid());
         } catch (Exception ex) {
             response.setAction("error");
             return response;
@@ -352,24 +351,23 @@ public class GameMaster {
 
     private Message actionPickUp(Message message) {
         try {
-                Piece pickupPiece=(Piece) masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
+            Piece pickupPiece=(Piece) masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
 
-                if(pickupPiece == null) throw new DeniedMoveException("there is no piece at given position");
+            if(pickupPiece == null) throw new DeniedMoveException("there is no piece at given position");
+            var player = playerMap.get(message.getPlayerUuid());
 
-                if(message.getPlayer().getPiece()==null) {
-                        message.getPlayer().setPiece(pickupPiece);
-                        masterBoard.getCellByPosition(message.getPosition()).removeContent(Piece.class);
-                }
-                else{
-                    Message response = new Message();
-                    response.setPosition(message.getPosition());
-                    response.setAction(message.getAction());
-                    response.setStatus(Message.Status.DENIED);
-                    response.setPlayer(message.getPlayer());
-                    return response;
-                }
+            if(player.getPiece()==null) {
+                player.setPiece(pickupPiece);
+                masterBoard.getCellByPosition(message.getPosition()).removeContent(Piece.class);
             }
-        catch (Exception e) {
+            else {
+                Message response = new Message();
+                response.setPosition(message.getPosition());
+                response.setAction(message.getAction());
+                response.setStatus(Message.Status.DENIED);
+                return response;
+            }
+        } catch (Exception e) {
             logger.warn(e.toString());
             Message response = new Message();
             response.setPosition(message.getPosition());
@@ -382,7 +380,6 @@ public class GameMaster {
         response.setAction(message.getAction());
         response.setPosition(message.getPosition());
         response.setStatus(Message.Status.OK);
-        response.setPlayer(message.getPlayer());
         return response;
     }
 

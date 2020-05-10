@@ -54,7 +54,7 @@ public class Player extends BoardObject {
         this.playerState = PlayerState.INITIALIZING;
     }
 
-    public Player(Team team, String playerName) {
+    public Player(Team team) {
         this.playerUuid = UUID.randomUUID();
         this.team = team;
         this.playerName = playerName;
