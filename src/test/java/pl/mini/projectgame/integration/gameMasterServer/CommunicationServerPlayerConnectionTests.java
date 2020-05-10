@@ -50,11 +50,7 @@ public class CommunicationServerPlayerConnectionTests {
         mapper = new ObjectMapper(jsonFactory);
 
         testMessage = new Message();
-        player = new Player();
-        player.setPlayerName("Test");
-
         testMessage.setAction("connect");
-        testMessage.setPlayer(player);
     }
 
     @AfterEach
@@ -90,14 +86,14 @@ public class CommunicationServerPlayerConnectionTests {
         Message response = mapper.readValue(cb.toString(), Message.class);
 
         if(gameMaster.isLastTeamWasRed()) {
-            Assert.assertTrue(gameMaster.getRedTeam().getPlayers().containsKey(response.getPlayer()));
+            Assert.assertFalse(gameMaster.getRedTeam().getPlayers().isEmpty());
         } else {
-            Assert.assertTrue(gameMaster.getBlueTeam().getPlayers().containsKey(response.getPlayer()));
+            Assert.assertFalse(gameMaster.getBlueTeam().getPlayers().isEmpty());
         }
     }
 
     @Test
-    public void serverShouldReturnTheSamePlayer() throws IOException {
+    public void serverShouldReturnPlayer() throws IOException {
         mapper.writeValue(out, testMessage);
         out.flush();
 
@@ -106,12 +102,12 @@ public class CommunicationServerPlayerConnectionTests {
         cb.flip();
 
         Message response = mapper.readValue(cb.toString(), Message.class);
-        Assert.assertEquals(player.getPlayerName(), response.getPlayer().getPlayerName());
+        Assert.assertNotNull(response.getPlayerUuid());
     }
 
     @Test
     public void serverShouldReturnErrorMessage() throws IOException {
-        testMessage.setPlayer(null);
+        testMessage.setAction("coNnect");
         mapper.writeValue(out, testMessage);
         out.flush();
 

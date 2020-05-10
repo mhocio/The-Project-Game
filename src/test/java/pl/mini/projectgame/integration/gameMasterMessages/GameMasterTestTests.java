@@ -21,8 +21,9 @@ public class GameMasterTestTests {
     private GameMaster gameMaster;
 
     Message message;
-    Player player;
+    Position position;
     Piece piece;
+    Player player;
 
     private Map<Position, Cell> cells;
 
@@ -39,42 +40,42 @@ public class GameMasterTestTests {
     @BeforeEach
     void initTestPiece() {
         message = new Message();
-        player = new Player();
         piece = new Piece(0.5);
+        position = new Position(1,1);
+        player = new Player();
 
-        player.setPosition(new Position(1,1));
+        gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
+        gameMaster.getMasterBoard().getCellByPosition(position).getContent().clear();
+        gameMaster.getMasterBoard().addBoardObject(player, position);
+        gameMaster.getMasterBoard().addBoardObject(piece, position);
 
-        gameMaster.getMasterBoard().getCellByPosition(player.getPosition()).getContent().clear();
+        message.setPosition(position);
+        message.setPlayer(player);
+        message.setAction("test");
+        message.setPlayerUuid(player.getPlayerUuid());
+    }
 
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-        gameMaster.getMasterBoard().addBoardObject(piece, player.getPosition());
-
+    @AfterEach
+    void after() {
+        gameMaster.getPlayerMap().clear();
     }
 
     @Test
     void testAction(){
-        message.setPlayer(player);
-        message.setAction("test");
-
         Message response = gameMaster.processAndReturn(message);
         assertNotEquals("error", response.getAction());
     }
 
     @Test
-    void testActionNullPlayer(){
-        message.setAction("test");
-        message.setPlayer(null);
-
+    void testActionNullPlayerUuid(){
+        message.setPlayerUuid(null);
         Message response = gameMaster.processAndReturn(message);
         assertEquals("error", response.getAction());
     }
 
     @Test
     void testActionNoPiece(){
-        message.setPlayer(player);
-        message.setAction("test");
-
-        gameMaster.getMasterBoard().getCellByPosition(player.getPosition()).removeContent(Piece.class);
+        gameMaster.getMasterBoard().getCellByPosition(position).removeContent(Piece.class);
 
         Message response = gameMaster.processAndReturn(message);
         assertEquals(Message.Status.DENIED, response.getStatus());
@@ -83,8 +84,6 @@ public class GameMasterTestTests {
 
     @Test
     void testActionDoubleTest(){
-        message.setPlayer(player);
-        message.setAction("test");
 
         gameMaster.processAndReturn(message);
         Message response = gameMaster.processAndReturn(message);

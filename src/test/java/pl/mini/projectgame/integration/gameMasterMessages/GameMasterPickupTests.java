@@ -10,6 +10,7 @@ import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.GameMasterConfiguration;
 import pl.mini.projectgame.models.*;
 
+import java.io.IOException;
 import java.util.Map;
 
 @SpringBootTest
@@ -36,18 +37,25 @@ public class GameMasterPickupTests {
     }
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws IOException {
         GameMasterConfiguration config = new GameMasterConfiguration();
+        Position testPosition = new Position(1, 1);
+        Player testPlayer = new Player();
+
         testBoard = new MasterBoard(config);
-        testBoard.getCellByPosition(new Position(1,1)).addContent(Piece.class,new Piece(0));
+        testBoard.getCellByPosition(testPosition).addContent(Piece.class, new Piece(0));
         gameMaster.setMasterBoard(testBoard);
         testMessage = new Message();
-        Position testPosition = new Position(1,1);
+
         testMessage.setPosition(testPosition);
-        Player testPlayer = new Player();
-        testPlayer.setPosition(testPosition);
-        testMessage.setPlayer(testPlayer);
+        gameMaster.getPlayerMap().put(testPlayer.getPlayerUuid(), testPlayer);
         testMessage.setAction("pickUp");
+        testMessage.setPlayerUuid(testPlayer.getPlayerUuid());
+    }
+
+    @AfterEach
+    void after() {
+        gameMaster.getPlayerMap().clear();
     }
 
     @Test

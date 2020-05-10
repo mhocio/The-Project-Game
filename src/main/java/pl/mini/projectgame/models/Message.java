@@ -23,6 +23,7 @@ public class Message {
     public enum Direction { UP, DOWN, LEFT, RIGHT };
 
     private Player player;
+    private UUID playerUuid;
     private String action;
     private Status status;
     private Boolean test;
