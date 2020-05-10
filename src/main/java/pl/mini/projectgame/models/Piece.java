@@ -1,5 +1,8 @@
 package pl.mini.projectgame.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,5 +28,4 @@ public class Piece extends BoardObject {
             isGood = true;
         testedPlayers = new HashSet<>();
     }
-
 }

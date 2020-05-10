@@ -286,6 +286,30 @@ public class GameMaster {
         return response;
     }
 
+    private Message actionPlace(Message message) {
+        if(message.getPlayer().placePiece()) {
+            message.getPlayer().getTeam().addPoints(1);
+            masterBoard.getCellByPosition(message.getPlayer().getPosition()).removeContent(Goal.class);
+        }
+        //@mhocio wanted some bad status idk
+        Message response = new Message();
+        response.setAction(message.getAction());
+        response.setStatus(Message.Status.OK);
+        response.setPlayer(message.getPlayer());
+        //TODO send the new score to all players message
+        return response;
+    }
+
+    private Message actionReady(Message message) {
+        //TODO edge case - disconnection before the start of the game
+        message.getPlayer().setReady(true);
+        Message response = new Message();
+        response.setAction(message.getAction());
+        response.setStatus(Message.Status.OK);
+        response.setPlayer(message.getPlayer());
+        return response;
+    }
+    
     private Message actionStart(Message message) {
         Message response = new Message();
         response.setAction(message.getAction());
