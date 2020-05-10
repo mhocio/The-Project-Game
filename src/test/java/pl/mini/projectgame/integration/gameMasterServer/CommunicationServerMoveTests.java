@@ -50,8 +50,12 @@ public class CommunicationServerMoveTests {
 
         message = new Message();
         player = new Player();
-        message.setPlayer(player);
         message.setAction("move");
+        message.setPlayerUuid(player.getPlayerUuid());
+        gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
+
+        player.setPosition(new Position(1, 1));
+        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
         message.setPosition(player.getPosition());
     }
 
@@ -65,9 +69,6 @@ public class CommunicationServerMoveTests {
     @Test
     void testMoveActionMessageUp() throws DeniedMoveException, IOException
     {
-        player.setPosition(new Position(1, 1));
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-
         message.setDirection(Message.Direction.UP);
 
         mapper.writeValue(out, message);
@@ -84,9 +85,6 @@ public class CommunicationServerMoveTests {
     @Test
     void testMoveActionMessageDown() throws DeniedMoveException, IOException
     {
-        player.setPosition(new Position(1, 1));
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-
         message.setDirection(Message.Direction.DOWN);
 
         mapper.writeValue(out, message);
@@ -103,9 +101,6 @@ public class CommunicationServerMoveTests {
     @Test
     void testMoveActionMessageLeft() throws DeniedMoveException, IOException
     {
-        player.setPosition(new Position(1, 1));
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-
         message.setDirection(Message.Direction.LEFT);
 
         mapper.writeValue(out, message);
@@ -122,9 +117,6 @@ public class CommunicationServerMoveTests {
     @Test
     void testMoveActionMessageRight() throws DeniedMoveException, IOException
     {
-        player.setPosition(new Position(1, 1));
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-
         message.setDirection(Message.Direction.RIGHT);
 
         mapper.writeValue(out, message);

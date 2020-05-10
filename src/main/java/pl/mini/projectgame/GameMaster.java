@@ -47,6 +47,7 @@ public class GameMaster {
     @Autowired
     public GameMaster(GameMasterConfiguration config, MasterBoard board, @Lazy CommunicationServer server) {
         this.server = server;
+        playerMap = new HashMap<>();
         lastTeamWasRed = false;
         configuration = config;
         masterBoard = board;
@@ -121,9 +122,10 @@ public class GameMaster {
 
         try {
             Method method = this.getClass().getDeclaredMethod("action" + StringUtils.capitalize(request.getAction()), Message.class);
+            logger.info(method.getName());
             response = (Message) method.invoke(this, request);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex1) {
-            logger.warn(ex1.toString());
+            logger.warn(ex1.getMessage());
 
             var msg = new Message();
             msg.setAction("error");
@@ -205,7 +207,6 @@ public class GameMaster {
     }
 
     private Message actionMove(Message message) {
-
         Message response = new Message();
         Position target = new Position();
 
@@ -219,7 +220,7 @@ public class GameMaster {
             source = message.getPosition();
 
         } catch (Exception e) {
-            logger.warn(e.toString());
+            logger.warn(e.getMessage());
             response.setAction("error");
             return response;
         }

@@ -16,6 +16,8 @@ import pl.mini.projectgame.models.Message;
 import pl.mini.projectgame.models.Player;
 import pl.mini.projectgame.models.Team;
 
+import java.util.UUID;
+
 @SpringBootTest
 @ComponentScan
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -25,7 +27,6 @@ public class GameMasterPlayerConnectionTests {
     private GameMaster gameMaster;
 
     private Message testMessage;
-    private Player player;
 
     @AfterAll
     void cleanUp() {
@@ -36,11 +37,7 @@ public class GameMasterPlayerConnectionTests {
     @BeforeEach
     public void setup() {
         testMessage = new Message();
-        player = new Player();
-        player.setPlayerName("Test");
-
         testMessage.setAction("connect");
-        testMessage.setPlayer(player);
     }
 
     @Test
@@ -54,21 +51,21 @@ public class GameMasterPlayerConnectionTests {
         Message response = gameMaster.processAndReturn(testMessage);
 
         if(gameMaster.isLastTeamWasRed()) {
-            Assert.assertTrue(gameMaster.getRedTeam().getPlayers().containsKey(response.getPlayer()));
+            Assert.assertFalse(gameMaster.getRedTeam().getPlayers().isEmpty());
         } else {
-            Assert.assertTrue(gameMaster.getBlueTeam().getPlayers().containsKey(response.getPlayer()));
+            Assert.assertTrue(gameMaster.getBlueTeam().getPlayers().isEmpty());
         }
     }
 
     @Test
-    public void serverShouldReturnTheSamePlayer() {
+    public void serverShouldReturnPlayer() {
         Message response = gameMaster.processAndReturn(testMessage);
-        Assert.assertEquals(player.getPlayerName(), response.getPlayer().getPlayerName());
+        Assert.assertNotNull(response.getPlayerUuid());
     }
 
     @Test
     public void serverShouldReturnErrorMessage() {
-        testMessage.setPlayer(null);
+        testMessage.setAction("coNnect");
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals("error", response.getAction());
     }

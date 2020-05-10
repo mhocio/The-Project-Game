@@ -23,9 +23,10 @@ import static org.junit.Assert.assertNotEquals;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CommunicationServerTestTests {
 
-    private Message message;
-    private Player player;
-    private Piece piece;
+    Message message;
+    Position position;
+    Piece piece;
+    Player player;
 
     @Autowired
     private GameMaster gameMaster;
@@ -57,15 +58,19 @@ public class CommunicationServerTestTests {
         mapper = new ObjectMapper(jsonFactory);
 
         message = new Message();
-        player = new Player();
         piece = new Piece(0.5);
+        position = new Position(1,1);
+        player = new Player();
 
-        player.setPosition(new Position(1,1));
+        gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
+        gameMaster.getMasterBoard().getCellByPosition(position).getContent().clear();
+        gameMaster.getMasterBoard().addBoardObject(player, position);
+        gameMaster.getMasterBoard().addBoardObject(piece, position);
 
-        gameMaster.getMasterBoard().getCellByPosition(player.getPosition()).getContent().clear();
-
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-        gameMaster.getMasterBoard().addBoardObject(piece, player.getPosition());
+        message.setPosition(position);
+        message.setPlayer(player);
+        message.setAction("test");
+        message.setPlayerUuid(player.getPlayerUuid());
 
     }
 
@@ -78,8 +83,6 @@ public class CommunicationServerTestTests {
 
     @Test
     void testAction() throws IOException {
-        message.setPlayer(player);
-        message.setAction("test");
 
         mapper.writeValue(out, message);
         out.flush();
@@ -94,9 +97,7 @@ public class CommunicationServerTestTests {
 
     @Test
     void testActionNullPlayer() throws IOException {
-        message.setAction("test");
-        message.setPlayer(null);
-
+        message.setPlayerUuid(null);
         mapper.writeValue(out, message);
         out.flush();
 
@@ -110,10 +111,8 @@ public class CommunicationServerTestTests {
 
     @Test
     void testActionNoPiece() throws IOException {
-        message.setPlayer(player);
-        message.setAction("test");
 
-        gameMaster.getMasterBoard().getCellByPosition(player.getPosition()).removeContent(Piece.class);
+        gameMaster.getMasterBoard().getCellByPosition(position).removeContent(Piece.class);
 
         mapper.writeValue(out, message);
         out.flush();
@@ -129,8 +128,6 @@ public class CommunicationServerTestTests {
 
     @Test
     void testActionDoubleTest() throws IOException {
-        message.setPlayer(player);
-        message.setAction("test");
 
         CharBuffer cb = CharBuffer.allocate(1024);
 

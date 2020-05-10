@@ -33,17 +33,23 @@ public class GameMasterMoveTests {
     void initTeam() {
         message = new Message();
         player = new Player();
-        message.setPlayer(player);
         message.setAction("move");
+        message.setPlayerUuid(player.getPlayerUuid());
+        gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
+
+        player.setPosition(new Position(1, 1));
+        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
         message.setPosition(player.getPosition());
+    }
+
+    @AfterEach
+    void after() {
+        gameMaster.getPlayerMap().clear();
     }
 
     @Test
     void testMoveActionMessageUp() throws DeniedMoveException
     {
-        player.setPosition(new Position(1, 1));
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-
         message.setDirection(Message.Direction.UP);
 
         Message response = gameMaster.processAndReturn(message);
@@ -53,9 +59,6 @@ public class GameMasterMoveTests {
     @Test
     void testMoveActionMessageDown() throws DeniedMoveException
     {
-        player.setPosition(new Position(1, 1));
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-
         message.setDirection(Message.Direction.DOWN);
 
         Message response = gameMaster.processAndReturn(message);
@@ -65,9 +68,6 @@ public class GameMasterMoveTests {
     @Test
     void testMoveActionMessageLeft() throws DeniedMoveException
     {
-        player.setPosition(new Position(1, 1));
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-
         message.setDirection(Message.Direction.LEFT);
 
         Message response = gameMaster.processAndReturn(message);
@@ -77,9 +77,6 @@ public class GameMasterMoveTests {
     @Test
     void testMoveActionMessageRight() throws DeniedMoveException
     {
-        player.setPosition(new Position(1, 1));
-        gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
-
         message.setDirection(Message.Direction.RIGHT);
 
         Message response = gameMaster.processAndReturn(message);
