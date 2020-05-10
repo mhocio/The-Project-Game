@@ -293,6 +293,7 @@ public class GameMaster {
         response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
         response.setPlayer(message.getPlayer());
+        return response;
     }
     
     private Message actionStart(Message message) {
