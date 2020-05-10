@@ -18,7 +18,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Message {
-
     public enum Status { OK, DENIED, YES, NO };
     public enum Direction { UP, DOWN, LEFT, RIGHT };
 
@@ -29,4 +28,6 @@ public class Message {
     private Position position;
     private List<Field> fields;
     private Direction direction;
+    private Board board;
+
 }

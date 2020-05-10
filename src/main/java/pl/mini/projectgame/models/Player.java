@@ -1,6 +1,7 @@
 package pl.mini.projectgame.models;
 
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.RequestHandledEvent;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.lang.UnsupportedOperationException;
 import java.util.UUID;
 
+import pl.mini.projectgame.GameMasterConfiguration;
 import pl.mini.projectgame.models.*;
 
 @Getter
@@ -44,7 +46,6 @@ public class Player extends BoardObject {
     private boolean ready = false;
     private boolean host = false;
 
-
     public Player(Team _team, InetAddress _ipAddress, int _portNumber, String _playerName){
         this.playerUuid = UUID.randomUUID();
         this.team = _team;
@@ -53,7 +54,6 @@ public class Player extends BoardObject {
         this.playerName = _playerName;
         this.playerState = PlayerState.INITIALIZING;
     }
-
     public Player(Team team) {
         this.playerUuid = UUID.randomUUID();
         this.team = team;

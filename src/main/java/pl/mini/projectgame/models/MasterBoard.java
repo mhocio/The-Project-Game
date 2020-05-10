@@ -13,10 +13,6 @@ public class MasterBoard extends Board {
         super(config);
     }
 
-    public Cell getCellByPosition(Position position) {
-        return cells.get(position);
-    }
-
     public synchronized void movePlayer(Player player, Position source, Position target)
             throws DeniedMoveException {
 

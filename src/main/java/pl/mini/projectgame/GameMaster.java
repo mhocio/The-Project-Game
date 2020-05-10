@@ -56,14 +56,40 @@ public class GameMaster {
     }
 
     public void startGame() {
-        // TODO: send the info to each player about game start
-//        server.sendToEveryone(); with message containing initial board
+        Random random = new Random();
+        var board = new Board(configuration);
+        Position position;
+
+        for(Player player : playerMap.values()) {
+            if(player.getTeam().getColor() == Team.TeamColor.RED) {
+                position = new Position(
+                        Math.abs(random.nextInt(board.getWidth())),
+                        Math.abs(random.nextInt(board.getGoalAreaHeight())));
+
+            } else {
+                position = new Position(
+                        Math.abs(random.nextInt(board.getWidth())),
+                        Math.abs(random.nextInt() % board.getGoalAreaHeight()
+                                + board.getGoalAreaHeight()
+                                + board.getTaskAreaHeight()));
+            }
+            board.getCellByPosition(position).getContent().put(Player.class, player);
+            player.setBoard(board);
+
+            var message = new Message();
+            message.setPlayerUuid(player.getPlayerUuid());
+            message.setAction("startGame");
+            message.setStatus(Message.Status.OK);
+            message.setPosition(position);
+            message.setBoard(board);
+
+            server.sendToSpecific(message);
+        }
 
         logger.info("The game has started!");
     }
 
     public void finishGame() {
-        // TODO
         Message message = new Message();
         message.setAction("finish");
         server.sendToEveryone(message);
@@ -85,7 +111,6 @@ public class GameMaster {
 //        DelayPlace = 100;
 
         System.out.println("Configuration loaded.");
-
     }
 
     private void putNewPiece() throws DeniedMoveException {
@@ -290,6 +315,15 @@ public class GameMaster {
         if(player.placePiece()) {
             player.getTeam().addPoints(1);
             masterBoard.getCellByPosition(message.getPosition()).removeContent(Goal.class);
+            if(player.getTeam().getColor() == Team.TeamColor.BLUE) {
+                if(player.getTeam().getPoints() == blueTeamGoals) {
+                    finishGame();
+                }
+            } else {
+                if(player.getTeam().getPoints() == redTeamGoals) {
+                    finishGame();
+                }
+            }
         }
         //@mhocio wanted some bad status idk
         Message response = new Message();
@@ -344,7 +378,7 @@ public class GameMaster {
             return response;
         }
 
-        this.startGame();
+        startGame();
         response.setStatus(Message.Status.OK);
         return response;
      }

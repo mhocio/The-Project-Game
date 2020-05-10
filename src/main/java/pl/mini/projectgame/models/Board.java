@@ -1,5 +1,6 @@
 package pl.mini.projectgame.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class Board {
 
     @JsonDeserialize(keyUsing = PositionKeyDeserializer.class)
+    @JsonIgnore
     protected Map<Position, Cell> cells;
     protected int width, height;
     protected int goalAreaHeight;
@@ -32,6 +34,10 @@ public class Board {
         height = 2 * goalAreaHeight + taskAreaHeight;
 
         generateCells();
+    }
+
+    public Cell getCellByPosition(Position position) {
+        return cells.get(position);
     }
 
     protected void generateCells() {
