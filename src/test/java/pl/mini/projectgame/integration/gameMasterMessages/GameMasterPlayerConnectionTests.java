@@ -2,10 +2,7 @@ package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.Assert;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,7 +25,7 @@ public class GameMasterPlayerConnectionTests {
 
     private Message testMessage;
 
-    @AfterAll
+    @AfterEach
     void cleanUp() {
         gameMaster.setBlueTeam(new Team(Team.TeamColor.BLUE));
         gameMaster.setRedTeam(new Team(Team.TeamColor.RED));
@@ -53,7 +50,7 @@ public class GameMasterPlayerConnectionTests {
         if(gameMaster.isLastTeamWasRed()) {
             Assert.assertFalse(gameMaster.getRedTeam().getPlayers().isEmpty());
         } else {
-            Assert.assertTrue(gameMaster.getBlueTeam().getPlayers().isEmpty());
+            Assert.assertFalse(gameMaster.getBlueTeam().getPlayers().isEmpty());
         }
     }
 
