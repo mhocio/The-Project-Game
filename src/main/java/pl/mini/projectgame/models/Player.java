@@ -45,7 +45,7 @@ public class Player extends BoardObject {
     private UUID playerUuid;
     private PlayerState playerState;
     private boolean ready = false;
-
+    private boolean host = false;
 
 
     public Player(Team _team, InetAddress _ipAddress, int _portNumber, String _playerName){
@@ -74,6 +74,14 @@ public class Player extends BoardObject {
         if(!piece.getIsGood()){ piece = null; return false; }
         if(board.getCells().get(position).getContent().containsKey(Goal.class)) { piece = null; return true; }
         piece = null; return false;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public boolean isHost() {
+        return host;
     }
 
     public Boolean testPiece(Piece piece){

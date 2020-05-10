@@ -25,7 +25,7 @@ public class GameMaster {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public enum GameMasterStatus {
-        ACTIVE, FINISHED, IDLE;
+        ACTIVE, FINISHED, IDLE
     }
 
     private boolean lastTeamWasRed;
@@ -51,6 +51,7 @@ public class GameMaster {
     }
 
     public void startGame() {
+        // TODO: send the info to each player about game start
         System.out.println("The game has been started.");
     }
 
@@ -270,6 +271,7 @@ public class GameMaster {
 
         return response;
     }
+
     private Message actionPlace(Message message) {
         if(message.getPlayer().placePiece()) {
             message.getPlayer().getTeam().addPoints(1);
@@ -291,6 +293,90 @@ public class GameMaster {
         response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
         response.setPlayer(message.getPlayer());
+
+    private Message actionStart(Message message) {
+        Message response = new Message();
+        response.setAction(message.getAction());
+        Player playerMessaged;
+
+        try {
+            playerMessaged = message.getPlayer();
+        } catch (Exception ex) {
+            response.setAction("error");
+            return response;
+        }
+
+        if (!playerMessaged.isHost()) {
+            response.setAction("error");
+            return response;
+        }
+
+        List<Player> players = new ArrayList<>();
+        redTeam.getPlayers().forEach((k, v) -> players.add((Player)k));
+        blueTeam.getPlayers().forEach((k, v) -> players.add((Player)k));
+
+        boolean allPlayersReady = true;
+
+        for (Player player : players) {
+            if (!player.isReady()) {
+                allPlayersReady = false;
+                break;
+            }
+        }
+
+        if (!allPlayersReady) {
+            response.setAction("error");
+            return response;
+        }
+
+        this.startGame();
+        response.setStatus(Message.Status.OK);
+        return response;
+     }
+
+    private Message actionPickUp(Message message) {
+        try {
+                Piece pickupPiece=(Piece) masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
+                if(message.getPlayer().getPiece()==null) {
+                        message.getPlayer().setPiece(pickupPiece);
+                        masterBoard.getCellByPosition(message.getPosition()).removeContent(Piece.class);
+                }
+                else{
+                    Message response = new Message();
+                    response.setPosition(message.getPosition());
+                    response.setAction(message.getAction());
+                    response.setStatus(Message.Status.DENIED);
+                    response.setPlayer(message.getPlayer());
+                    return response;
+                }
+            }
+        catch (Exception e) {
+            logger.warn(e.toString());
+            Message response = new Message();
+            response.setPosition(message.getPosition());
+            response.setAction("error");
+            response.setStatus(Message.Status.DENIED);
+            return response;
+        }
+
+        Message response = new Message();
+        response.setAction(message.getAction());
+        response.setPosition(message.getPosition());
+        response.setStatus(Message.Status.OK);
+        response.setPlayer(message.getPlayer());
+        return response;
+    }
+
+    private Message actionSetup(Message message) {
+        Message response = new Message();
+
+        if(configuration == null ||  masterBoard == null ){
+            response.setAction(message.getAction());
+            response.setStatus(Message.Status.DENIED);
+            return response;
+        }
+        response.setAction(message.getAction());
+        response.setStatus(Message.Status.OK);
         return response;
     }
 }
