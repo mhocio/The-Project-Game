@@ -11,10 +11,6 @@ public class MasterBoard extends Board {
     @Autowired
     public MasterBoard(GameMasterConfiguration config) {
         super(config);
-
-        config.getPredefinedGoalPositions().forEach(pos -> {
-            getCellByPosition(pos).getContent().put(Goal.class, new Goal());
-        });
     }
 
     public synchronized void movePlayer(Player player, Position source, Position target)

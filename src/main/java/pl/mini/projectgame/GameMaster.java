@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
@@ -55,7 +56,18 @@ public class GameMaster {
         redTeam = new Team(Team.TeamColor.RED);
         pieces = new ArrayList<>();
 
-        // TODO config for both teams
+        try {
+            File file = new File(
+                    Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource("gameMasterConfig.json")).getFile()
+            );
+            config.configureFromFile(file.getPath());
+            config.getPredefinedGoalPositions().forEach(pos -> {
+                board.getCellByPosition(pos).getContent().put(Goal.class, new Goal());
+            });
+        } catch(NullPointerException e) {
+            logger.error(e.getMessage());
+        }
+
         blueTeamGoals = config.getPredefinedGoalPositions().size();
         redTeamGoals = blueTeamGoals;
     }
