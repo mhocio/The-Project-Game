@@ -36,9 +36,4 @@ public class MasterBoard extends Board {
         cells.get(source).removeContent(Player.class);
     }
 
-    public synchronized void addBoardObject(BoardObject object, Position position)
-    {
-        cells.get(position).addContent(object.getClass(), object);
-    }
-
 }

@@ -3,11 +3,11 @@
     "maxTeamSize": 11,
     "maxPieces": 5,
     "predefinedGoalPositions": [
-        {"x": 15, "y": 15}, {"x": 20, "y": 20}, {"x": 25, "y": 25}
+        {"x": 2, "y": 1}, {"x": 4, "y": 0}, {"x": 6, "y": 3}
     ],
     "boardWidth": 12,
-     "boardTaskHeight": 6,
-     "boardGoalHeight": 30,
+     "boardTaskHeight": 30,
+     "boardGoalHeight": 6,
 
      "DelayDestroyPiece": 100,
      "DelayNextPiecePlace": 200,

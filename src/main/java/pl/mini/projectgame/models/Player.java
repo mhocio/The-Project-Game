@@ -28,10 +28,10 @@ public class Player extends BoardObject {
         INITIALIZING, ACTIVE, COMPLETED;
     }
 
-
     private enum ActionType {
         MOVE, PICKUP, TEST, PLACE, DESTROY, SEND;
     }
+
     private Team team;
     public Position position;
     private InetAddress ipAddress;
@@ -65,10 +65,10 @@ public class Player extends BoardObject {
         this.playerState = PlayerState.INITIALIZING;
     }
   
-    public boolean placePiece(){
+    public boolean placePiece(MasterBoard masterBoard){
         lastAction=ActionType.PLACE;
         if(!piece.getIsGood()){ piece = null; return false; }
-        if(board.getCells().get(position).getContent().containsKey(Goal.class)) { piece = null; return true; }
+        if(masterBoard.getCells().get(position).getContent().containsKey(Goal.class)) { piece = null; return true; }
         piece = null; return false;
     }
 
