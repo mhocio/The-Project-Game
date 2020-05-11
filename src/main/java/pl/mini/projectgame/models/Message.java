@@ -22,6 +22,8 @@ public class Message {
     public enum Direction { UP, DOWN, LEFT, RIGHT };
 
     private Player player;
+    private Team.TeamColor teamColor;
+    private Team.TeamRole teamRole;
     private UUID playerUuid;
     private String action;
     private Status status;
@@ -30,5 +32,4 @@ public class Message {
     private List<Field> fields;
     private Direction direction;
     private Board board;
-
 }

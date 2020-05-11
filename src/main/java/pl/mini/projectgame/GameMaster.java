@@ -55,6 +55,7 @@ public class GameMaster {
         blueTeam = new Team(Team.TeamColor.BLUE);
         redTeam = new Team(Team.TeamColor.RED);
         pieces = new ArrayList<>();
+
         try {
             File file = new File(
                     Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource("gameMasterConfig.json")).getFile()
@@ -66,6 +67,7 @@ public class GameMaster {
         } catch(NullPointerException e) {
             logger.error(e.getMessage());
         }
+
         blueTeamGoals = config.getPredefinedGoalPositions().size();
         redTeamGoals = blueTeamGoals;
     }
@@ -76,19 +78,23 @@ public class GameMaster {
         Position position;
 
         for(Player player : playerMap.values()) {
-            if(player.getTeam().getColor() == Team.TeamColor.RED) {
-                position = new Position(
-                        Math.abs(random.nextInt(board.getWidth())),
-                        Math.abs(random.nextInt(board.getGoalAreaHeight())));
+            do {
+                if (player.getTeam().getColor() == Team.TeamColor.RED) {
+                    position = new Position(
+                            random.nextInt(board.getWidth()),
+                            random.nextInt(board.getGoalAreaHeight()));
 
-            } else {
-                position = new Position(
-                        Math.abs(random.nextInt(board.getWidth())),
-                        Math.abs(random.nextInt() % board.getGoalAreaHeight()
-                                + board.getGoalAreaHeight()
-                                + board.getTaskAreaHeight()));
-            }
-            board.getCellByPosition(position).getContent().put(Player.class, player);
+                } else {
+                    position = new Position(
+                            random.nextInt(board.getWidth()),
+                            random.nextInt() % board.getGoalAreaHeight()
+                                    + board.getGoalAreaHeight()
+                                    + board.getTaskAreaHeight());
+                }
+            } while(masterBoard.getCellByPosition(position).getContent().containsKey(Player.class));
+
+            masterBoard.addBoardObject(player, position);
+            board.addBoardObject(player, position);
             player.setBoard(board);
 
             var message = new Message();
@@ -191,6 +197,8 @@ public class GameMaster {
 
         response.setAction(message.getAction());
         response.setPlayerUuid(player.getPlayerUuid());
+        response.setTeamColor(player.getTeam().getTeamColor());
+        response.setTeamRole(player.getTeam().getPlayerRole(player));
         response.setStatus(Message.Status.OK);
 
         return response;
@@ -327,9 +335,10 @@ public class GameMaster {
 
         var player = playerMap.get(message.getPlayerUuid());
 
-        if(player.placePiece()) {
+        if(player.placePiece(masterBoard)) {
             player.getTeam().addPoints(1);
             masterBoard.getCellByPosition(message.getPosition()).removeContent(Goal.class);
+
             if(player.getTeam().getColor() == Team.TeamColor.BLUE) {
                 if(player.getTeam().getPoints() == blueTeamGoals) {
                     finishGame();

@@ -50,4 +50,9 @@ public class Board {
             }
         }
     }
+
+    public synchronized void addBoardObject(BoardObject object, Position position)
+    {
+        cells.get(position).addContent(object.getClass(), object);
+    }
 }
