@@ -3,20 +3,20 @@ package pl.mini.projectgame.integration.gameMasterServer;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.After;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
-import pl.mini.projectgame.models.*;
+import pl.mini.projectgame.models.Message;
+import pl.mini.projectgame.models.Player;
+import pl.mini.projectgame.models.Position;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.CharBuffer;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,7 +35,7 @@ public class CommunicationServerMoveTests {
 
     @AfterAll
     void cleanUp() {
-        gameMaster.getMasterBoard().getCells().forEach((k,v) -> v.setContent(new HashMap<>()));
+        gameMaster.getMasterBoard().getCells().forEach((k, v) -> v.setContent(new HashMap<>()));
     }
 
     @BeforeEach
@@ -67,8 +67,7 @@ public class CommunicationServerMoveTests {
     }
 
     @Test
-    void testMoveActionMessageUp() throws DeniedMoveException, IOException
-    {
+    void testMoveActionMessageUp() throws DeniedMoveException, IOException {
         message.setDirection(Message.Direction.UP);
 
         mapper.writeValue(out, message);
@@ -83,8 +82,7 @@ public class CommunicationServerMoveTests {
     }
 
     @Test
-    void testMoveActionMessageDown() throws DeniedMoveException, IOException
-    {
+    void testMoveActionMessageDown() throws DeniedMoveException, IOException {
         message.setDirection(Message.Direction.DOWN);
 
         mapper.writeValue(out, message);
@@ -99,8 +97,7 @@ public class CommunicationServerMoveTests {
     }
 
     @Test
-    void testMoveActionMessageLeft() throws DeniedMoveException, IOException
-    {
+    void testMoveActionMessageLeft() throws DeniedMoveException, IOException {
         message.setDirection(Message.Direction.LEFT);
 
         mapper.writeValue(out, message);
@@ -115,8 +112,7 @@ public class CommunicationServerMoveTests {
     }
 
     @Test
-    void testMoveActionMessageRight() throws DeniedMoveException, IOException
-    {
+    void testMoveActionMessageRight() throws DeniedMoveException, IOException {
         message.setDirection(Message.Direction.RIGHT);
 
         mapper.writeValue(out, message);

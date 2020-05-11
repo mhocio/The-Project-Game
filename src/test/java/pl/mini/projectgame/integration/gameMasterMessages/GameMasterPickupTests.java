@@ -5,7 +5,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.junit4.SpringRunner;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.GameMasterConfiguration;
 import pl.mini.projectgame.models.*;
@@ -63,9 +62,10 @@ public class GameMasterPickupTests {
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals(Message.Status.OK, response.getStatus());
     }
+
     @Test
     public void serverShouldReturnErrorMessage() {
-        testMessage.setPosition(new Position(3,3));
+        testMessage.setPosition(new Position(3, 3));
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals("error", response.getAction());
     }
