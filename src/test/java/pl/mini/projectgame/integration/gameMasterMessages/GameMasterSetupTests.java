@@ -39,6 +39,7 @@ public class GameMasterSetupTests {
     public void setup() {
         testMessage = new Message();
         testMessage.setAction("setup");
+        gameMaster.setMode(GameMaster.gmMode.NONE);
     }
 
     @Test
