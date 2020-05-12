@@ -5,17 +5,14 @@ import lombok.Setter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.stereotype.Component;
+import pl.mini.projectgame.models.Position;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import java.lang.Math;
-
-import org.springframework.stereotype.Component;
-import pl.mini.projectgame.models.*;
 
 @Getter
 @Setter
@@ -59,28 +56,28 @@ public class GameMasterConfiguration {
 
     @Override
     public String toString() {
-        String ret = "";
-        ret += "shamProbability: " + shamProbability + "\n";
-        ret += "maxTeamSize: " + maxTeamSize + "\n";
-        ret += "maxPieces: " + maxPieces + "\n";
-        
-        ret += "predefinedGoalPositions: ";
-        for (Position pos: predefinedGoalPositions) {
-            ret += "( " + pos.getX() + ", " + pos.getY() + " ), ";
+        StringBuilder ret = new StringBuilder();
+        ret.append("shamProbability: ").append(shamProbability).append("\n");
+        ret.append("maxTeamSize: ").append(maxTeamSize).append("\n");
+        ret.append("maxPieces: ").append(maxPieces).append("\n");
+
+        ret.append("predefinedGoalPositions: ");
+        for (Position pos : predefinedGoalPositions) {
+            ret.append("( ").append(pos.getX()).append(", ").append(pos.getY()).append(" ), ");
         }
-        ret += "\n";
-        
-        ret += "boardWidth: " + boardWidth + "\n";
-        ret += "boardTaskHeight: " + boardTaskHeight + "\n";
-        ret += "boardGoalHeight: " + boardGoalHeight + "\n";
-        ret += "DelayDestroyPiece: " + DelayDestroyPiece + "\n";
-        ret += "DelayNextPiecePlace: " + DelayNextPiecePlace + "\n";
-        ret += "DelayMove: " + DelayMove + "\n";
-        ret += "DelayDiscover: " + DelayDiscover + "\n";
-        ret += "DelayTest: " + DelayTest + "\n";
-        ret += "DelayPick: " + DelayPick + "\n";
-        ret += "DelayPlace: " + DelayPlace + "\n";
-        return ret;
+        ret.append("\n");
+
+        ret.append("boardWidth: ").append(boardWidth).append("\n");
+        ret.append("boardTaskHeight: ").append(boardTaskHeight).append("\n");
+        ret.append("boardGoalHeight: ").append(boardGoalHeight).append("\n");
+        ret.append("DelayDestroyPiece: ").append(DelayDestroyPiece).append("\n");
+        ret.append("DelayNextPiecePlace: ").append(DelayNextPiecePlace).append("\n");
+        ret.append("DelayMove: ").append(DelayMove).append("\n");
+        ret.append("DelayDiscover: ").append(DelayDiscover).append("\n");
+        ret.append("DelayTest: ").append(DelayTest).append("\n");
+        ret.append("DelayPick: ").append(DelayPick).append("\n");
+        ret.append("DelayPlace: ").append(DelayPlace).append("\n");
+        return ret.toString();
     }
 
     public GameMasterConfiguration() {

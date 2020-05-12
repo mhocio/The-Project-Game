@@ -1,19 +1,16 @@
 package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.Assert;
-
-import org.junit.jupiter.api.*;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.junit4.SpringRunner;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.models.Message;
-import pl.mini.projectgame.models.Player;
 import pl.mini.projectgame.models.Team;
-
-import java.util.UUID;
 
 @SpringBootTest
 @ComponentScan
@@ -48,7 +45,7 @@ public class GameMasterPlayerConnectionTests {
     public void serverShouldAddPlayerToTheTeam() {
         Message response = gameMaster.processAndReturn(testMessage);
 
-        if(gameMaster.isLastTeamWasRed()) {
+        if (gameMaster.isLastTeamWasRed()) {
             Assert.assertFalse(gameMaster.getRedTeam().getPlayers().isEmpty());
         } else {
             Assert.assertFalse(gameMaster.getBlueTeam().getPlayers().isEmpty());

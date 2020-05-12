@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -18,8 +17,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Message {
-    public enum Status { OK, DENIED, YES, NO };
-    public enum Direction { UP, DOWN, LEFT, RIGHT };
+    public enum Status {OK, DENIED, YES, NO}
+
+    public enum Direction {UP, DOWN, LEFT, RIGHT}
 
     private Player player;
     private Team.TeamColor teamColor;

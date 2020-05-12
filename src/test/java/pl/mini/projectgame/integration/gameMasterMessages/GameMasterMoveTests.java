@@ -3,16 +3,15 @@ package pl.mini.projectgame.integration.gameMasterMessages;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
-import pl.mini.projectgame.models.*;
+import pl.mini.projectgame.models.Message;
+import pl.mini.projectgame.models.Player;
+import pl.mini.projectgame.models.Position;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertEquals;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -26,7 +25,7 @@ public class GameMasterMoveTests {
 
     @AfterAll
     void cleanUp() {
-        gameMaster.getMasterBoard().getCells().forEach((k,v) -> v.setContent(new HashMap<>()));
+        gameMaster.getMasterBoard().getCells().forEach((k, v) -> v.setContent(new HashMap<>()));
     }
 
     @BeforeEach
@@ -48,8 +47,7 @@ public class GameMasterMoveTests {
     }
 
     @Test
-    void testMoveActionMessageUp() throws DeniedMoveException
-    {
+    void testMoveActionMessageUp() throws DeniedMoveException {
         message.setDirection(Message.Direction.UP);
 
         Message response = gameMaster.processAndReturn(message);
@@ -57,8 +55,7 @@ public class GameMasterMoveTests {
     }
 
     @Test
-    void testMoveActionMessageDown() throws DeniedMoveException
-    {
+    void testMoveActionMessageDown() throws DeniedMoveException {
         message.setDirection(Message.Direction.DOWN);
 
         Message response = gameMaster.processAndReturn(message);
@@ -66,8 +63,7 @@ public class GameMasterMoveTests {
     }
 
     @Test
-    void testMoveActionMessageLeft() throws DeniedMoveException
-    {
+    void testMoveActionMessageLeft() throws DeniedMoveException {
         message.setDirection(Message.Direction.LEFT);
 
         Message response = gameMaster.processAndReturn(message);
@@ -75,8 +71,7 @@ public class GameMasterMoveTests {
     }
 
     @Test
-    void testMoveActionMessageRight() throws DeniedMoveException
-    {
+    void testMoveActionMessageRight() throws DeniedMoveException {
         message.setDirection(Message.Direction.RIGHT);
 
         Message response = gameMaster.processAndReturn(message);

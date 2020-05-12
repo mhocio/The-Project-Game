@@ -16,7 +16,6 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.CharBuffer;
-import java.util.Map;
 
 @SpringBootTest
 @ComponentScan
@@ -96,6 +95,7 @@ public class CommunicationServerSetupTests {
         Message response = mapper.readValue(cb.toString(), Message.class);
         Assert.assertEquals("error", response.getAction());
     }
+
     @Test
     public void serverShouldReturnErrorMessage2() throws IOException {
         gameMaster.setMasterBoard(null);

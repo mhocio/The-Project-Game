@@ -89,9 +89,10 @@ public class CommunicationServerPickupTests {
         Message response = mapper.readValue(cb.toString(), Message.class);
         Assert.assertEquals(Message.Status.OK, response.getStatus());
     }
+
     @Test
     public void serverShouldReturnErrorMessage() throws IOException {
-        testMessage.setPosition(new Position(3,3));
+        testMessage.setPosition(new Position(3, 3));
         mapper.writeValue(out, testMessage);
         out.flush();
 

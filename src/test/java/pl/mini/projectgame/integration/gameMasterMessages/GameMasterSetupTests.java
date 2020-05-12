@@ -1,16 +1,14 @@
 package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.Assert;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.GameMasterConfiguration;
-import pl.mini.projectgame.models.*;
-
-import java.util.Map;
+import pl.mini.projectgame.models.MasterBoard;
+import pl.mini.projectgame.models.Message;
 
 @SpringBootTest
 @ComponentScan
@@ -56,6 +54,7 @@ public class GameMasterSetupTests {
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals("error", response.getAction());
     }
+
     @Test
     public void serverShouldReturnErrorMessage2() {
         gameMaster.setMasterBoard(null);

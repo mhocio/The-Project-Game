@@ -25,44 +25,44 @@ public class TeamTests {
     }
 
     @Test
-    void testTeamInit(){
+    void testTeamInit() {
         assertNotNull(team);
-        assertEquals(0,team.getSize());
+        assertEquals(0, team.getSize());
         assertNotNull(team.getPlayers());
         assertNull(team.getColor());
     }
 
     @Test
-    void testSetColor(){
+    void testSetColor() {
         team.setColor(Team.TeamColor.RED);
         assertEquals(team.getColor(), Team.TeamColor.RED);
     }
 
     @Test
     void testAddPlayer() throws TeamSquadChangeException, FullTeamException {
-        Player toAdd=new Player();
+        Player toAdd = new Player();
         team.addPlayer(toAdd);
         assertTrue(team.getPlayers().containsKey(toAdd));
     }
 
     @Test
     void testAddExtraPlayer() throws TeamSquadChangeException, FullTeamException {
-        for(int i=0;i<4;i++)
+        for (int i = 0; i < 4; i++)
             team.addPlayer(new Player());
-        assertThrows(FullTeamException.class,()->team.addPlayer(new Player()));
+        assertThrows(FullTeamException.class, () -> team.addPlayer(new Player()));
     }
 
     @Test
     void testAddNullPlayer() throws TeamSquadChangeException, FullTeamException {
-        int initSize=team.getSize();
+        int initSize = team.getSize();
         team.addPlayer(null);
-        assertEquals(initSize,team.getSize());
+        assertEquals(initSize, team.getSize());
     }
 
     @Test
     void testRemovePlayer() throws TeamSquadChangeException, FullTeamException, EmptyTeamException {
         team.addPlayer(new Player());
-        Player toRemove=new Player();
+        Player toRemove = new Player();
         team.addPlayer(toRemove);
         assertTrue(team.getPlayers().containsKey(toRemove));
         team.removePlayer(toRemove);
@@ -71,15 +71,15 @@ public class TeamTests {
 
     @Test
     void testRemoveLastPlayer() throws TeamSquadChangeException, FullTeamException {
-        Player toRemove=new Player();
+        Player toRemove = new Player();
         team.addPlayer(toRemove);
-        assertThrows(EmptyTeamException.class,()->team.removePlayer(toRemove));
+        assertThrows(EmptyTeamException.class, () -> team.removePlayer(toRemove));
     }
 
     @Test
     void testRemoveNonExistingPlayer() throws TeamSquadChangeException, FullTeamException, EmptyTeamException {
         team.addPlayer(new Player());
-        Player toRemove=new Player();
+        Player toRemove = new Player();
         team.removePlayer(toRemove);
         assertFalse(team.getPlayers().containsKey(toRemove));
     }
@@ -87,55 +87,55 @@ public class TeamTests {
     @Test
     void removeNullPlayer() throws TeamSquadChangeException, FullTeamException, EmptyTeamException {
         team.addPlayer(new Player());
-        int initSize=team.getSize();
+        int initSize = team.getSize();
         team.removePlayer(null);
-        assertEquals(initSize,team.getSize());
+        assertEquals(initSize, team.getSize());
     }
 
     @Test
-    void testGetPlayers(){
+    void testGetPlayers() {
         assertNotNull(team.getPlayers());
     }
 
     @Test
     void testGetRole() throws TeamSquadChangeException, FullTeamException {
-        Player leader=new Player();
-        Player member=new Player();
+        Player leader = new Player();
+        Player member = new Player();
         team.addPlayer(leader);
         team.addPlayer(member);
-        assertEquals(Team.TeamRole.LEADER,team.getPlayerRole(leader));
-        assertEquals(Team.TeamRole.MEMBER,team.getPlayerRole(member));
+        assertEquals(Team.TeamRole.LEADER, team.getPlayerRole(leader));
+        assertEquals(Team.TeamRole.MEMBER, team.getPlayerRole(member));
     }
 
     @Test
     void testSetNewLeader() throws TeamSquadChangeException, FullTeamException {
-        Player firstLeader=new Player();
+        Player firstLeader = new Player();
         team.addPlayer(firstLeader);
-        assertEquals(Team.TeamRole.LEADER,team.getPlayerRole(firstLeader));
+        assertEquals(Team.TeamRole.LEADER, team.getPlayerRole(firstLeader));
 
-        Player secondLeader=new Player();
+        Player secondLeader = new Player();
         team.addPlayer(secondLeader);
         team.setPlayerRole(secondLeader, Team.TeamRole.LEADER);
-        assertEquals(Team.TeamRole.LEADER,team.getPlayerRole(secondLeader));
-        assertEquals(Team.TeamRole.MEMBER,team.getPlayerRole(firstLeader));
+        assertEquals(Team.TeamRole.LEADER, team.getPlayerRole(secondLeader));
+        assertEquals(Team.TeamRole.MEMBER, team.getPlayerRole(firstLeader));
     }
 
     @Test
     void testGetLeader() throws TeamSquadChangeException, FullTeamException {
-        Player leader=new Player();
+        Player leader = new Player();
         team.addPlayer(leader);
-        assertEquals(leader,team.getLeader());
+        assertEquals(leader, team.getLeader());
     }
 
     @Test
     void testRemoveLeader() throws FullTeamException, TeamSquadChangeException, EmptyTeamException {
-        Player leader=new Player();
-        Player newLeader=new Player();
+        Player leader = new Player();
+        Player newLeader = new Player();
         team.addPlayer(leader);
         team.addPlayer(newLeader);
         team.removePlayer(leader);
-        assertEquals(team.getLeader(),newLeader);
-        assertEquals(Team.TeamRole.LEADER,team.getPlayerRole(newLeader));
+        assertEquals(team.getLeader(), newLeader);
+        assertEquals(Team.TeamRole.LEADER, team.getPlayerRole(newLeader));
     }
 
 }

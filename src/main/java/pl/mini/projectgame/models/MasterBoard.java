@@ -16,15 +16,15 @@ public class MasterBoard extends Board {
     public synchronized void movePlayer(Player player, Position source, Position target)
             throws DeniedMoveException {
 
-        if(!cells.get(source).getContent().containsValue(player)) {
+        if (!cells.get(source).getContent().containsValue(player)) {
             throw new DeniedMoveException("Requested object is not in the specified position!");
         }
 
-        if(!cells.containsKey(target)) {
+        if (!cells.containsKey(target)) {
             throw new DeniedMoveException("You tried to move outside of board bounds!");
         }
 
-        if(cells.get(target).getContent().containsKey(Player.class)) {
+        if (cells.get(target).getContent().containsKey(Player.class)) {
             throw new DeniedMoveException("Target cell is occupied by another player!");
         }
 

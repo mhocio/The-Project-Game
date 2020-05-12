@@ -33,7 +33,7 @@ public class GameMasterConfigurationTests {
     @Test
     void testParserFromExistingFile_maxTeamSize() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.getMaxTeamSize(),  12);
+        assertEquals(configFromFile.getMaxTeamSize(), 12);
     }
 
     @Test

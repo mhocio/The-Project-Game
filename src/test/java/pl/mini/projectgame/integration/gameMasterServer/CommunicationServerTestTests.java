@@ -59,7 +59,7 @@ public class CommunicationServerTestTests {
 
         message = new Message();
         piece = new Piece(0.5);
-        position = new Position(1,1);
+        position = new Position(1, 1);
         player = new Player();
 
         gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);

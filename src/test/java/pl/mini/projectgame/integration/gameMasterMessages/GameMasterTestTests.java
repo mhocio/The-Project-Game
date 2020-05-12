@@ -9,7 +9,8 @@ import pl.mini.projectgame.models.*;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 
 @SpringBootTest
@@ -41,7 +42,7 @@ public class GameMasterTestTests {
     void initTestPiece() {
         message = new Message();
         piece = new Piece(0.5);
-        position = new Position(1,1);
+        position = new Position(1, 1);
         player = new Player();
 
         gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
@@ -61,20 +62,20 @@ public class GameMasterTestTests {
     }
 
     @Test
-    void testAction(){
+    void testAction() {
         Message response = gameMaster.processAndReturn(message);
         assertNotEquals("error", response.getAction());
     }
 
     @Test
-    void testActionNullPlayerUuid(){
+    void testActionNullPlayerUuid() {
         message.setPlayerUuid(null);
         Message response = gameMaster.processAndReturn(message);
         assertEquals("error", response.getAction());
     }
 
     @Test
-    void testActionNoPiece(){
+    void testActionNoPiece() {
         gameMaster.getMasterBoard().getCellByPosition(position).removeContent(Piece.class);
 
         Message response = gameMaster.processAndReturn(message);
@@ -83,7 +84,7 @@ public class GameMasterTestTests {
 
 
     @Test
-    void testActionDoubleTest(){
+    void testActionDoubleTest() {
 
         gameMaster.processAndReturn(message);
         Message response = gameMaster.processAndReturn(message);

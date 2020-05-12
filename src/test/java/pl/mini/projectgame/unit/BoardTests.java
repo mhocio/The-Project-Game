@@ -1,7 +1,6 @@
 package pl.mini.projectgame.unit;
 
 import org.junit.Assert;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

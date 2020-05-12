@@ -16,8 +16,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.CharBuffer;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author buensons
@@ -53,9 +51,9 @@ public class CommunicationServer {
 
     private void listen() {
         logger.info("Server is listening on port 8080...");
-        while(true) {
+        while (true) {
             try {
-                if(!serverSocket.isClosed()) {
+                if (!serverSocket.isClosed()) {
                     Socket client = serverSocket.accept();
                     connections.add(client);
                     var thread = new Thread(() -> handle(client));
@@ -77,7 +75,7 @@ public class CommunicationServer {
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        } catch(IOException e) {
+        } catch (IOException e) {
             logger.warn(e.getMessage());
             try {
                 connections.remove(socket);
@@ -88,7 +86,7 @@ public class CommunicationServer {
             return;
         }
 
-        while(true) {
+        while (true) {
             try {
                 if (in.ready()) {
                     CharBuffer cb = CharBuffer.allocate(1024);
@@ -115,7 +113,7 @@ public class CommunicationServer {
                     message = gameMaster.processAndReturn(message);
 
                     // TODO: check if game is in lobby mode
-                    if(message.getAction().equals("connect")) {
+                    if (message.getAction().equals("connect")) {
                         conn.put(message.getPlayerUuid(), socket);
                     }
 
