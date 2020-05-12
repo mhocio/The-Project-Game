@@ -104,8 +104,6 @@ public class CommunicationServer {
 
                     message = objectMapper.readValue(cb.toString(), Message.class);
 
-                    int responseTime = getResponseTime(message);
-
                     if (message == null) {
                         message = new Message();
                         message.setAction("error");
@@ -115,6 +113,9 @@ public class CommunicationServer {
                         continue;
                     }
 
+                    int responseTime = getResponseTime(message);
+                    responseTime -= 5;
+
                     message = gameMaster.processAndReturn(message);
 
                     // TODO: check if game is in lobby mode
@@ -123,15 +124,14 @@ public class CommunicationServer {
                     }
 
                     long endTime = System.nanoTime();
-                    System.out.println(responseTime - (System.nanoTime() - startTime)/1000);
+                    long remTime = (endTime - startTime) / 1000000;
 
-                    if (responseTime > 0) {
+                    if (responseTime > 0 && (remTime < responseTime))
                         try {
-                            TimeUnit.MILLISECONDS.sleep(responseTime - (endTime - startTime)/1000);
-                        } catch (InterruptedException ie) {
+                            Thread.sleep(responseTime - remTime);
+                        } catch(InterruptedException ex) {
                             Thread.currentThread().interrupt();
                         }
-                    }
 
                     objectMapper.writeValue(out, message);
                     out.flush();
@@ -186,8 +186,13 @@ public class CommunicationServer {
         try {
             action = message.getAction();
         } catch (Exception e) {
-            return -1;
+            return 0;
         }
+
+        // TODO: IMPORTANT - check if return val are not null
+        //  those upper try/catch do not work...
+        if (action == null)
+            return -1;
 
         switch (action) {
             case "place":

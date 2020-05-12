@@ -315,7 +315,6 @@ public class GameMaster {
             player = playerMap.get(message.getPlayerUuid());
             direction = message.getDirection();
             source = message.getPosition();
-
         } catch (Exception e) {
             logger.warn(e.getMessage());
             response.setAction("error");

@@ -11,7 +11,7 @@
 
      "DelayDestroyPiece": 100,
      "DelayNextPiecePlace": 200,
-     "DelayMove": 300, 
+     "DelayMove": 100,
      "DelayDiscover": 400,
      "DelayTest": 500,
      "DelayPick": 600,
