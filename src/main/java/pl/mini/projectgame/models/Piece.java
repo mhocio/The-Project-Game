@@ -1,13 +1,8 @@
 package pl.mini.projectgame.models;
 
 import lombok.Getter;
-import lombok.Setter;
-
-
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -22,10 +17,7 @@ public class Piece extends BoardObject {
 
     public Piece(double shamProbability) {
         pieceUuid = UUID.randomUUID();
-        if (Math.random() < shamProbability)
-            isGood = false;
-        else
-            isGood = true;
+        isGood = !(Math.random() < shamProbability);
         testedPlayers = new HashSet<>();
     }
 }

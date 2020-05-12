@@ -10,16 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.GameMasterConfiguration;
-import pl.mini.projectgame.models.Cell;
 import pl.mini.projectgame.models.MasterBoard;
 import pl.mini.projectgame.models.Message;
-import pl.mini.projectgame.models.Position;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.CharBuffer;
-import java.util.Map;
 
 @SpringBootTest
 @ComponentScan
@@ -95,6 +92,7 @@ public class CommunicationServerSetupTests {
         Message response = mapper.readValue(cb.toString(), Message.class);
         Assert.assertEquals("error", response.getAction());
     }
+
     @Test
     public void serverShouldReturnErrorMessage2() throws IOException {
         gameMaster.setMasterBoard(null);

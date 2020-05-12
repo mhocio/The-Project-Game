@@ -1,8 +1,8 @@
 package pl.mini.projectgame.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import pl.mini.projectgame.exceptions.EmptyTeamException;
 import pl.mini.projectgame.exceptions.FullTeamException;
 import pl.mini.projectgame.exceptions.TeamSquadChangeException;
@@ -16,7 +16,7 @@ public class Team {
     private TeamColor teamColor;
     private int size;
     private long points;
-  
+
     @JsonIgnore
     private Hashtable<Player, TeamRole> players;
 
@@ -41,12 +41,16 @@ public class Team {
     }
 
     private boolean isReady() {
-        for(Map.Entry<Player,TeamRole> entry : players.entrySet()) {
-            if(!entry.getKey().isReady()) return false;
+        for (Map.Entry<Player, TeamRole> entry : players.entrySet()) {
+            if (!entry.getKey().isReady()) return false;
         }
         return true;
     }
-    public void addPoints(int num) { points += num; }
+
+    public void addPoints(int num) {
+        points += num;
+    }
+
     public int getSize() {
         return size;
     }
@@ -61,12 +65,12 @@ public class Team {
             throw new FullTeamException("This team is full!");
         if (player != null && !players.containsKey(player)) {
             // first player is the team leader
-            if(size==0)
+            if (size == 0)
                 players.put(player, TeamRole.LEADER);
             else
                 players.put(player, TeamRole.MEMBER);
 
-            if(players.containsKey(player))
+            if (players.containsKey(player))
                 size++;
             else
                 throw new TeamSquadChangeException("Adding the member failed!");
@@ -74,21 +78,20 @@ public class Team {
     }
 
     public void removePlayer(Player player)
-        throws TeamSquadChangeException, EmptyTeamException {
+            throws TeamSquadChangeException, EmptyTeamException {
         if (player != null && players.containsKey(player)) {
             players.remove(player);
-            if(!players.containsKey(player)) {
+            if (!players.containsKey(player)) {
                 size--;
-            }
-            else
+            } else
                 throw new TeamSquadChangeException("Removing the member failed!");
         }
-        if(this.getSize()==0)
+        if (this.getSize() == 0)
             throw new EmptyTeamException("This team is empty!");
         // pick next member to be the leader
         //TODO send message to GM about leader change
-        if(this.getLeader()==null){
-            this.setPlayerRole((Player) players.keySet().toArray()[0],TeamRole.LEADER);
+        if (this.getLeader() == null) {
+            this.setPlayerRole((Player) players.keySet().toArray()[0], TeamRole.LEADER);
         }
     }
 

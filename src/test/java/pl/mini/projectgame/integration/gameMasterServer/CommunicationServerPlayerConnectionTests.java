@@ -85,7 +85,7 @@ public class CommunicationServerPlayerConnectionTests {
 
         Message response = mapper.readValue(cb.toString(), Message.class);
 
-        if(gameMaster.isLastTeamWasRed()) {
+        if (gameMaster.isLastTeamWasRed()) {
             Assert.assertFalse(gameMaster.getRedTeam().getPlayers().isEmpty());
         } else {
             Assert.assertFalse(gameMaster.getBlueTeam().getPlayers().isEmpty());

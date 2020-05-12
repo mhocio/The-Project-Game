@@ -2,8 +2,6 @@ package pl.mini.projectgame.models;
 
 import lombok.*;
 
-import java.util.Objects;
-
 /**
  * @author buensons
  */
