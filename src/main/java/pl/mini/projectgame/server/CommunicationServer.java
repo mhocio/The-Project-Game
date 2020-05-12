@@ -16,6 +16,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.CharBuffer;
 import java.util.*;
+import java.time.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author buensons
@@ -89,6 +93,8 @@ public class CommunicationServer {
         while (true) {
             try {
                 if (in.ready()) {
+                    long startTime = System.nanoTime();
+
                     CharBuffer cb = CharBuffer.allocate(1024);
                     if (in.read(cb) < 0) {
                         logger.warn("Error while reading InputStream!");
@@ -96,10 +102,9 @@ public class CommunicationServer {
                     }
                     cb.flip();
 
-                    // TODO: start timer
-                    // int responseTime = getResponseTime(message);
-
                     message = objectMapper.readValue(cb.toString(), Message.class);
+
+                    int responseTime = getResponseTime(message);
 
                     if (message == null) {
                         message = new Message();
@@ -117,11 +122,21 @@ public class CommunicationServer {
                         conn.put(message.getPlayerUuid(), socket);
                     }
 
-                    // TODO: send the below message after the required time
-                    // TODO: add tests for it
+                    long endTime = System.nanoTime();
+                    System.out.println(responseTime - (System.nanoTime() - startTime)/1000);
+
+                    if (responseTime > 0) {
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(responseTime - (endTime - startTime)/1000);
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+
                     objectMapper.writeValue(out, message);
                     out.flush();
                 }
+
             } catch (IOException e) {
                 logger.warn(e.getMessage());
                 connections.remove(socket);
@@ -163,6 +178,34 @@ public class CommunicationServer {
             serverSocket.close();
         } catch (IOException e) {
             logger.warn(e.toString());
+        }
+    }
+
+    private int getResponseTime(Message message) {
+        String action;
+        try {
+            action = message.getAction();
+        } catch (Exception e) {
+            return -1;
+        }
+
+        switch (action) {
+            case "place":
+                return gameMaster.getConfiguration().getDelayPlace();
+            case "pick":
+                return gameMaster.getConfiguration().getDelayPick();
+            case "test":
+                return gameMaster.getConfiguration().getDelayTest();
+            case "discover":
+                return gameMaster.getConfiguration().getDelayDiscover();
+            case "move":
+                return gameMaster.getConfiguration().getDelayMove();
+            case "destroy": // not used
+                return gameMaster.getConfiguration().getDelayDestroyPiece();
+            case "nextPiecePlace": // not used
+                return gameMaster.getConfiguration().getDelayNextPiecePlace();
+            default:
+                return 0;
         }
     }
 }
