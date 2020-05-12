@@ -24,12 +24,16 @@ public class Message {
     private Player player;
     private Team.TeamColor teamColor;
     private Team.TeamRole teamRole;
+    private boolean host;
     private UUID playerUuid;
+
     private String action;
     private Status status;
     private Boolean test;
+
     private Position position;
     private List<Field> fields;
+    private List<Goal> goals;
     private Direction direction;
     private Board board;
 }

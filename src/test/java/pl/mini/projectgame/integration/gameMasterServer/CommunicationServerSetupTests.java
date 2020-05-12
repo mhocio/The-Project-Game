@@ -10,10 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.GameMasterConfiguration;
-import pl.mini.projectgame.models.Cell;
-import pl.mini.projectgame.models.MasterBoard;
-import pl.mini.projectgame.models.Message;
-import pl.mini.projectgame.models.Position;
+import pl.mini.projectgame.models.*;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -53,6 +50,10 @@ public class CommunicationServerSetupTests {
     public void setup() throws IOException {
         testMessage = new Message();
         testMessage.setAction("setup");
+        Player player = new Player();
+        gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
+        testMessage.setPlayerUuid(player.getPlayerUuid());
+
         client = new Socket(InetAddress.getLocalHost().getHostName(), 8080);
         out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));

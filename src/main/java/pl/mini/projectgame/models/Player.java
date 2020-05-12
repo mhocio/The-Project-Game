@@ -53,16 +53,22 @@ public class Player extends BoardObject {
         this.portNumber = _portNumber;
         this.playerName = _playerName;
         this.playerState = PlayerState.INITIALIZING;
+        this.host = false;
+        this.ready = false;
     }
     public Player(Team team) {
         this.playerUuid = UUID.randomUUID();
         this.team = team;
         this.playerState = PlayerState.INITIALIZING;
+        this.host = false;
+        this.ready = false;
     }
   
     public Player() {
         this.playerUuid = UUID.randomUUID();
         this.playerState = PlayerState.INITIALIZING;
+        this.host = false;
+        this.ready = false;
     }
   
     public boolean placePiece(MasterBoard masterBoard){

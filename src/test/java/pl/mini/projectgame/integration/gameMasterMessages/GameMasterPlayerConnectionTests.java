@@ -35,6 +35,7 @@ public class GameMasterPlayerConnectionTests {
     public void setup() {
         testMessage = new Message();
         testMessage.setAction("connect");
+        gameMaster.setMode(GameMaster.gmMode.LOBBY);
     }
 
     @Test
@@ -63,6 +64,13 @@ public class GameMasterPlayerConnectionTests {
     @Test
     public void serverShouldReturnErrorMessage() {
         testMessage.setAction("coNnect");
+        Message response = gameMaster.processAndReturn(testMessage);
+        Assert.assertEquals("error", response.getAction());
+    }
+
+    @Test
+    public void serverShouldReturnErrorMessageNotLobby() {
+        gameMaster.setMode(GameMaster.gmMode.NONE);
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals("error", response.getAction());
     }

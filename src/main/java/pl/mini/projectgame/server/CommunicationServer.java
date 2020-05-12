@@ -98,6 +98,9 @@ public class CommunicationServer {
                     }
                     cb.flip();
 
+                    // TODO: start timer
+                    // int responseTime = getResponseTime(message);
+
                     message = objectMapper.readValue(cb.toString(), Message.class);
 
                     if (message == null) {
@@ -111,10 +114,13 @@ public class CommunicationServer {
 
                     message = gameMaster.processAndReturn(message);
 
+                    // TODO: check if game is in lobby mode
                     if(message.getAction().equals("connect")) {
                         conn.put(message.getPlayerUuid(), socket);
                     }
 
+                    // TODO: send the below message after the required time
+                    // TODO: add tests for it
                     objectMapper.writeValue(out, message);
                     out.flush();
                 }
@@ -127,6 +133,7 @@ public class CommunicationServer {
     }
 
     public void sendToEveryone(Message message) {
+        // TODO: use conn?
         connections.forEach(socket -> {
             try {
                 objectMapper.writeValue(socket.getOutputStream(), message);

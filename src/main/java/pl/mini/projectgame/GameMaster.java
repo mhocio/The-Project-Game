@@ -30,7 +30,15 @@ public class GameMaster {
         ACTIVE, FINISHED, IDLE
     }
 
+    // TODO: use it after creating a lobby and starting the game
+    // to know when respond to which messages
+    public enum gmMode {
+        NONE, LOBBY, GAME
+    }
+    public gmMode mode;
+
     private Map<UUID, Player> playerMap;
+    private boolean firstPlayer;
 
     private boolean lastTeamWasRed;
     private int portNumber;
@@ -56,6 +64,9 @@ public class GameMaster {
         redTeam = new Team(Team.TeamColor.RED);
         pieces = new ArrayList<>();
 
+        mode = gmMode.NONE;
+        firstPlayer = true;
+
         try {
             File file = new File(
                     Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource("gameMasterConfig.json")).getFile()
@@ -72,10 +83,21 @@ public class GameMaster {
         redTeamGoals = blueTeamGoals;
     }
 
+    public void reset() {
+        // TODO: reset all variables, delete all players and connections
+        //  prepare for the next game
+    }
+
     public void startGame() {
         Random random = new Random();
         var board = new Board(configuration);
         Position position;
+
+        mode = gmMode.GAME;
+
+        // TODO: set goals from config
+        // TODO: set pieces
+        // TODO: start a thread with piece generator
 
         for(Player player : playerMap.values()) {
             do {
@@ -97,6 +119,7 @@ public class GameMaster {
             board.addBoardObject(player, position);
             player.setBoard(board);
 
+            // TODO: send to everyone? instead to each player separately
             var message = new Message();
             message.setPlayerUuid(player.getPlayerUuid());
             message.setAction("startGame");
@@ -111,6 +134,8 @@ public class GameMaster {
     }
 
     public void finishGame() {
+        mode = gmMode.NONE;
+
         Message message = new Message();
         message.setAction("finish");
         server.sendToEveryone(message);
@@ -176,6 +201,13 @@ public class GameMaster {
             msg.setAction("error");
             return msg;
         }
+
+        /* TODO: set goals in players goal area
+            in each response if game is ON
+        if (mode == gmMode.GAME) {
+            response.setGoals(getGoals(response.getPlayer()));
+        }*/
+
         return response;
     }
 
@@ -184,6 +216,11 @@ public class GameMaster {
         Team team = lastTeamWasRed ? blueTeam : redTeam;
         lastTeamWasRed = !lastTeamWasRed;
         Player player;
+
+        if (mode != gmMode.LOBBY) {
+            response.setAction("error");
+            return response;
+        }
 
         try {
             player = new Player(team);
@@ -195,15 +232,28 @@ public class GameMaster {
             return response;
         }
 
+        if (firstPlayer) {
+            player.setHost(true);
+            firstPlayer = false;
+        }
+
+        // TODO: set host to some player if host disconnects
+
         response.setAction(message.getAction());
         response.setPlayerUuid(player.getPlayerUuid());
         response.setTeamColor(player.getTeam().getTeamColor());
         response.setTeamRole(player.getTeam().getPlayerRole(player));
+        response.setHost(player.isHost());
         response.setStatus(Message.Status.OK);
 
         return response;
     }
 
+    /**
+     * discover distance to the nearest pieces
+     * for each neighbour cell
+     * return the Manhattan distance to the nearest piece
+     */
     private Message actionDiscover(Message message) {
         List<Field> fields = new ArrayList<>();
         Message response = new Message();
@@ -333,10 +383,13 @@ public class GameMaster {
 
     private Message actionPlace(Message message) {
 
+        // TODO: change the state of the cell if non-goal also,
+        //  we need it to return the players goals
         var player = playerMap.get(message.getPlayerUuid());
 
         if(player.placePiece(masterBoard)) {
             player.getTeam().addPoints(1);
+            // TODO: change the state of the goal
             masterBoard.getCellByPosition(message.getPosition()).removeContent(Goal.class);
 
             if(player.getTeam().getColor() == Team.TeamColor.BLUE) {
@@ -360,6 +413,7 @@ public class GameMaster {
     private Message actionReady(Message message) {
         //TODO edge case - disconnection before the start of the game
 
+        // TODO: check if message is correct
         playerMap.get(message.getPlayerUuid()).setReady(true);
         Message response = new Message();
         response.setAction(message.getAction());
@@ -441,14 +495,29 @@ public class GameMaster {
         return response;
     }
 
+    /**
+     * Create a lobby?
+     * Now player can join to the game
+     * @param message
+     * @return
+     */
     private Message actionSetup(Message message) {
         Message response = new Message();
+        Player player;
+
+        if (mode != gmMode.NONE) {
+            response.setAction("error");
+            return response;
+        }
 
         if(configuration == null ||  masterBoard == null ){
             response.setAction("error");
             response.setStatus(Message.Status.DENIED);
             return response;
         }
+
+        mode = gmMode.LOBBY;
+
         response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
         return response;
