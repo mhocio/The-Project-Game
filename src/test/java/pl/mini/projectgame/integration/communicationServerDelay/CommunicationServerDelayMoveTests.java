@@ -69,17 +69,18 @@ public class CommunicationServerDelayMoveTests {
 
     @Test
     void testMoveActionMessageUp() throws DeniedMoveException, IOException {
-        //message.setDirection(Message.Direction.UP);
+
+        // TODO: board generated correctly?
 
         System.out.println("config delay: " + gameMaster.getConfiguration().getDelayMove());
         int originalDelay = gameMaster.getConfiguration().getDelayMove();
-        int numOfRuns = 30;
+        int numOfRuns = 50;
         long sum = 0;
 
         for (int i = 0; i < numOfRuns; i++) {
             message = new Message();
             message.setAction("move");
-            //message.setDirection(Message.Direction.UP);
+            message.setDirection(Message.Direction.UP);
             message.setPlayerUuid(player.getPlayerUuid());
             message.setPosition(player.getPosition());
 
@@ -92,11 +93,20 @@ public class CommunicationServerDelayMoveTests {
             Message response = mapper.readValue(cb.toString(), Message.class);
             long endTime = System.nanoTime();
 
+            if (response.getPosition() != null)
+                player.setPosition(response.getPosition());
+            else
+                player.setPosition(player.getPosition());
+
+            System.out.println("new position: " + player.getPosition());
+
             long diffInMiliseconds = (endTime - startTime) / 1000000;
             sum += diffInMiliseconds;
 
-            //System.out.println("test: " + diffInMiliseconds);
-            //assertEquals(new Position(1, 2), response.getPosition());
+            if (response.getPosition() != null)
+                assertEquals(new Position(1, 2 + i), response.getPosition());
+            else
+                assertEquals(response.getStatus(), Message.Status.DENIED);
         }
 
         boolean result = false;
@@ -108,21 +118,3 @@ public class CommunicationServerDelayMoveTests {
         assertTrue(result);
     }
 }
-
-    /*@Test
-    void testMoveActionMessageUp() throws DeniedMoveException {
-        message.setDirection(Message.Direction.UP);
-
-        long startTime = System.nanoTime();
-        Message response = gameMaster.processAndReturn(message);
-        long endTime = System.nanoTime();
-
-        long diffInMiliseconds = (endTime - startTime)/1000000;
-
-        boolean result;
-        System.out.println("test: " + diffInMiliseconds);
-        System.out.println(gameMaster.getConfiguration().getDelayMove());
-
-        System.out.println(startTime + " " + endTime + " " + (endTime - startTime));
-        assertEquals(new Position(1, 2), response.getPosition());
-    }*/
