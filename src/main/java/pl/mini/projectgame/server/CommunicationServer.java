@@ -89,15 +89,14 @@ public class CommunicationServer {
         while (true) {
             try {
                 if (in.ready()) {
+                    long startTime = System.nanoTime();
+
                     CharBuffer cb = CharBuffer.allocate(1024);
                     if (in.read(cb) < 0) {
                         logger.warn("Error while reading InputStream!");
                         continue;
                     }
                     cb.flip();
-
-                    // TODO: start timer
-                    // int responseTime = getResponseTime(message);
 
                     message = objectMapper.readValue(cb.toString(), Message.class);
 
@@ -110,6 +109,9 @@ public class CommunicationServer {
                         continue;
                     }
 
+                    int responseTime = getResponseTime(message);
+                    responseTime -= 5;
+
                     message = gameMaster.processAndReturn(message);
 
                     // TODO: check if game is in lobby mode
@@ -117,11 +119,20 @@ public class CommunicationServer {
                         conn.put(message.getPlayerUuid(), socket);
                     }
 
-                    // TODO: send the below message after the required time
-                    // TODO: add tests for it
+                    long endTime = System.nanoTime();
+                    long remTime = (endTime - startTime) / 1000000;
+
+                    if (responseTime > 0 && (remTime < responseTime))
+                        try {
+                            Thread.sleep(responseTime - remTime);
+                        } catch(InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        }
+
                     objectMapper.writeValue(out, message);
                     out.flush();
                 }
+
             } catch (IOException e) {
                 logger.warn(e.getMessage());
                 connections.remove(socket);
@@ -163,6 +174,39 @@ public class CommunicationServer {
             serverSocket.close();
         } catch (IOException e) {
             logger.warn(e.toString());
+        }
+    }
+
+    private int getResponseTime(Message message) {
+        String action;
+        try {
+            action = message.getAction();
+        } catch (Exception e) {
+            return 0;
+        }
+
+        // TODO: IMPORTANT - check if return val are not null
+        //  those upper try/catch do not work...
+        if (action == null)
+            return -1;
+
+        switch (action) {
+            case "place":
+                return gameMaster.getConfiguration().getDelayPlace();
+            case "pick":
+                return gameMaster.getConfiguration().getDelayPick();
+            case "test":
+                return gameMaster.getConfiguration().getDelayTest();
+            case "discover":
+                return gameMaster.getConfiguration().getDelayDiscover();
+            case "move":
+                return gameMaster.getConfiguration().getDelayMove();
+            case "destroy": // not used
+                return gameMaster.getConfiguration().getDelayDestroyPiece();
+            case "nextPiecePlace": // not used
+                return gameMaster.getConfiguration().getDelayNextPiecePlace();
+            default:
+                return 0;
         }
     }
 }

@@ -315,7 +315,7 @@ public class GameMaster {
             player = playerMap.get(message.getPlayerUuid());
             direction = message.getDirection();
             source = message.getPosition();
-
+            response.setAction(message.getAction());
         } catch (Exception e) {
             logger.warn(e.getMessage());
             response.setAction("error");
@@ -345,15 +345,13 @@ public class GameMaster {
             masterBoard.movePlayer(player, source, target);
         } catch (Exception e) {
             logger.warn(e.toString());
-            response = new Message();
             response.setStatus(Message.Status.DENIED);
             response.setPosition(null);
             return response;
         }
-        response.setAction(message.getAction());
+
         response.setPosition(target);
         response.setStatus(Message.Status.OK);
-
         return response;
     }
 
