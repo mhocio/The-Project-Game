@@ -57,6 +57,7 @@ public class CommunicationServerDelayMoveTests {
 
         player.setPosition(new Position(1, 1));
         gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
+        gameMaster.setMode(GameMaster.gmMode.GAME);
         message.setPosition(player.getPosition());
     }
 
@@ -107,6 +108,8 @@ public class CommunicationServerDelayMoveTests {
                 assertEquals(new Position(1, 2 + i), response.getPosition());
             else
                 assertEquals(response.getStatus(), Message.Status.DENIED);
+
+            assertEquals("move", response.getAction());
         }
 
         boolean result = false;

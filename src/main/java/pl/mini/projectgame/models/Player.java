@@ -25,7 +25,7 @@ public class Player extends BoardObject {
     }
 
     private Team team;
-    public Position position;
+    //public Position position;
     private InetAddress ipAddress;
     private int portNumber;
     private String playerName;
@@ -66,16 +66,9 @@ public class Player extends BoardObject {
 
     public boolean placePiece(MasterBoard masterBoard) {
         lastAction = ActionType.PLACE;
-        if (!piece.getIsGood()) {
-            piece = null;
-            return false;
-        }
-        if (masterBoard.getCells().get(position).getContent().containsKey(Goal.class)) {
-            piece = null;
-            return true;
-        }
         piece = null;
-        return false;
+
+        return true;
     }
 
     public boolean isReady() {

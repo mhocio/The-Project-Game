@@ -35,6 +35,15 @@ public class Board {
         generateCells();
     }
 
+    public void configure(GameMasterConfiguration config) {
+        goalAreaHeight = config.getBoardGoalHeight();
+        taskAreaHeight = config.getBoardTaskHeight();
+        width = config.getBoardWidth();
+        height = 2 * goalAreaHeight + taskAreaHeight;
+
+        generateCells();
+    }
+
     public Cell getCellByPosition(Position position) {
         return cells.get(position);
     }

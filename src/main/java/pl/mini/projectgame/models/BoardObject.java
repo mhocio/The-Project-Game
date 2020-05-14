@@ -10,5 +10,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class BoardObject {
-    private Position position;
+    public Position position;
 }

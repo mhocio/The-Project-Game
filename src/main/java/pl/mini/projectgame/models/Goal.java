@@ -28,4 +28,15 @@ public class Goal extends BoardObject {
         }
         setPosition(pos);
     }
+
+    public Goal(boolean real, Position pos, Team _team) {
+        this.real = real;
+        if (real) {
+            discovered = goalDiscover.NOT_DISCOVERED;
+        } else {
+            discovered = goalDiscover.DISCOVERED_NON_GOAL;
+        }
+        setPosition(pos);
+        team = _team;
+    }
 }
