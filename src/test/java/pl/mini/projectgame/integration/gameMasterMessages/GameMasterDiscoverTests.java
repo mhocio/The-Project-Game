@@ -1,8 +1,8 @@
 package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,12 +12,23 @@ import pl.mini.projectgame.models.Position;
 
 @SpringBootTest
 @ComponentScan
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GameMasterDiscoverTests {
 
     @Autowired
     private GameMaster gameMaster;
 
     private Message testMessage;
+
+    @BeforeAll
+    void beforeAll() {
+        gameMaster.setMode(GameMaster.gmMode.GAME);
+    }
+
+    @AfterAll
+    void cleanup() {
+        gameMaster.setMode(GameMaster.gmMode.NONE);
+    }
 
     @BeforeEach
     public void setup() {

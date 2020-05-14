@@ -142,18 +142,9 @@ public class GameMaster {
             masterBoard.addBoardObject(player, position);
             board.addBoardObject(player, position);
             player.setBoard(board);
-
-            // TODO: send to everyone? instead to each player separately
-            var message = new Message();
-            message.setPlayerUuid(player.getPlayerUuid());
-            message.setAction("startGame");
-            message.setStatus(Message.Status.OK);
-            message.setPosition(position);
-            message.setBoard(board);
-
-            server.sendToSpecific(message);
+            player.setPosition(position);
         }
-
+        sendStartGameMessage();
         logger.info("The game has started!");
     }
 
@@ -212,6 +203,9 @@ public class GameMaster {
 
     public List<Goal> getGoals(Player player) {
         List<Goal> returnGoals = new ArrayList<>();
+
+        if(player == null) return returnGoals;
+
         Team playerTeam = player.getTeam();
         List<Goal> teamGoals;
 
@@ -219,6 +213,8 @@ public class GameMaster {
             teamGoals = redTeamGoals;
         else
             teamGoals = blueTeamGoals;
+
+        if(teamGoals == null) return returnGoals;
 
         for (Goal goal: teamGoals) {
             if (goal.getDiscovered() != Goal.goalDiscover.NOT_DISCOVERED)
@@ -386,7 +382,9 @@ public class GameMaster {
             masterBoard.movePlayer(player, source, target);
         } catch (Exception e) {
             logger.warn(e.toString());
-            return createErrorMessage();
+            response.setStatus(Message.Status.DENIED);
+            response.setPosition(null);
+            return response;
         }
 
         response.setPosition(target);
@@ -565,6 +563,20 @@ public class GameMaster {
         message.setAction("error");
         message.setStatus(Message.Status.DENIED);
         return message;
+    }
+
+    private void sendStartGameMessage() {
+
+        for(Player p : playerMap.values()) {
+            var message = new Message();
+            message.setPlayerUuid(p.getPlayerUuid());
+            message.setAction("startGame");
+            message.setStatus(Message.Status.OK);
+            message.setPosition(p.getPosition());
+            message.setBoard(p.getBoard());
+
+            server.sendToSpecific(message);
+        }
     }
 
 }

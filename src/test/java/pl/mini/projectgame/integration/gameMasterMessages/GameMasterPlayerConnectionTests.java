@@ -1,10 +1,7 @@
 package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -19,8 +16,17 @@ public class GameMasterPlayerConnectionTests {
 
     @Autowired
     private GameMaster gameMaster;
-
     private Message testMessage;
+
+    @BeforeAll
+    void beforeAll() {
+        gameMaster.setMode(GameMaster.gmMode.LOBBY);
+    }
+
+    @AfterAll
+    void after() {
+        gameMaster.setMode(GameMaster.gmMode.NONE);
+    }
 
     @AfterEach
     void cleanUp() {
@@ -67,7 +73,7 @@ public class GameMasterPlayerConnectionTests {
 
     @Test
     public void serverShouldReturnErrorMessageNotLobby() {
-        gameMaster.setMode(GameMaster.gmMode.NONE);
+        gameMaster.setMode(GameMaster.gmMode.GAME);
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals("error", response.getAction());
     }

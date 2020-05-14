@@ -23,9 +23,15 @@ public class GameMasterMoveTests {
     Message message;
     Player player;
 
+    @BeforeAll
+    void setup() {
+        gameMaster.setMode(GameMaster.gmMode.GAME);
+    }
+
     @AfterAll
     void cleanUp() {
         gameMaster.getMasterBoard().getCells().forEach((k, v) -> v.setContent(new HashMap<>()));
+        gameMaster.setMode(GameMaster.gmMode.NONE);
     }
 
     @BeforeEach

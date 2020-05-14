@@ -4,10 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,6 +31,15 @@ public class CommunicationServerDiscoverTests {
     private BufferedReader in;
     private ObjectMapper mapper;
 
+    @BeforeAll
+    void beforeAll() {
+        gameMaster.setMode(GameMaster.gmMode.GAME);
+    }
+
+    @AfterAll
+    void afterAll() {
+        gameMaster.setMode(GameMaster.gmMode.NONE);
+    }
 
     @BeforeEach
     public void setup() throws IOException {
