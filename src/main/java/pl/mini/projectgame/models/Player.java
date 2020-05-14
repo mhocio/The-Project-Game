@@ -70,12 +70,16 @@ public class Player extends BoardObject {
             piece = null;
             return false;
         }
-        if (masterBoard.getCells().get(position).getContent().containsKey(Goal.class)) {
+        try {
+            if (masterBoard.getCells().get(position).getContent().containsKey(Goal.class)) {
+                piece = null;
+                return true;
+            }
             piece = null;
-            return true;
+            return false;
+        } catch(Exception e) {
+            return false;
         }
-        piece = null;
-        return false;
     }
 
     public boolean isReady() {
