@@ -24,12 +24,14 @@ public class Team {
         players = new Hashtable<Player, TeamRole>();
         size = 0;
         teamColor = null;
+        points = 0;
     }
 
     public Team(TeamColor color) {
         players = new Hashtable<Player, TeamRole>();
         size = 0;
         teamColor = color;
+        points = 0;
     }
 
     public enum TeamColor {
