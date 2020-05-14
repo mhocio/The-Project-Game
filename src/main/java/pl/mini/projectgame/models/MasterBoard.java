@@ -31,5 +31,4 @@ public class MasterBoard extends Board {
         cells.get(target).addContent(Player.class, player);
         cells.get(source).removeContent(Player.class);
     }
-
 }
