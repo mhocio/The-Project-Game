@@ -459,8 +459,11 @@ public class GameMaster {
 
         //TODO edge case - disconnection before the start of the game
 
-        // TODO: check if message is correct
-        playerMap.get(message.getPlayerUuid()).setReady(true);
+        var playerId = message.getPlayerUuid();
+
+        if(playerId == null) return createErrorMessage();
+
+        playerMap.get(playerId).setReady(true);
         Message response = new Message();
         response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
