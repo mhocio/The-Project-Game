@@ -190,7 +190,7 @@ public class CommunicationServer {
         switch (action) {
             case "place":
                 return gameMaster.getConfiguration().getDelayPlace();
-            case "pick":
+            case "pickUp":
                 return gameMaster.getConfiguration().getDelayPick();
             case "test":
                 return gameMaster.getConfiguration().getDelayTest();
