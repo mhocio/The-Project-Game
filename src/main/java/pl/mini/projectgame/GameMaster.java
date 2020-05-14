@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
 @Getter
@@ -588,6 +589,7 @@ public class GameMaster {
             if (player.getPiece() == null) {
                 player.setPiece(pickupPiece);
                 masterBoard.getCellByPosition(message.getPosition()).removeContent(Piece.class);
+                pieces.remove(pickupPiece);
             } else {
                 message.setStatus(Message.Status.DENIED);
                 return message;
