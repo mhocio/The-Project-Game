@@ -29,15 +29,12 @@ public class GameMaster {
         ACTIVE, FINISHED, IDLE
     }
 
-    // TODO: use it after creating a lobby and starting the game
-    // to know when respond to which messages
     public enum gmMode {
         NONE, LOBBY, GAME
     }
     public gmMode mode;
 
     private Map<UUID, Player> playerMap;
-    private boolean firstPlayer;
 
     private boolean lastTeamWasRed;
     private int portNumber;
@@ -62,9 +59,7 @@ public class GameMaster {
         blueTeam = new Team(Team.TeamColor.BLUE);
         redTeam = new Team(Team.TeamColor.RED);
         pieces = new ArrayList<>();
-
         mode = gmMode.NONE;
-        firstPlayer = true;
 
         try {
             File file = new File(
@@ -217,10 +212,7 @@ public class GameMaster {
         lastTeamWasRed = !lastTeamWasRed;
         Player player;
 
-        if (mode != gmMode.LOBBY) {
-            response.setAction("error");
-            return response;
-        }
+        if (mode == gmMode.GAME) return createErrorMessage();
 
         try {
             player = new Player(team);
@@ -228,13 +220,12 @@ public class GameMaster {
             playerMap.put(player.getPlayerUuid(), player);
         } catch (Exception e) {
             logger.warn(e.toString());
-            response.setAction("error");
-            return response;
+            return createErrorMessage();
         }
 
-        if (firstPlayer) {
+        if (mode == gmMode.NONE) {
             player.setHost(true);
-            firstPlayer = false;
+            mode = gmMode.LOBBY;
         }
 
         // TODO: set host to some player if host disconnects
@@ -257,6 +248,9 @@ public class GameMaster {
     private Message actionDiscover(Message message) {
         List<Field> fields = new ArrayList<>();
         Message response = new Message();
+
+        if(mode != gmMode.GAME) return createErrorMessage();
+
         try {
             Position playerPosition = message.getPosition();
 
@@ -292,8 +286,7 @@ public class GameMaster {
             }
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            response.setAction("error");
-            return response;
+            return createErrorMessage();
         }
 
         response.setAction(message.getAction());
@@ -307,6 +300,8 @@ public class GameMaster {
         Message response = new Message();
         Position target = new Position();
 
+        if(mode != gmMode.GAME) return createErrorMessage();
+
         Player player;
         Message.Direction direction;
         Position source;
@@ -318,8 +313,7 @@ public class GameMaster {
             response.setAction(message.getAction());
         } catch (Exception e) {
             logger.warn(e.getMessage());
-            response.setAction("error");
-            return response;
+            return createErrorMessage();
         }
 
         switch (direction) {
@@ -345,9 +339,7 @@ public class GameMaster {
             masterBoard.movePlayer(player, source, target);
         } catch (Exception e) {
             logger.warn(e.toString());
-            response.setStatus(Message.Status.DENIED);
-            response.setPosition(null);
-            return response;
+            return createErrorMessage();
         }
 
         response.setPosition(target);
@@ -356,6 +348,9 @@ public class GameMaster {
     }
 
     private Message actionTest(Message message) {
+
+        if(mode != gmMode.GAME) return createErrorMessage();
+
         Message response = new Message();
         try {
             Player player = playerMap.get(message.getPlayerUuid());
@@ -371,14 +366,15 @@ public class GameMaster {
             response.setAction(message.getAction());
         } catch (Exception e) {
             logger.warn(e.toString());
-            response.setAction("error");
-            response.setTest(null);
+            return createErrorMessage();
         }
 
         return response;
     }
 
     private Message actionPlace(Message message) {
+
+        if(mode != gmMode.GAME) return createErrorMessage();
 
         // TODO: change the state of the cell if non-goal also,
         //  we need it to return the players goals
@@ -408,6 +404,9 @@ public class GameMaster {
     }
 
     private Message actionReady(Message message) {
+
+        if(mode != gmMode.LOBBY) return createErrorMessage();
+
         //TODO edge case - disconnection before the start of the game
 
         // TODO: check if message is correct
@@ -426,13 +425,11 @@ public class GameMaster {
         try {
             playerMessaged = playerMap.get(message.getPlayerUuid());
         } catch (Exception ex) {
-            response.setAction("error");
-            return response;
+            return createErrorMessage();
         }
 
-        if (!playerMessaged.isHost()) {
-            response.setAction("error");
-            return response;
+        if (!playerMessaged.isHost() || mode != gmMode.LOBBY) {
+            return createErrorMessage();
         }
 
         List<Player> players = new ArrayList<>();
@@ -448,10 +445,7 @@ public class GameMaster {
             }
         }
 
-        if (!allPlayersReady) {
-            response.setAction("error");
-            return response;
-        }
+        if (!allPlayersReady) return createErrorMessage();
 
         startGame();
         response.setStatus(Message.Status.OK);
@@ -459,6 +453,9 @@ public class GameMaster {
     }
 
     private Message actionPickUp(Message message) {
+
+        if(mode != gmMode.GAME) return createErrorMessage();
+
         try {
             Piece pickupPiece = (Piece) masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
 
@@ -477,11 +474,7 @@ public class GameMaster {
             }
         } catch (Exception e) {
             logger.warn(e.toString());
-            Message response = new Message();
-            response.setPosition(message.getPosition());
-            response.setAction("error");
-            response.setStatus(Message.Status.DENIED);
-            return response;
+            return createErrorMessage();
         }
 
         Message response = new Message();
@@ -495,21 +488,16 @@ public class GameMaster {
      * Create a lobby?
      * Now player can join to the game
      * @param message
-     * @return
+     * @deprecated
      */
     private Message actionSetup(Message message) {
         Message response = new Message();
         Player player;
 
-        if (mode != gmMode.NONE) {
-            response.setAction("error");
-            return response;
-        }
+        if (mode == gmMode.GAME) return createErrorMessage();
 
         if (configuration == null || masterBoard == null) {
-            response.setAction("error");
-            response.setStatus(Message.Status.DENIED);
-            return response;
+            return  createErrorMessage();
         }
 
         mode = gmMode.LOBBY;
@@ -517,6 +505,13 @@ public class GameMaster {
         response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
         return response;
+    }
+
+    private Message createErrorMessage() {
+        var message = new Message();
+        message.setAction("error");
+        message.setStatus(Message.Status.DENIED);
+        return message;
     }
 
 }
