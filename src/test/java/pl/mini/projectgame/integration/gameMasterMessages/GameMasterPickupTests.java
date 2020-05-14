@@ -28,11 +28,13 @@ public class GameMasterPickupTests {
     @BeforeAll
     void saveConfig() {
         cells = gameMaster.getMasterBoard().getCells();
+        gameMaster.setMode(GameMaster.gmMode.GAME);
     }
 
     @AfterAll
     void cleanUp() {
         gameMaster.getMasterBoard().setCells(cells);
+        gameMaster.setMode(GameMaster.gmMode.NONE);
     }
 
     @BeforeEach

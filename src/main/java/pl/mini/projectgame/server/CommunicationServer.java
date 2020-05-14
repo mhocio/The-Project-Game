@@ -100,7 +100,7 @@ public class CommunicationServer {
 
                     message = objectMapper.readValue(cb.toString(), Message.class);
 
-                    if (message == null) {
+                    if (message == null || message.getAction() == null) {
                         message = new Message();
                         message.setAction("error");
                         objectMapper.writeValue(out, message);
@@ -114,7 +114,6 @@ public class CommunicationServer {
 
                     message = gameMaster.processAndReturn(message);
 
-                    // TODO: check if game is in lobby mode
                     if (message.getAction().equals("connect")) {
                         conn.put(message.getPlayerUuid(), socket);
                     }
@@ -185,8 +184,6 @@ public class CommunicationServer {
             return 0;
         }
 
-        // TODO: IMPORTANT - check if return val are not null
-        //  those upper try/catch do not work...
         if (action == null)
             return -1;
 

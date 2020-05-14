@@ -45,11 +45,14 @@ public class CommunicationServerPickupTests {
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
         mapper = new ObjectMapper(jsonFactory);
+
+        gameMaster.setMode(GameMaster.gmMode.GAME);
     }
 
     @AfterAll
     void cleanUp() throws IOException {
         gameMaster.getMasterBoard().setCells(cells);
+        gameMaster.setMode(GameMaster.gmMode.NONE);
         in.close();
         out.close();
         client.close();
