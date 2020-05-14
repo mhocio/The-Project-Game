@@ -39,15 +39,19 @@ public class GameMaster {
     private boolean lastTeamWasRed;
     private int portNumber;
     private InetAddress ipAddress;
-    private int blueTeamGoals;
-    private int redTeamGoals;
+
+    // redTeam is DOWN of the map
     private Team redTeam;
+    private List<Goal> redTeamGoals;
+    // blueTeam is UP of the map
     private Team blueTeam;
-    private int currentPieces;
+    private List<Goal> blueTeamGoals;
+
     private MasterBoard masterBoard;
     private GameMasterConfiguration configuration;
     private CommunicationServer server;
     private List<Piece> pieces;
+    private int requiredPointsToWin;
 
     @Autowired
     public GameMaster(GameMasterConfiguration config, MasterBoard board, @Lazy CommunicationServer server) {
@@ -72,9 +76,6 @@ public class GameMaster {
         } catch (NullPointerException e) {
             logger.error(e.getMessage());
         }
-
-        blueTeamGoals = config.getPredefinedGoalPositions().size();
-        redTeamGoals = blueTeamGoals;
     }
 
     public void reset() {
@@ -88,8 +89,36 @@ public class GameMaster {
         Position position;
 
         mode = gmMode.GAME;
+        requiredPointsToWin = configuration.getPredefinedGoalPositions().size();
 
         // TODO: set goals from config
+        List<Position> predefinedGoals = configuration.getPredefinedGoalPositions();
+        for (Position goalPos: predefinedGoals) {
+            int x = goalPos.getX();
+            int y = goalPos.getY();
+
+            if (x >= masterBoard.getWidth() || y >= masterBoard.getTaskAreaHeight()) {
+                Position pos;
+                do {
+                    x = random.nextInt(board.getWidth());
+                    y = random.nextInt(board.getGoalAreaHeight());
+                    pos = new Position(x, y);
+                } while (masterBoard.getCellByPosition(pos).getContent().containsKey(Goal.class));
+            }
+
+            Position pos1 = new Position(x, y);
+            Goal goal1 = new Goal(true, pos1);
+            goal1.setTeam(redTeam);
+            masterBoard.addBoardObject(goal1, pos1);
+            redTeamGoals.add(goal1);
+
+            y += configuration.boardTaskHeight + configuration.boardGoalHeight;
+            Position pos2 = new Position(x, y);
+            Goal goal2 = new Goal(true, pos2);
+            goal1.setTeam(blueTeam);
+            masterBoard.addBoardObject(goal2, pos2);
+            blueTeamGoals.add(goal2);
+        }
         // TODO: set pieces
         // TODO: start a thread with piece generator
 
@@ -181,6 +210,24 @@ public class GameMaster {
         System.out.println("Message handled.");
     }
 
+    public List<Goal> getGoals(Player player) {
+        List<Goal> returnGoals = new ArrayList<>();
+        Team playerTeam = player.getTeam();
+        List<Goal> teamGoals;
+
+        if (playerTeam == redTeam)
+            teamGoals = redTeamGoals;
+        else
+            teamGoals = blueTeamGoals;
+
+        for (Goal goal: teamGoals) {
+            if (goal.getDiscovered() != Goal.goalDiscover.NOT_DISCOVERED)
+                returnGoals.add(goal);
+        }
+
+        return returnGoals;
+    }
+
     public synchronized Message processAndReturn(Message request) {
 
         Message response;
@@ -197,11 +244,11 @@ public class GameMaster {
             return msg;
         }
 
-        /* TODO: set goals in players goal area
-            in each response if game is ON
+         //set goals in players goal area in each response if game is ON
         if (mode == gmMode.GAME) {
-            response.setGoals(getGoals(response.getPlayer()));
-        }*/
+            Player player = playerMap.get(request.getPlayerUuid());
+            response.setGoals(getGoals(player));
+        }
 
         return response;
     }
@@ -385,6 +432,7 @@ public class GameMaster {
             // TODO: change the state of the goal
             masterBoard.getCellByPosition(message.getPosition()).removeContent(Goal.class);
 
+            /*
             if (player.getTeam().getColor() == Team.TeamColor.BLUE) {
                 if (player.getTeam().getPoints() == blueTeamGoals) {
                     finishGame();
@@ -393,7 +441,9 @@ public class GameMaster {
                 if (player.getTeam().getPoints() == redTeamGoals) {
                     finishGame();
                 }
-            }
+            }*/
+
+            // TODO: checkWinningState(); which can finish game
         }
         //@mhocio wanted some bad status idk
         Message response = new Message();
