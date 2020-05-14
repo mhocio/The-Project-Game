@@ -21,6 +21,8 @@ public class Message {
 
     public enum Direction {UP, DOWN, LEFT, RIGHT}
 
+    public enum placementResult {CORRECT, POINTLESS}
+
     private Player player;
     private Team.TeamColor teamColor;
     private Team.TeamRole teamRole;
@@ -30,6 +32,7 @@ public class Message {
     private String action;
     private Status status;
     private Boolean test;
+    private placementResult placementResult;
 
     private Position position;
     private List<Field> fields;

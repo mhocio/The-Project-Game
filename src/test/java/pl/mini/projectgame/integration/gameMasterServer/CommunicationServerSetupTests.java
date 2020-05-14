@@ -37,6 +37,7 @@ public class CommunicationServerSetupTests {
     void saveConfig() {
         masterBoard = gameMaster.getMasterBoard();
         config = gameMaster.getConfiguration();
+        gameMaster.setMode(GameMaster.gmMode.NONE);
     }
 
     @AfterAll

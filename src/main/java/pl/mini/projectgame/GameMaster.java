@@ -70,9 +70,9 @@ public class GameMaster {
                     Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource("gameMasterConfig.json")).getFile()
             );
             config.configureFromFile(file.getPath());
-            config.getPredefinedGoalPositions().forEach(pos -> {
-                board.getCellByPosition(pos).getContent().put(Goal.class, new Goal());
-            });
+            blueTeam.setMaxTeamSize(config.getMaxTeamSize());
+            redTeam.setMaxTeamSize(config.getMaxTeamSize());
+            masterBoard.configure(config);
         } catch (NullPointerException e) {
             logger.error(e.getMessage());
         }
@@ -91,7 +91,12 @@ public class GameMaster {
         mode = gmMode.GAME;
         requiredPointsToWin = configuration.getPredefinedGoalPositions().size();
 
-        // TODO: set goals from config
+        if (requiredPointsToWin <= 0) {
+            logger.error("some error with configuration.getPredefinedGoalPositions ");
+            requiredPointsToWin = 5;
+        }
+
+        // set goals from config
         List<Position> predefinedGoals = configuration.getPredefinedGoalPositions();
         for (Position goalPos: predefinedGoals) {
             int x = goalPos.getX();
@@ -119,9 +124,13 @@ public class GameMaster {
             masterBoard.addBoardObject(goal2, pos2);
             blueTeamGoals.add(goal2);
         }
-        // TODO: set pieces
-        // TODO: start a thread with piece generator
 
+        // set pieces
+        for (int i = 0; i < configuration.getMaxPieces(); i++) {
+            putNewPiece();
+        }
+
+        // TODO: start a thread with piece generator
 
         for (Player player : playerMap.values()) {
             do {
@@ -148,7 +157,7 @@ public class GameMaster {
         logger.info("The game has started!");
     }
 
-    public void finishGame() {
+    public void finishGame(Team.TeamColor color) {
         mode = gmMode.NONE;
 
         Message message = new Message();
@@ -174,7 +183,7 @@ public class GameMaster {
         System.out.println("Configuration loaded.");
     }
 
-    private void putNewPiece() throws DeniedMoveException {
+    private void putNewPiece() {
         var target = new Position();
 
         Random random = new Random();
@@ -189,8 +198,6 @@ public class GameMaster {
         }
 
         masterBoard.getCells().get(target).addContent(Piece.class, piece);
-
-        System.out.println("New piece has been put.");
     }
 
     private void printBoard(Board board) {
@@ -417,41 +424,98 @@ public class GameMaster {
         return response;
     }
 
+    private void checkWinningState() {
+        if (redTeam.getPoints() == requiredPointsToWin) {
+            finishGame(Team.TeamColor.RED);
+        }
+
+        if (blueTeam.getPoints() == requiredPointsToWin) {
+            finishGame(Team.TeamColor.BLUE);
+        }
+    }
+
     private Message actionPlace(Message message) {
 
-        if(mode != gmMode.GAME) return createErrorMessage();
+        if(mode != gmMode.GAME)
+            return createErrorMessage();
 
-        // TODO: change the state of the cell if non-goal also,
-        //  we need it to return the players goals
-        var player = playerMap.get(message.getPlayerUuid());
-        var position = message.getPosition();
+        Message response = new Message();
+        response.setAction(message.getAction());
+        response.setStatus(Message.Status.OK);
+        response.setPlacementResult(Message.placementResult.CORRECT);
 
-        if (player.placePiece(masterBoard)) {
-            player.getTeam().addPoints(1);
-            // TODO: change the state of the goal
+        Player player;
+        Position playerPosition;
+        Piece playerPiece;
+        Goal goal = null;
+        Team playerTeam;
 
-            var cell = masterBoard.getCellByPosition(position);
+        try {
+            player = playerMap.get(message.getPlayerUuid());
+            response.setPlayerUuid(message.getPlayerUuid());
+            playerPosition = player.getPosition();
+            playerPiece = player.getPiece();
+            playerTeam = player.getTeam();
 
-            if(cell == null) return createErrorMessage();
+            if (playerPiece == null)
+                return createErrorMessage();
 
-            cell.removeContent(Goal.class);
+            if (masterBoard.getCellByPosition(player.getPosition()).getContent().containsKey(Goal.class)) {
+                goal = (Goal) masterBoard.getCellByPosition(player.getPosition()).getContent().get(Goal.class);
+            }
 
-            /*
-            if (player.getTeam().getColor() == Team.TeamColor.BLUE) {
-                if (player.getTeam().getPoints() == blueTeamGoals) {
-                    finishGame();
-                }
-            } else {
-                if (player.getTeam().getPoints() == redTeamGoals) {
-                    finishGame();
-                }
-            }*/
-
-            // TODO: checkWinningState(); which can finish game
+        } catch (Exception ex) {
+            return createErrorMessage();
         }
-        //TODO send the new score to all players message
-        message.setStatus(Message.Status.OK);
-        return message;
+
+        player.placePiece(masterBoard);
+
+        // good piece
+        if (playerPiece.getIsGood()) {
+            // empty cell
+            if (goal == null) {
+                response.setPlacementResult(Message.placementResult.POINTLESS);
+                if (playerTeam == blueTeam) {
+                    Goal newGoal = new Goal(false, playerPosition, blueTeam);
+                    masterBoard.addBoardObject(new Goal(false, playerPosition), playerPosition);
+                    blueTeamGoals.add(newGoal);
+                } else {
+                    Goal newGoal = new Goal(false, playerPosition, redTeam);
+                    masterBoard.addBoardObject(new Goal(false, playerPosition), playerPosition);
+                    redTeamGoals.add(newGoal);
+                }
+                return response;
+            }
+
+            // discovered cell
+            if (goal.getDiscovered().equals(Goal.goalDiscover.DISCOVERED_NON_GOAL)
+                    || goal.getDiscovered().equals(Goal.goalDiscover.DISCOVERED_GOAL)) {
+                response.setPlacementResult(Message.placementResult.POINTLESS);
+                return response;
+            }
+
+            // good place
+            if (goal.getDiscovered().equals(Goal.goalDiscover.NOT_DISCOVERED)) {
+                // good team
+                if (goal.getTeam() == playerTeam) {
+                    playerTeam.addPoints(1);
+                    goal.setDiscovered(Goal.goalDiscover.DISCOVERED_GOAL);
+                    checkWinningState();
+                } else {
+                    // wrong team
+                    response.setPlacementResult(Message.placementResult.POINTLESS);
+                    response.setStatus(Message.Status.DENIED);
+                }
+                return response;
+            }
+
+        } else {
+            // sham piece
+            response.setPlacementResult(Message.placementResult.POINTLESS);
+            return response;
+        }
+
+        return response;
     }
 
     private Message actionReady(Message message) {

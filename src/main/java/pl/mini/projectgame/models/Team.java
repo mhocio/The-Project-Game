@@ -16,6 +16,7 @@ public class Team {
     private TeamColor teamColor;
     private int size;
     private long points;
+    private int maxTeamSize;
 
     @JsonIgnore
     private Hashtable<Player, TeamRole> players;
@@ -25,6 +26,7 @@ public class Team {
         size = 0;
         teamColor = null;
         points = 0;
+        maxTeamSize = 4;
     }
 
     public Team(TeamColor color) {
@@ -32,6 +34,7 @@ public class Team {
         size = 0;
         teamColor = color;
         points = 0;
+        maxTeamSize = 4;
     }
 
     public enum TeamColor {
@@ -63,7 +66,7 @@ public class Team {
 
     public void addPlayer(Player player)
             throws TeamSquadChangeException, FullTeamException {
-        if (this.getSize() == 4)
+        if (this.getSize() == maxTeamSize)
             throw new FullTeamException("This team is full!");
         if (player != null && !players.containsKey(player)) {
             // first player is the team leader
