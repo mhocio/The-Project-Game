@@ -33,5 +33,4 @@ public class MasterBoard extends Board {
 
         player.setPosition(target);
     }
-
 }

@@ -60,6 +60,9 @@ public class Board {
     }
 
     public synchronized void addBoardObject(BoardObject object, Position position) {
-        cells.get(position).addContent(object.getClass(), object);
+        var cell = cells.get(position);
+
+        if(cell == null || object == null) return;
+        cell.addContent(object.getClass(), object);
     }
 }

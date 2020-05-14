@@ -239,18 +239,15 @@ public class GameMaster {
             Method method = this.getClass().getDeclaredMethod("action" + StringUtils.capitalize(request.getAction()), Message.class);
             logger.info(method.getName());
             response = (Message) method.invoke(this, request);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex1) {
-            logger.warn(ex1.getMessage());
 
-            var msg = new Message();
-            msg.setAction("error");
-            return msg;
-        }
-
-         //set goals in players goal area in each response if game is ON
-        if (mode == gmMode.GAME) {
-            Player player = playerMap.get(request.getPlayerUuid());
-            response.setGoals(getGoals(player));
+            //set goals in players goal area in each response if game is ON
+            if (mode == gmMode.GAME) {
+                Player player = playerMap.get(request.getPlayerUuid());
+                response.setGoals(getGoals(player));
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+            return createErrorMessage();
         }
 
         return response;
@@ -268,24 +265,25 @@ public class GameMaster {
             player = new Player(team);
             team.addPlayer(player);
             playerMap.put(player.getPlayerUuid(), player);
+
+            if (mode == gmMode.NONE) {
+                player.setHost(true);
+                mode = gmMode.LOBBY;
+            }
+
+            response.setAction(message.getAction());
+            response.setPlayerUuid(player.getPlayerUuid());
+            response.setTeamColor(player.getTeam().getTeamColor());
+            response.setTeamRole(player.getTeam().getPlayerRole(player));
+            response.setHost(player.isHost());
+            response.setStatus(Message.Status.OK);
+
         } catch (Exception e) {
             logger.warn(e.toString());
             return createErrorMessage();
         }
 
-        if (mode == gmMode.NONE) {
-            player.setHost(true);
-            mode = gmMode.LOBBY;
-        }
-
         // TODO: set host to some player if host disconnects
-
-        response.setAction(message.getAction());
-        response.setPlayerUuid(player.getPlayerUuid());
-        response.setTeamColor(player.getTeam().getTeamColor());
-        response.setTeamRole(player.getTeam().getPlayerRole(player));
-        response.setHost(player.isHost());
-        response.setStatus(Message.Status.OK);
 
         return response;
     }
@@ -365,6 +363,8 @@ public class GameMaster {
             logger.warn(e.getMessage());
             return createErrorMessage();
         }
+
+        if(direction == null || source == null) return createErrorMessage();
 
         switch (direction) {
             case UP:
@@ -529,15 +529,11 @@ public class GameMaster {
         if(playerId == null) return createErrorMessage();
 
         playerMap.get(playerId).setReady(true);
-        Message response = new Message();
-        response.setAction(message.getAction());
-        response.setStatus(Message.Status.OK);
-        return response;
+        message.setStatus(Message.Status.OK);
+        return message;
     }
 
     private Message actionStart(Message message) {
-        Message response = new Message();
-        response.setAction(message.getAction());
         Player playerMessaged;
 
         try {
@@ -566,8 +562,8 @@ public class GameMaster {
         if (!allPlayersReady) return createErrorMessage();
 
         startGame();
-        response.setStatus(Message.Status.OK);
-        return response;
+        message.setStatus(Message.Status.OK);
+        return message;
     }
 
     private Message actionPickUp(Message message) {
@@ -584,22 +580,16 @@ public class GameMaster {
                 player.setPiece(pickupPiece);
                 masterBoard.getCellByPosition(message.getPosition()).removeContent(Piece.class);
             } else {
-                Message response = new Message();
-                response.setPosition(message.getPosition());
-                response.setAction(message.getAction());
-                response.setStatus(Message.Status.DENIED);
-                return response;
+                message.setStatus(Message.Status.DENIED);
+                return message;
             }
         } catch (Exception e) {
             logger.warn(e.toString());
             return createErrorMessage();
         }
 
-        Message response = new Message();
-        response.setAction(message.getAction());
-        response.setPosition(message.getPosition());
-        response.setStatus(Message.Status.OK);
-        return response;
+        message.setStatus(Message.Status.OK);
+        return message;
     }
 
     /**
@@ -645,5 +635,4 @@ public class GameMaster {
             server.sendToSpecific(message);
         }
     }
-
 }
