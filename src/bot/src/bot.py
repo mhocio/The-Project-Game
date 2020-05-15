@@ -13,7 +13,7 @@ def bot_function(addr):
     
     my_player.start()
     my_player.move_right()
-    my_player.move_down()
+    my_player.move_left()
     my_player.close()
 
 
@@ -54,15 +54,17 @@ class Player:
     def bot_read(self):
         while(True):
             if self.writing == False:
+                print("WRITING IN BOT "+str(self.writing))
                 rv = self.recv()
                 print("RECV: ", rv)
                 if(rv['action'] == "finish"):
                     print("BOT_READ finish")
                     break
-                # response for start message from host
                 elif rv['action'] == 'start' and rv['status'] == "OK":
                     print("BOT_READ start")
-                    # pass
+                    self.writing = False
+                    pass
+                # response for start message from host
                 elif rv['action'] == 'discover' and rv['status'] == "OK":
                     print("BOT_READ discover")
                     for field in rv['fields']:
@@ -76,7 +78,6 @@ class Player:
                         print("BOT_READ position1 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
                         self.set_pos(rv['position']['x'], rv['position']['y'])
                         print("BOT_READ position2 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
-
 
                 self.writing = True
 
@@ -109,10 +110,10 @@ class Player:
         return self.pos_y
 
     def wait(self):
-        print("WAIT "+str(self.writing))
         while(self.writing == False):
             pass
-        print("WAIT "+str(self.writing))
+        print("WRITING "+str(self.writing))
+
 
     def move_right(self):
         self.wait()
@@ -127,6 +128,7 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
+        print("WRITING "+str(self.writing))
 
     def move_left(self):
         self.wait()
@@ -141,6 +143,7 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
+        print("WRITING "+str(self.writing))
 
 
     def move_up(self):
@@ -156,6 +159,7 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
+        print("WRITING "+str(self.writing))
         
     def move_down(self):
         self.wait()
@@ -170,6 +174,7 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
+        print("WRITING "+str(self.writing))
 
     def pickup(self):
         self.wait()
