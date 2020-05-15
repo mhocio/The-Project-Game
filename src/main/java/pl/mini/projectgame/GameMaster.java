@@ -62,6 +62,8 @@ public class GameMaster {
         masterBoard = board;
         blueTeam = new Team(Team.TeamColor.BLUE);
         redTeam = new Team(Team.TeamColor.RED);
+        redTeamGoals = new ArrayList<>();
+        blueTeamGoals = new ArrayList<>();
         pieces = new ArrayList<>();
         mode = gmMode.NONE;
 
@@ -160,6 +162,15 @@ public class GameMaster {
     public void finishGame(Team.TeamColor color) {
         mode = gmMode.NONE;
 
+        logger.info("Red team points: " + redTeam.getPoints());
+        logger.info("Blue team points: " + blueTeam.getPoints());
+
+        if(color == null) {
+            logger.info("Draw!");
+        } else {
+            logger.info(color + " wins!");
+        }
+
         Message message = new Message();
         message.setAction("finish");
         server.sendToEveryone(message);
@@ -189,10 +200,10 @@ public class GameMaster {
         Random random = new Random();
         var piece = new Piece(configuration.getShamProbability());
 
-        target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
-        target.setX(random.nextInt(masterBoard.getWidth()));
+        target.setY(Math.abs(random.nextInt()) % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
+        target.setX(Math.abs(random.nextInt(masterBoard.getWidth())));
 
-        while (masterBoard.getCells().get(target).getContent().containsKey(Player.class)) {
+        while (masterBoard.getCells().get(target).getContent().containsKey(Piece.class) || masterBoard.getCells().get(target).getContent().containsKey(Player.class)) {
             target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
             target.setX(random.nextInt(masterBoard.getWidth()));
         }
@@ -286,6 +297,22 @@ public class GameMaster {
         // TODO: set host to some player if host disconnects
 
         return response;
+    }
+
+    private Message actionFinish(Message message) {
+        var player = playerMap.get(message.getPlayerUuid());
+
+        if(player == null || !player.isHost()) return createErrorMessage();
+
+        if(redTeam.getPoints() > blueTeam.getPoints()) {
+            finishGame(redTeam.getColor());
+        } else if(redTeam.getPoints() < blueTeam.getPoints()) {
+            finishGame(blueTeam.getColor());
+        } else {
+            finishGame(null);
+        }
+
+        return message;
     }
 
     /**
@@ -562,7 +589,12 @@ public class GameMaster {
         if (!allPlayersReady) return createErrorMessage();
 
         startGame();
+        message.setPlayerUuid(playerMessaged.getPlayerUuid());
+        message.setAction("startGame");
         message.setStatus(Message.Status.OK);
+        message.setPosition(playerMessaged.getPosition());
+        message.setBoard(playerMessaged.getBoard());
+
         return message;
     }
 
@@ -625,14 +657,16 @@ public class GameMaster {
     private void sendStartGameMessage() {
 
         for(Player p : playerMap.values()) {
-            var message = new Message();
-            message.setPlayerUuid(p.getPlayerUuid());
-            message.setAction("startGame");
-            message.setStatus(Message.Status.OK);
-            message.setPosition(p.getPosition());
-            message.setBoard(p.getBoard());
+            if(!p.isHost()) {
+                var message = new Message();
+                message.setPlayerUuid(p.getPlayerUuid());
+                message.setAction("startGame");
+                message.setStatus(Message.Status.OK);
+                message.setPosition(p.getPosition());
+                message.setBoard(p.getBoard());
 
-            server.sendToSpecific(message);
+                server.sendToSpecific(message);
+            }
         }
     }
 }

@@ -34,6 +34,7 @@ public class CommunicationServer {
     private ObjectMapper objectMapper;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     private GameMaster gameMaster;
+    private List<Thread> clientHandles;
 
     public CommunicationServer(@Autowired GameMaster gameMaster) throws IOException {
         JsonFactory jsonFactory = new JsonFactory();
@@ -43,6 +44,7 @@ public class CommunicationServer {
         connections = new HashSet<>();
         conn = new HashMap<>();
         this.gameMaster = gameMaster;
+        clientHandles = new ArrayList<>();
 
         listeningThread = new Thread(this::listen);
         listeningThread.setName("Listening");
@@ -59,6 +61,7 @@ public class CommunicationServer {
                     var thread = new Thread(() -> handle(client));
                     thread.setName("Handle for " + client.getInetAddress().toString());
                     thread.start();
+                    clientHandles.add(thread);
                     logger.info("New player connected from " + client.getInetAddress().toString());
                 }
             } catch (IOException e) {
@@ -164,16 +167,22 @@ public class CommunicationServer {
         connections.forEach(socket -> {
             try {
                 socket.close();
+                logger.info("Client socket closed!");
             } catch (IOException e) {
                 logger.warn(e.getMessage());
             }
         });
+
+        clientHandles.forEach(Thread::interrupt);
+
         listeningThread.interrupt();
         try {
             serverSocket.close();
+            logger.info("Server Socket Closed!");
         } catch (IOException e) {
             logger.warn(e.toString());
         }
+        System.exit(0);
     }
 
     private int getResponseTime(Message message) {
