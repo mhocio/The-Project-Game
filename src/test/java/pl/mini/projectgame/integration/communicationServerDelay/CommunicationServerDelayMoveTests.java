@@ -130,7 +130,7 @@ public class CommunicationServerDelayMoveTests {
         }
 
         assertEquals(lastPosition, new Position(x, gameMaster.getConfiguration().getBoardGoalHeight()
-                                                        + gameMaster.getConfiguration().getBoardTaskHeight()));
+                                                        + gameMaster.getConfiguration().getBoardTaskHeight() - 1));
         result = false;
         mean = sum / numOfRuns;
         if (Math.abs(originalDelay - mean) < 7.0)

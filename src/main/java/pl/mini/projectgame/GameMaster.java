@@ -373,7 +373,7 @@ public class GameMaster {
 
         switch (direction) {
             case UP:
-                if (team == Team.TeamColor.RED && source.getY() + 1 <= blueTeamBorder || team == Team.TeamColor.BLUE) {
+                if ((team == Team.TeamColor.RED && (source.getY() + 1 < blueTeamBorder)) || team == Team.TeamColor.BLUE) {
                     target.setX(source.getX());
                     target.setY(source.getY() + 1);
                 }
@@ -383,7 +383,7 @@ public class GameMaster {
                 }
                 break;
             case DOWN:
-                if (team == Team.TeamColor.BLUE && source.getY() - 1 >= redTeamBorder || team == Team.TeamColor.RED) {
+                if ((team == Team.TeamColor.BLUE && (source.getY() - 1 >= redTeamBorder)) || team == Team.TeamColor.RED) {
                     target.setX(source.getX());
                     target.setY(source.getY() - 1);
                 }
