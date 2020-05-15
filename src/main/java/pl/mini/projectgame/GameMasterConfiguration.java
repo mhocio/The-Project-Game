@@ -43,7 +43,7 @@ public class GameMasterConfiguration {
 
         boardWidth = 10;
         boardTaskHeight = 30;
-        boardGoalHeight = 5;
+        boardGoalHeight = 6;
 
         DelayDestroyPiece = 2950;
         DelayNextPiecePlace = 3000;
