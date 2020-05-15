@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @Getter
@@ -188,16 +189,23 @@ public class GameMaster {
     private void putNewPiece() {
         var target = new Position();
 
-        Random random = new Random();
+        //Random random = new Random();
         var piece = new Piece(configuration.getShamProbability());
 
-        target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
-        target.setX(random.nextInt(masterBoard.getWidth()));
+        //target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
+        //target.setX(random.nextInt(masterBoard.getWidth()));
+
+        target.setY(ThreadLocalRandom.current().nextInt(0, masterBoard.getTaskAreaHeight())
+                    + masterBoard.getGoalAreaHeight());
+        target.setX(ThreadLocalRandom.current().nextInt(0, masterBoard.getWidth()));
 
         while (masterBoard.getCells().get(target).getContent().containsKey(Player.class)
             || masterBoard.getCells().get(target).getContent().containsKey(Piece.class)) {
-            target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
-            target.setX(random.nextInt(masterBoard.getWidth()));
+            //target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
+            //target.setX(random.nextInt(masterBoard.getWidth()));
+            target.setY(ThreadLocalRandom.current().nextInt(0, masterBoard.getTaskAreaHeight())
+                    + masterBoard.getGoalAreaHeight());
+            target.setX(ThreadLocalRandom.current().nextInt(0, masterBoard.getWidth()));
         }
 
         piece.setPosition(target);
