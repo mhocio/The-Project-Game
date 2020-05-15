@@ -59,6 +59,9 @@ class Player:
                 continue
             if(rv['action'] == "finish"):
                 break
+            # response for start message from host
+            elif rv['action'] == 'start' and rv['status'] == "OK":
+                pass
             elif rv['action'] == 'discover' and rv['status'] == "OK":
                 for field in rv['fields']:
                     self.board.set_cell(field['x'], field['y'], field['cell']['distance'])
@@ -235,17 +238,14 @@ class Player:
             print(config)
 
         if config["action"] == "startGame":
-                # self.set_team(config["team"])
-                # self.set_role(config["teamRole"])
                 self.set_board(config["board"]["width"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
                 self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
-                print("POSITION: ", self.get_pos_x(), self.get_pos_y())
-                start = self.recv()
-                print("WAIT:", start)
-                while start['action'] == "error":
-                    print("WAIT:", start)
-                    start = self.recv()
-                if start['status'] == 'OK':
+                # start = self.recv()
+                # print("WAIT:", start)
+                # while start['action'] == "error":
+                #     print("WAIT:", start)
+                #     start = self.recv()
+                if config['status'] == 'OK':
                     self.x = Thread(target = self.bot_read)
                     self.x.start()
 
