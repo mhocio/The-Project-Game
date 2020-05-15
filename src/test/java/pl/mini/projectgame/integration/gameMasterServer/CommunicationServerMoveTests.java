@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
-import pl.mini.projectgame.models.Message;
-import pl.mini.projectgame.models.Player;
-import pl.mini.projectgame.models.Position;
-import pl.mini.projectgame.models.Team;
+import pl.mini.projectgame.models.*;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -27,6 +24,9 @@ public class CommunicationServerMoveTests {
 
     @Autowired
     private GameMaster gameMaster;
+    @Autowired
+    private MasterBoard masterBoard;
+
     private Socket client;
     private BufferedWriter out;
     private BufferedReader in;

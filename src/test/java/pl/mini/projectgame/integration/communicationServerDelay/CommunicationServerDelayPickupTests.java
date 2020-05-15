@@ -27,6 +27,10 @@ public class CommunicationServerDelayPickupTests {
 
     @Autowired
     private GameMaster gameMaster;
+
+    @Autowired
+    private MasterBoard masterBoard;
+
     private Message testMessage;
 
     private Socket client;
@@ -60,7 +64,8 @@ public class CommunicationServerDelayPickupTests {
 
     @AfterAll
     void cleanUp() throws IOException {
-        gameMaster.getMasterBoard().setCells(cells);
+        gameMaster.setMasterBoard(masterBoard);
+        gameMaster.getPlayerMap().clear();
         gameMaster.setMode(GameMaster.gmMode.NONE);
         in.close();
         out.close();

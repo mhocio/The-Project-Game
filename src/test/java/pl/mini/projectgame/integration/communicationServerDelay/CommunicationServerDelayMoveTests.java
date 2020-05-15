@@ -48,6 +48,7 @@ public class CommunicationServerDelayMoveTests {
     @BeforeAll
     void beforeAll() {
         gameMaster.setMode(GameMaster.gmMode.GAME);
+        gameMaster.getMasterBoard().getCells().forEach((k,v) -> v.setContent(new HashMap<>()));
         originalDelay = gameMaster.getConfiguration().getDelayMove();
         x = gameMaster.getConfiguration().getBoardWidth()/2;
         y = gameMaster.getConfiguration().getBoardTaskHeight()/2 +

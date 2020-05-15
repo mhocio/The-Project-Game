@@ -64,6 +64,8 @@ public class GameMaster {
         redTeam = new Team(Team.TeamColor.RED);
         pieces = new ArrayList<>();
         mode = gmMode.NONE;
+        blueTeamGoals = new ArrayList<>();
+        redTeamGoals = new ArrayList<>();
 
         try {
             File file = new File(
