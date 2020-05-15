@@ -53,33 +53,31 @@ class Player:
 
     def bot_read(self):
         while(True):
-            if self.writing == False:
-                print("WRITING IN BOT "+str(self.writing))
-                rv = self.recv()
-                print("RECV: ", rv)
-                if(rv['action'] == "finish"):
-                    print("BOT_READ finish")
-                    break
-                elif rv['action'] == 'start' and rv['status'] == "OK":
-                    print("BOT_READ start")
-                    self.writing = False
-                    pass
-                # response for start message from host
-                elif rv['action'] == 'discover' and rv['status'] == "OK":
-                    print("BOT_READ discover")
-                    for field in rv['fields']:
-                        self.board.set_cell(field['x'], field['y'], field['cell']['distance'])
-                elif rv['action'] == 'test' and rv['status'] == "OK":
-                    # TODO test piece status update
-                    pass
-                elif rv['action'] == 'move':
-                    print("BOT_READ move")
-                    if rv['status'] == "OK":
-                        print("BOT_READ position1 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
-                        self.set_pos(rv['position']['x'], rv['position']['y'])
-                        print("BOT_READ position2 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+            rv = self.recv()
+            print("RECV: ", rv)
+            if(rv['action'] == "finish"):
+                print("BOT_READ finish")
+                break
+            elif rv['action'] == 'start' and rv['status'] == "OK":
+                print("BOT_READ start")
+                self.writing = False
+                pass
+            # response for start message from host
+            elif rv['action'] == 'discover' and rv['status'] == "OK":
+                print("BOT_READ discover")
+                for field in rv['fields']:
+                    self.board.set_cell(field['x'], field['y'], field['cell']['distance'])
+            elif rv['action'] == 'test' and rv['status'] == "OK":
+                # TODO test piece status update
+                pass
+            elif rv['action'] == 'move':
+                print("BOT_READ move")
+                if rv['status'] == "OK":
+                    print("BOT_READ position1 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+                    self.set_pos(rv['position']['x'], rv['position']['y'])
+                    print("BOT_READ position2 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
 
-                self.writing = True
+            self.writing = True
 
     def set_host(self, host):
         self.host = host
@@ -117,6 +115,7 @@ class Player:
 
     def move_right(self):
         self.wait()
+        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
@@ -128,10 +127,11 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
-        print("WRITING "+str(self.writing))
+        print("WRITING after "+str(self.writing))
 
     def move_left(self):
         self.wait()
+        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
@@ -143,11 +143,12 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
-        print("WRITING "+str(self.writing))
+        print("WRITING after "+str(self.writing))
 
 
     def move_up(self):
         self.wait()
+        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
@@ -159,10 +160,11 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
-        print("WRITING "+str(self.writing))
+        print("WRITING after "+str(self.writing))
         
     def move_down(self):
         self.wait()
+        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
@@ -174,7 +176,7 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
-        print("WRITING "+str(self.writing))
+        print("WRITING after "+str(self.writing))
 
     def pickup(self):
         self.wait()
