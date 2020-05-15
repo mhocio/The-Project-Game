@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @Getter
@@ -67,6 +68,8 @@ public class GameMaster {
         masterBoard = board;
         blueTeam = new Team(Team.TeamColor.BLUE);
         redTeam = new Team(Team.TeamColor.RED);
+        blueTeamGoals = new ArrayList<>();
+        redTeamGoals = new ArrayList<>();
         pieces = new ArrayList<>();
         mode = gmMode.NONE;
         scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -196,16 +199,26 @@ public class GameMaster {
 
         var target = new Position();
         Random random = new Random();
+
         var piece = new Piece(configuration.getShamProbability());
 
-        target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
-        target.setX(random.nextInt(masterBoard.getWidth()));
+        //target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
+        //target.setX(random.nextInt(masterBoard.getWidth()));
 
-        while (masterBoard.getCells().get(target).getContent().containsKey(Player.class)) {
-            target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
-            target.setX(random.nextInt(masterBoard.getWidth()));
+        target.setY(ThreadLocalRandom.current().nextInt(0, masterBoard.getTaskAreaHeight())
+                    + masterBoard.getGoalAreaHeight());
+        target.setX(ThreadLocalRandom.current().nextInt(0, masterBoard.getWidth()));
+
+        while (masterBoard.getCells().get(target).getContent().containsKey(Player.class)
+            || masterBoard.getCells().get(target).getContent().containsKey(Piece.class)) {
+            //target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
+            //target.setX(random.nextInt(masterBoard.getWidth()));
+            target.setY(ThreadLocalRandom.current().nextInt(0, masterBoard.getTaskAreaHeight())
+                    + masterBoard.getGoalAreaHeight());
+            target.setX(ThreadLocalRandom.current().nextInt(0, masterBoard.getWidth()));
         }
 
+        piece.setPosition(target);
         pieces.add(piece);
         masterBoard.getCells().get(target).addContent(Piece.class, piece);
     }
