@@ -3,6 +3,7 @@ package pl.mini.projectgame.integration.communicationServerDelay;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.flogger.Flogger;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,7 +49,6 @@ public class CommunicationServerDelayMoveTests {
     @BeforeAll
     void beforeAll() {
         gameMaster.setMode(GameMaster.gmMode.GAME);
-        gameMaster.getMasterBoard().getCells().forEach((k,v) -> v.setContent(new HashMap<>()));
         originalDelay = gameMaster.getConfiguration().getDelayMove();
         x = gameMaster.getConfiguration().getBoardWidth()/2;
         y = gameMaster.getConfiguration().getBoardTaskHeight()/2 +
@@ -70,7 +70,7 @@ public class CommunicationServerDelayMoveTests {
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
         mapper = new ObjectMapper(jsonFactory);
-
+        gameMaster.getMasterBoard().getCells().forEach((k,v) -> v.setContent(new HashMap<>()));
         player = new Player();
         player.setPosition(new Position(x, y));
         gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
@@ -146,6 +146,7 @@ public class CommunicationServerDelayMoveTests {
         numOfRuns = 50;
         sum = 0;
         player.setTeam(new Team(Team.TeamColor.BLUE));
+        System.out.println(gameMaster.getMasterBoard().getGoalAreaHeight());
 
         for (int i = 1; i <= numOfRuns; i++) {
             message = new Message();
