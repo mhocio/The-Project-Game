@@ -11,6 +11,7 @@ import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.Message;
 import pl.mini.projectgame.models.Player;
 import pl.mini.projectgame.models.Position;
+import pl.mini.projectgame.models.Team;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -33,6 +34,10 @@ public class CommunicationServerDelayMoveTests {
     private ObjectMapper mapper;
     private Message message;
     private Player player;
+    private Position lastPosition;
+
+    int x;
+    int y;
 
     private int originalDelay;
     private boolean result;
@@ -44,6 +49,9 @@ public class CommunicationServerDelayMoveTests {
     void beforeAll() {
         gameMaster.setMode(GameMaster.gmMode.GAME);
         originalDelay = gameMaster.getConfiguration().getDelayMove();
+        x = gameMaster.getConfiguration().getBoardWidth()/2;
+        y = gameMaster.getConfiguration().getBoardTaskHeight()/2 +
+                    gameMaster.getConfiguration().getBoardGoalHeight();
     }
 
     @AfterAll
@@ -63,7 +71,7 @@ public class CommunicationServerDelayMoveTests {
         mapper = new ObjectMapper(jsonFactory);
 
         player = new Player();
-        player.setPosition(new Position(5, 21));
+        player.setPosition(new Position(x, y));
         gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
         gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
         gameMaster.setMode(GameMaster.gmMode.GAME);
@@ -77,9 +85,10 @@ public class CommunicationServerDelayMoveTests {
     }
 
     @Test
-    void testDelayMoveActionMessageUp() throws DeniedMoveException, IOException {
+    void testDelayMoveActionMessageUpForRedPlayer() throws DeniedMoveException, IOException {
         sum = 0;
         numOfRuns = 50;
+        player.setTeam(new Team(Team.TeamColor.RED));
 
         for (int i = 1; i <= numOfRuns; i++) {
             message = new Message();
@@ -110,14 +119,18 @@ public class CommunicationServerDelayMoveTests {
             long diffInMiliseconds = (endTime - startTime) / 1000000;
             sum += diffInMiliseconds;
 
-            if (response.getPosition() != null)
-                assertEquals(new Position(5, 21 + i), response.getPosition());
+            if (response.getPosition() != null){
+                assertEquals(new Position(x, y + i), response.getPosition());
+                lastPosition = response.getPosition();
+            }
             else
                 assertEquals(response.getStatus(), Message.Status.DENIED);
 
             assertEquals("move", response.getAction());
         }
 
+        assertEquals(lastPosition, new Position(x, gameMaster.getConfiguration().getBoardGoalHeight()
+                                                        + gameMaster.getConfiguration().getBoardTaskHeight()));
         result = false;
         mean = sum / numOfRuns;
         if (Math.abs(originalDelay - mean) < 7.0)
@@ -128,9 +141,10 @@ public class CommunicationServerDelayMoveTests {
     }
 
     @Test
-    void testDelayMoveActionMessageDown() throws DeniedMoveException, IOException {
+    void testDelayMoveActionMessageDownForBluePlayer() throws DeniedMoveException, IOException {
         numOfRuns = 50;
         sum = 0;
+        player.setTeam(new Team(Team.TeamColor.BLUE));
 
         for (int i = 1; i <= numOfRuns; i++) {
             message = new Message();
@@ -161,13 +175,17 @@ public class CommunicationServerDelayMoveTests {
             long diffInMiliseconds = (endTime - startTime) / 1000000;
             sum += diffInMiliseconds;
 
-            if (response.getPosition() != null)
-                assertEquals(new Position(5, 21 - i), response.getPosition());
+            if (response.getPosition() != null){
+                assertEquals(new Position(x, y - i), response.getPosition());
+                lastPosition = response.getPosition();
+            }
             else
                 assertEquals(response.getStatus(), Message.Status.DENIED);
 
             assertEquals("move", response.getAction());
         }
+
+        assertEquals(lastPosition, new Position(x, gameMaster.getConfiguration().getBoardGoalHeight()));
 
         result = false;
         mean = sum / numOfRuns;
@@ -182,6 +200,7 @@ public class CommunicationServerDelayMoveTests {
     void testDelayMoveActionMessageLeft() throws DeniedMoveException, IOException {
         int numOfRuns = 50;
         long sum = 0;
+        player.setTeam(new Team(Team.TeamColor.RED));
 
         for (int i = 1; i <= numOfRuns; i++) {
             message = new Message();
@@ -189,6 +208,7 @@ public class CommunicationServerDelayMoveTests {
             message.setDirection(Message.Direction.LEFT);
             message.setPlayerUuid(player.getPlayerUuid());
             message.setPosition(player.getPosition());
+
 
             mapper.writeValue(out, message);
             long startTime = System.nanoTime();
@@ -210,7 +230,7 @@ public class CommunicationServerDelayMoveTests {
             sum += diffInMiliseconds;
 
             if (response.getPosition() != null)
-                assertEquals(new Position(5 - i, 21), response.getPosition());
+                assertEquals(new Position(x - i, y), response.getPosition());
             else
                 assertEquals(response.getStatus(), Message.Status.DENIED);
 
@@ -230,6 +250,7 @@ public class CommunicationServerDelayMoveTests {
     void testDelayMoveActionMessageRight() throws DeniedMoveException, IOException {
         numOfRuns = 50;
         sum = 0;
+        player.setTeam(new Team(Team.TeamColor.RED));
 
         for (int i = 1; i <= numOfRuns; i++) {
             message = new Message();
@@ -258,7 +279,7 @@ public class CommunicationServerDelayMoveTests {
             sum += diffInMiliseconds;
 
             if (response.getPosition() != null)
-                assertEquals(new Position(5 + i, 21), response.getPosition());
+                assertEquals(new Position(x + i, y), response.getPosition());
             else
                 assertEquals(response.getStatus(), Message.Status.DENIED);
 

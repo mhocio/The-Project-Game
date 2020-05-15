@@ -353,12 +353,14 @@ public class GameMaster {
         Player player;
         Message.Direction direction;
         Position source;
+        Team.TeamColor team;
 
         try {
             player = playerMap.get(message.getPlayerUuid());
             direction = message.getDirection();
             source = message.getPosition();
             response.setAction(message.getAction());
+            team = player.getTeam().getColor();
         } catch (Exception e) {
             logger.warn(e.getMessage());
             return createErrorMessage();
@@ -366,14 +368,29 @@ public class GameMaster {
 
         if(direction == null || source == null) return createErrorMessage();
 
+        int redTeamBorder = masterBoard.getGoalAreaHeight();
+        int blueTeamBorder = masterBoard.getGoalAreaHeight() + masterBoard.getTaskAreaHeight();
+
         switch (direction) {
             case UP:
-                target.setX(source.getX());
-                target.setY(source.getY() + 1);
+                if (team == Team.TeamColor.RED && source.getY() + 1 <= blueTeamBorder || team == Team.TeamColor.BLUE) {
+                    target.setX(source.getX());
+                    target.setY(source.getY() + 1);
+                }
+                else {
+                    target.setX(source.getX());
+                    target.setY(source.getY());
+                }
                 break;
             case DOWN:
-                target.setX(source.getX());
-                target.setY(source.getY() - 1);
+                if (team == Team.TeamColor.BLUE && source.getY() - 1 >= redTeamBorder || team == Team.TeamColor.RED) {
+                    target.setX(source.getX());
+                    target.setY(source.getY() - 1);
+                }
+                else {
+                    target.setX(source.getX());
+                    target.setY(source.getY());
+                }
                 break;
             case LEFT:
                 target.setX(source.getX() - 1);

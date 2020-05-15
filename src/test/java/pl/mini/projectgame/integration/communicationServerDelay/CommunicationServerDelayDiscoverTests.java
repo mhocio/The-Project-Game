@@ -110,10 +110,8 @@ public class CommunicationServerDelayDiscoverTests {
 
     @Test
     public void serverShouldReturnErrorMessageDelay() throws IOException {
-
-        int originalDelay = gameMaster.getConfiguration().getDelayDiscover();
-        int numOfRuns = 50;
-        long sum = 0;
+        numOfRuns = 10;
+        sum = 0;
 
         for (int i = 1; i <= numOfRuns; i++) {
             testMessage.setPosition(null);

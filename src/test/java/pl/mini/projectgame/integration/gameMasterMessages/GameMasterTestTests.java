@@ -84,7 +84,6 @@ public class GameMasterTestTests {
         assertEquals(Message.Status.DENIED, response.getStatus());
     }
 
-
     @Test
     void testActionDoubleTest() {
 

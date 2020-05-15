@@ -11,6 +11,7 @@ import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.Message;
 import pl.mini.projectgame.models.Player;
 import pl.mini.projectgame.models.Position;
+import pl.mini.projectgame.models.Team;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -61,6 +62,7 @@ public class CommunicationServerMoveTests {
         gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
 
         player.setPosition(new Position(1, 1));
+        player.setTeam(new Team(Team.TeamColor.RED));
         gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
         message.setPosition(player.getPosition());
     }

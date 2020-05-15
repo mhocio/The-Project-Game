@@ -71,6 +71,4 @@ public class GameMasterPickupTests {
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals("error", response.getAction());
     }
-
-
 }
