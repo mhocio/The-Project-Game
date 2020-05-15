@@ -120,8 +120,8 @@ public class CommunicationServerDelayMoveTests {
             sum += diffInMiliseconds;
 
             if (response.getPosition() != null){
-                assertEquals(new Position(x, y + i), response.getPosition());
                 lastPosition = response.getPosition();
+                assertEquals(new Position(x, y + i), response.getPosition());
             }
             else
                 assertEquals(response.getStatus(), Message.Status.DENIED);
@@ -176,8 +176,8 @@ public class CommunicationServerDelayMoveTests {
             sum += diffInMiliseconds;
 
             if (response.getPosition() != null){
-                assertEquals(new Position(x, y - i), response.getPosition());
                 lastPosition = response.getPosition();
+                assertEquals(new Position(x, y - i), response.getPosition());
             }
             else
                 assertEquals(response.getStatus(), Message.Status.DENIED);
@@ -185,6 +185,8 @@ public class CommunicationServerDelayMoveTests {
             assertEquals("move", response.getAction());
         }
 
+        System.out.println("last position: " + lastPosition);
+        System.out.println("goal height: " + gameMaster.getConfiguration().getBoardGoalHeight());
         assertEquals(lastPosition, new Position(x, gameMaster.getConfiguration().getBoardGoalHeight()));
 
         result = false;
