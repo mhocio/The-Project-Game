@@ -53,23 +53,32 @@ class Player:
 
     def bot_read(self):
         while(True):
-            rv = self.recv()
-            print("RECV: ", rv)
-            if(len(rv) == 0):
-                continue
-            if(rv['action'] == "finish"):
-                break
-            # response for start message from host
-            elif rv['action'] == 'start' and rv['status'] == "OK":
-                pass
-            elif rv['action'] == 'discover' and rv['status'] == "OK":
-                for field in rv['fields']:
-                    self.board.set_cell(field['x'], field['y'], field['cell']['distance'])
-            elif rv['action'] == 'test' and rv['status'] == "OK":
-                # TODO test piece status update
-                pass
+            if self.writing == False:
+                rv = self.recv()
+                print("RECV: ", rv)
+                if(rv['action'] == "finish"):
+                    print("BOT_READ finish")
+                    break
+                # response for start message from host
+                elif rv['action'] == 'start' and rv['status'] == "OK":
+                    print("BOT_READ start")
+                    # pass
+                elif rv['action'] == 'discover' and rv['status'] == "OK":
+                    print("BOT_READ discover")
+                    for field in rv['fields']:
+                        self.board.set_cell(field['x'], field['y'], field['cell']['distance'])
+                elif rv['action'] == 'test' and rv['status'] == "OK":
+                    # TODO test piece status update
+                    pass
+                elif rv['action'] == 'move':
+                    print("BOT_READ move")
+                    if rv['status'] == "OK":
+                        print("BOT_READ position1 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+                        self.set_pos(rv['position']['x'], rv['position']['y'])
+                        print("BOT_READ position2 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
 
-            self.writing = True
+
+                self.writing = True
 
     def set_host(self, host):
         self.host = host
@@ -100,8 +109,10 @@ class Player:
         return self.pos_y
 
     def wait(self):
+        print("WAIT "+str(self.writing))
         while(self.writing == False):
             pass
+        print("WAIT "+str(self.writing))
 
     def move_right(self):
         self.wait()
@@ -240,16 +251,11 @@ class Player:
         if config["action"] == "startGame":
                 self.set_board(config["board"]["width"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
                 self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
-                # start = self.recv()
-                # print("WAIT:", start)
-                # while start['action'] == "error":
-                #     print("WAIT:", start)
-                #     start = self.recv()
+
                 if config['status'] == 'OK':
                     self.x = Thread(target = self.bot_read)
                     self.x.start()
 
-            
 
     def start(self):
         message = {
