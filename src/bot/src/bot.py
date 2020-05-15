@@ -68,6 +68,12 @@ class Player:
 
             self.writing = True
 
+    def set_host(self, host):
+        self.host = host
+
+    def get_host(self):
+        return self.host
+
     def get_guid(self):
         return self.GUID
 
@@ -202,14 +208,31 @@ class Player:
 
     def init_config(self):
         print(self.get_guid())
-        message = {
-            "action" : "start",
-            "playerUuid": self.get_guid()
-        }
-        self.send(message)
+        print(self.get_host())
+        
+        if self.get_host() == True:
+            message = {
+                "action" : "start",
+                "playerUuid": self.get_guid()
+            }
+            self.send(message)
+            print("SEND")
+            print(message)
+
         config = self.recv()
         print("CONFIG")
         print(config)
+
+        # wait until all the players are ready
+        while config["status"] == "DENIED":
+            sleep(5)
+            if self.get_host() == True:
+                self.send(message)
+                print("SEND")
+                print(message)
+            config = self.recv()
+            print("CONFIG while")
+            print(config)
 
         if config["action"] == "startGame":
                 # self.set_team(config["team"])
@@ -242,6 +265,9 @@ class Player:
 
         if "status" in connected and connected["status"] == "OK":
             self.set_guid(connected["playerUuid"])
+            self.set_role(connected["teamRole"])
+            self.set_team(connected["teamColor"])
+            self.set_host(connected["host"])
 
             print(self.get_guid())
             message = {
