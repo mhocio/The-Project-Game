@@ -61,7 +61,9 @@ public class GameMaster {
         configuration = config;
         masterBoard = board;
         blueTeam = new Team(Team.TeamColor.BLUE);
+        blueTeamGoals = new ArrayList<>();
         redTeam = new Team(Team.TeamColor.RED);
+        redTeamGoals = new ArrayList<>();
         pieces = new ArrayList<>();
         mode = gmMode.NONE;
 
@@ -192,11 +194,14 @@ public class GameMaster {
         target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
         target.setX(random.nextInt(masterBoard.getWidth()));
 
-        while (masterBoard.getCells().get(target).getContent().containsKey(Player.class)) {
+        while (masterBoard.getCells().get(target).getContent().containsKey(Player.class)
+            || masterBoard.getCells().get(target).getContent().containsKey(Piece.class)) {
             target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
             target.setX(random.nextInt(masterBoard.getWidth()));
         }
 
+        piece.setPosition(target);
+        pieces.add(piece);
         masterBoard.getCells().get(target).addContent(Piece.class, piece);
     }
 
