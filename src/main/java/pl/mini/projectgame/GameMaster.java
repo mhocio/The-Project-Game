@@ -13,10 +13,13 @@ import pl.mini.projectgame.models.*;
 import pl.mini.projectgame.server.CommunicationServer;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
@@ -53,9 +56,11 @@ public class GameMaster {
     private CommunicationServer server;
     private List<Piece> pieces;
     private int requiredPointsToWin;
+    private ScheduledExecutorService scheduler;
 
     @Autowired
     public GameMaster(GameMasterConfiguration config, MasterBoard board, @Lazy CommunicationServer server) {
+
         this.server = server;
         playerMap = new HashMap<>();
         lastTeamWasRed = false;
@@ -69,6 +74,7 @@ public class GameMaster {
 
         pieces = new ArrayList<>();
         mode = gmMode.NONE;
+        scheduler = Executors.newSingleThreadScheduledExecutor();
 
         try {
             File file = new File(
@@ -135,7 +141,7 @@ public class GameMaster {
             putNewPiece();
         }
 
-        // TODO: start a thread with piece generator
+        scheduler.scheduleAtFixedRate(this::putNewPiece, 30, 30, TimeUnit.SECONDS);
 
         for (Player player : playerMap.values()) {
             do {
@@ -176,6 +182,7 @@ public class GameMaster {
 
         Message message = new Message();
         message.setAction("finish");
+        scheduler.shutdownNow();
         server.sendToEveryone(message);
         server.close();
         logger.info("Game finished");
@@ -198,9 +205,12 @@ public class GameMaster {
     }
 
     private void putNewPiece() {
-        var target = new Position();
 
-        //Random random = new Random();
+        if(pieces.size() == configuration.getMaxPieces()) return;
+
+        var target = new Position();
+        Random random = new Random();
+
         var piece = new Piece(configuration.getShamProbability());
 
         //target.setY(random.nextInt() % masterBoard.getTaskAreaHeight() + masterBoard.getGoalAreaHeight());
@@ -625,6 +635,7 @@ public class GameMaster {
             if (player.getPiece() == null) {
                 player.setPiece(pickupPiece);
                 masterBoard.getCellByPosition(message.getPosition()).removeContent(Piece.class);
+                pieces.remove(pickupPiece);
             } else {
                 message.setStatus(Message.Status.DENIED);
                 return message;
