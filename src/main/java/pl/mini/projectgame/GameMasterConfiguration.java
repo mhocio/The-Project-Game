@@ -23,6 +23,7 @@ public class GameMasterConfiguration {
     int maxTeamSize;
     int maxPieces;
     List<Position> predefinedGoalPositions;
+    List<Position> predefinedPiecePositions;
 
     int boardWidth;
     int boardTaskHeight;
@@ -88,7 +89,8 @@ public class GameMasterConfiguration {
 
     public void configureFromFile(String filePath) {
         this.defaultConfiguration();
-        predefinedGoalPositions = new ArrayList<Position>();
+        predefinedGoalPositions = new ArrayList<>();
+        predefinedPiecePositions = new ArrayList<>();
 
         JSONParser parser = new JSONParser();
         JSONObject jsonObject;
@@ -181,6 +183,15 @@ public class GameMasterConfiguration {
                 JSONObject PosJSON = goalPositionsIterator.next();
                 Position pos = new Position(Math.toIntExact((long) PosJSON.get("x")), Math.toIntExact((long) PosJSON.get("y")));
                 predefinedGoalPositions.add(pos);
+            }
+
+            PositionsJSONArray = (JSONArray) jsonObject.get("predefinedPiecePositions");
+            goalPositionsIterator = PositionsJSONArray.iterator();
+
+            while (goalPositionsIterator.hasNext()) {
+                JSONObject PosJSON = goalPositionsIterator.next();
+                Position pos = new Position(Math.toIntExact((long) PosJSON.get("x")), Math.toIntExact((long) PosJSON.get("y")));
+                predefinedPiecePositions.add(pos);
             }
 
         } catch (FileNotFoundException e) {

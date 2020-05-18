@@ -78,7 +78,9 @@ public class GameMaster {
 
         try {
             File file = new File(
-                    Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource("gameMasterConfig.json")).getFile()
+                    //Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource("gameMasterConfig.json")).getFile()
+                    Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource("gameMasterScenarioConfig1.json")).getFile()
+
             );
             config.configureFromFile(file.getPath());
             blueTeam.setMaxTeamSize(config.getMaxTeamSize());
