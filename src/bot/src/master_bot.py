@@ -24,3 +24,4 @@ for index in range(n):
 
 for thread in threads:
     thread.join()
+    print("END BOT")
