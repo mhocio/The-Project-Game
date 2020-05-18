@@ -97,6 +97,8 @@ public class GameMaster {
     }
 
     public void startGame() {
+        // TODO: test for this method
+
         Random random = new Random();
         var board = new Board(configuration);
         Position position;
@@ -139,10 +141,18 @@ public class GameMaster {
         }
 
         // set pieces
-        for (int i = 0; i < configuration.getMaxPieces(); i++) {
+        List<Position> predefinedPiecePositions = configuration.getPredefinedPiecePositions();
+        for (Position pos: predefinedPiecePositions) {
+            if (masterBoard.getCells().get(pos).getContent().containsKey(Piece.class))
+                continue;
+
+            Piece piece = new Piece(configuration.getShamProbability());
+            piece.setPosition(pos);
+            pieces.add(piece);
+        }
+        for (int i = pieces.size(); i < configuration.getMaxPieces(); i++) {
             putNewPiece();
         }
-
         scheduler.scheduleAtFixedRate(this::putNewPiece, 30, 30, TimeUnit.SECONDS);
 
         for (Player player : playerMap.values()) {
