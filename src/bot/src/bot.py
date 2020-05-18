@@ -13,8 +13,10 @@ def bot_function(addr):
     
     my_player.start()
     my_player.move_right()
-    my_player.move_down()
+    my_player.move_left()
+    my_player.finish()
     my_player.close()
+    print("END BOT FUNCTION")
 
 
 class Role(Enum):
@@ -41,6 +43,7 @@ class Board:
 
 class Player:
     writing = True
+    is_carrying_piece = False
 
     def __init__(self, _host = '127.0.0.1', _port = 8080):
         self.HOST = _host
@@ -51,22 +54,40 @@ class Player:
     def set_guid(self, guid):
         self.GUID = guid
 
-    def bot_read(self):
+    def reading_thread(self):
         while(True):
             rv = self.recv()
             print("RECV: ", rv)
-            if(len(rv) == 0):
-                continue
             if(rv['action'] == "finish"):
+                print("BOT_READ finish")
                 break
+            # elif rv['action'] == 'start' and rv['status'] == "OK":
+            #     print("BOT_READ start")
+            #     self.writing = False
+            #     pass
+            # response for start message from host
             elif rv['action'] == 'discover' and rv['status'] == "OK":
+                print("BOT_READ discover")
                 for field in rv['fields']:
                     self.board.set_cell(field['x'], field['y'], field['cell']['distance'])
             elif rv['action'] == 'test' and rv['status'] == "OK":
                 # TODO test piece status update
                 pass
+            elif rv['action'] == 'move' and rv['status'] == "OK":
+                print("BOT_READ move")
+                print("BOT_READ position1 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+                self.set_pos(rv['position']['x'], rv['position']['y'])
+                print("BOT_READ position2 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+            elif rv['action'] == 'pickup' and rv['status'] == "OK":
+                self.is_carrying_piece = True
 
             self.writing = True
+
+    def set_host(self, host):
+        self.host = host
+
+    def get_host(self):
+        return self.host
 
     def get_guid(self):
         return self.GUID
@@ -93,9 +114,20 @@ class Player:
     def wait(self):
         while(self.writing == False):
             pass
+        print("WRITING "+str(self.writing))
+
+    def place_piece(self):
+        self.wait()
+        TestMessage={
+            "action": "test",
+            "playerUuid": self.get_guid()
+            }
+        self.send(TestMessage)
+        self.writing = False
 
     def move_right(self):
         self.wait()
+        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
@@ -107,9 +139,12 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
+        print("WRITING after "+str(self.writing))
 
     def move_left(self):
         self.wait()
+        print("POSITION before "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
@@ -121,10 +156,13 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
+        print("POSITION after "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+        print("WRITING after "+str(self.writing))
 
 
     def move_up(self):
         self.wait()
+        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
@@ -136,9 +174,11 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
+        print("WRITING after "+str(self.writing))
         
     def move_down(self):
         self.wait()
+        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
@@ -150,6 +190,7 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
+        print("WRITING after "+str(self.writing))
 
     def pickup(self):
         self.wait()
@@ -187,12 +228,23 @@ class Player:
         self.send(MoveMessage)
         self.writing = False
 
+    def finish(self):
+        self.wait()
+        MoveMessage={
+            "action": "finish",
+            "playerUuid": self.get_guid(),
+        }
+        self.send(MoveMessage)
+        self.writing = False
+
     def connect(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.HOST, self.PORT))
     
     def close(self):
+        self.x.join()
         self.socket.close()
+        print("CLOSING SOCKET")
 
     def send(self, message):
         self.socket.sendall(bytes(json.JSONEncoder().encode(message), "utf-8"))
@@ -202,31 +254,40 @@ class Player:
 
     def init_config(self):
         print(self.get_guid())
-        message = {
-            "action" : "start",
-            "playerUuid": self.get_guid()
-        }
-        self.send(message)
+        print(self.get_host())
+        
+        if self.get_host() == True:
+            message = {
+                "action" : "start",
+                "playerUuid": self.get_guid()
+            }
+            self.send(message)
+            print("SEND")
+            print(message)
+
         config = self.recv()
         print("CONFIG")
         print(config)
 
+        # wait until all the players are ready
+        while config["status"] == "DENIED":
+            sleep(5)
+            if self.get_host() == True:
+                self.send(message)
+                print("SEND")
+                print(message)
+            config = self.recv()
+            print("CONFIG while")
+            print(config)
+
         if config["action"] == "startGame":
-                # self.set_team(config["team"])
-                # self.set_role(config["teamRole"])
                 self.set_board(config["board"]["width"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
                 self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
-                print("POSITION: ", self.get_pos_x(), self.get_pos_y())
-                start = self.recv()
-                print("WAIT:", start)
-                while start['action'] == "error":
-                    print("WAIT:", start)
-                    start = self.recv()
-                if start['status'] == 'OK':
-                    self.x = Thread(target = self.bot_read)
+
+                if config['status'] == 'OK':
+                    self.x = Thread(target = self.reading_thread)
                     self.x.start()
 
-            
 
     def start(self):
         message = {
@@ -242,6 +303,9 @@ class Player:
 
         if "status" in connected and connected["status"] == "OK":
             self.set_guid(connected["playerUuid"])
+            self.set_role(connected["teamRole"])
+            self.set_team(connected["teamColor"])
+            self.set_host(connected["host"])
 
             print(self.get_guid())
             message = {
