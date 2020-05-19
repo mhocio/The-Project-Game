@@ -68,6 +68,12 @@ public class GameMasterConfiguration {
         }
         ret.append("\n");
 
+        ret.append("predefinedPiecePositions: ");
+        for (Position pos : predefinedPiecePositions) {
+            ret.append("( ").append(pos.getX()).append(", ").append(pos.getY()).append(" ), ");
+        }
+        ret.append("\n");
+
         ret.append("boardWidth: ").append(boardWidth).append("\n");
         ret.append("boardTaskHeight: ").append(boardTaskHeight).append("\n");
         ret.append("boardGoalHeight: ").append(boardGoalHeight).append("\n");
@@ -83,7 +89,8 @@ public class GameMasterConfiguration {
 
     public GameMasterConfiguration() {
         this.defaultConfiguration();
-        predefinedGoalPositions = new ArrayList<Position>();
+        predefinedGoalPositions = new ArrayList<>();
+        predefinedPiecePositions = new ArrayList<>();
         predefinedGoalPositions.add(new Position(15, 15));
     }
 

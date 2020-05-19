@@ -19,7 +19,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
@@ -64,7 +63,6 @@ public class GameMaster {
         this.server = server;
         playerMap = new HashMap<>();
         lastTeamWasRed = false;
-        configuration = config;
         masterBoard = board;
         blueTeam = new Team(Team.TeamColor.BLUE);
         redTeam = new Team(Team.TeamColor.RED);
@@ -77,18 +75,31 @@ public class GameMaster {
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
         try {
-            File file = new File(
-                    //Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource("gameMasterConfig.json")).getFile()
-                    Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource("gameMasterScenarioConfig1.json")).getFile()
-
+            File configFromResourcesFile = new File(
+                    Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource(
+                            "gameMasterScenarioConfig1.json")).getFile()
             );
-            config.configureFromFile(file.getPath());
-            blueTeam.setMaxTeamSize(config.getMaxTeamSize());
-            redTeam.setMaxTeamSize(config.getMaxTeamSize());
-            masterBoard.configure(config);
-        } catch (NullPointerException e) {
-            logger.error(e.getMessage());
+            if (configFromResourcesFile.exists())
+                config.configureFromFile(configFromResourcesFile.getPath());
+
+            String path = System.getenv("HOME")
+                    + "/develop/gameMasterScenarioConfig1.json";
+            File configFromPathFile = new File(path);
+            if (configFromPathFile.exists())
+                config.configureFromFile(path);
+
+            System.out.println("success reading config");
+        } catch (Exception e) {
+            logger.error("error reading config: " + e.toString());
         }
+
+        configuration = config;
+
+        blueTeam.setMaxTeamSize(configuration.getMaxTeamSize());
+        redTeam.setMaxTeamSize(configuration.getMaxTeamSize());
+        masterBoard.configure(configuration);
+
+        System.out.println(configuration);
     }
 
     public void reset() {
