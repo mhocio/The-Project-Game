@@ -84,6 +84,11 @@ public class GameMaster {
 
             String path = System.getenv("HOME")
                     + "/develop/gameMasterScenarioConfig1.json";
+            String context = System.getProperty("config-path");
+            System.out.println("context: " + context);
+            if (context != null)
+                path = context;
+
             File configFromPathFile = new File(path);
             if (configFromPathFile.exists())
                 config.configureFromFile(path);
