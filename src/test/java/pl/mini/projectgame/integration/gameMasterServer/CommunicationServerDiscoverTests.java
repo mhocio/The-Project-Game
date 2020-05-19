@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import pl.mini.projectgame.GameMaster;
+import pl.mini.projectgame.GameMasterConfiguration;
+import pl.mini.projectgame.models.MasterBoard;
 import pl.mini.projectgame.models.Message;
+import pl.mini.projectgame.models.Player;
 import pl.mini.projectgame.models.Position;
 
 import java.io.*;
@@ -30,6 +33,10 @@ public class CommunicationServerDiscoverTests {
     private BufferedWriter out;
     private BufferedReader in;
     private ObjectMapper mapper;
+
+    private MasterBoard testBoard;
+    private Position testPosition;
+    private Player testPlayer = new Player();
 
     @BeforeAll
     void beforeAll() {
@@ -53,9 +60,18 @@ public class CommunicationServerDiscoverTests {
 
         testMessage = new Message();
         testMessage.setAction("discover");
-        testMessage.setPosition(new Position(
+        GameMasterConfiguration config = new GameMasterConfiguration();
+
+        testBoard = new MasterBoard(config);
+        gameMaster.setMasterBoard(testBoard);
+
+        testPosition = new Position(
                 gameMaster.getMasterBoard().getWidth() / 2,
-                gameMaster.getMasterBoard().getGoalAreaHeight() + 4));
+                gameMaster.getMasterBoard().getGoalAreaHeight() + 4);
+        testPlayer.setPosition(testPosition);
+
+        gameMaster.getPlayerMap().put(testPlayer.getPlayerUuid(), testPlayer);
+        testMessage.setPlayerUuid(testPlayer.getPlayerUuid());
     }
 
     @AfterEach
@@ -81,8 +97,9 @@ public class CommunicationServerDiscoverTests {
 
     @Test
     public void serverShouldReturnThreeFields() throws IOException {
-        testMessage.getPosition().setX(0);
-        testMessage.getPosition().setY(gameMaster.getMasterBoard().getGoalAreaHeight());
+        testPosition.setX(0);
+        testPosition.setY(gameMaster.getMasterBoard().getGoalAreaHeight());
+        testPlayer.setPosition(testPosition);
         mapper.writeValue(out, testMessage);
         out.flush();
 
@@ -96,7 +113,8 @@ public class CommunicationServerDiscoverTests {
 
     @Test
     public void serverShouldReturnFiveFields() throws IOException {
-        testMessage.getPosition().setY(gameMaster.getMasterBoard().getGoalAreaHeight());
+        testPosition.setY(gameMaster.getMasterBoard().getGoalAreaHeight());
+        testPlayer.setPosition(testPosition);
         mapper.writeValue(out, testMessage);
         out.flush();
 
@@ -110,7 +128,7 @@ public class CommunicationServerDiscoverTests {
 
     @Test
     public void serverShouldReturnErrorMessage() throws IOException {
-        testMessage.setPosition(null);
+        testPlayer.setPosition(null);
         mapper.writeValue(out, testMessage);
         out.flush();
 
@@ -119,6 +137,6 @@ public class CommunicationServerDiscoverTests {
         cb.flip();
 
         Message response = mapper.readValue(cb.toString(), Message.class);
-        Assert.assertEquals("error", response.getAction());
+        Assert.assertEquals(Message.Status.DENIED, response.getStatus());
     }
 }
