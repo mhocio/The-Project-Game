@@ -1,5 +1,5 @@
 {
-    "shamProbability": 0.5,
+    "shamProbability": 50,
     "maxTeamSize": 4,
     "maxPieces": 3,
     "predefinedGoalPositions": [

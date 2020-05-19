@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 public class GameMasterConfiguration {
 
-    double shamProbability;
+    int shamProbability;
     int maxTeamSize;
     int maxPieces;
     List<Position> predefinedGoalPositions;
@@ -38,7 +38,7 @@ public class GameMasterConfiguration {
     int DelayPlace;
 
     void defaultConfiguration() {
-        shamProbability = 0.5;
+        shamProbability = 50;
         maxTeamSize = 4;
         maxPieces = 3;
 
@@ -99,7 +99,7 @@ public class GameMasterConfiguration {
             jsonObject = (JSONObject) obj;
 
             try {
-                shamProbability = (double) jsonObject.get("shamProbability");
+                shamProbability = Math.toIntExact((long) jsonObject.get("shamProbability"));
             } catch (Exception e) {
                 e.printStackTrace();
             }

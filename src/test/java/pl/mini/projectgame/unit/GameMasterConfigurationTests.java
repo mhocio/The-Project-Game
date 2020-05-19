@@ -33,13 +33,13 @@ public class GameMasterConfigurationTests {
     @Test
     void testParserFromExistingFile_shamProbability() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.getShamProbability(), 0.7, 0.0);
+        assertEquals(70, configFromFile.getShamProbability());
     }
 
     @Test
     void testParserFromExistingFile_maxTeamSize() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.getMaxTeamSize(), 12);
+        assertEquals(configFromFile.getMaxTeamSize(), 13);
     }
 
     @Test

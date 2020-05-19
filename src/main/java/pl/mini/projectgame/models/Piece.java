@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.UUID;
 
 @Getter
@@ -17,7 +18,8 @@ public class Piece extends BoardObject {
 
     public Piece(double shamProbability) {
         pieceUuid = UUID.randomUUID();
-        isGood = !(Math.random() < shamProbability);
+        Random r = new Random();
+        isGood = r.nextInt(100) >= shamProbability;
         testedPlayers = new HashSet<>();
     }
 }

@@ -127,15 +127,13 @@ public class GameMaster {
             }
 
             Position pos1 = new Position(x, y);
-            Goal goal1 = new Goal(true, pos1);
-            goal1.setTeam(redTeam);
+            Goal goal1 = new Goal(true, pos1, redTeam);
             masterBoard.addBoardObject(goal1, pos1);
             redTeamGoals.add(goal1);
 
             y += configuration.boardTaskHeight + configuration.boardGoalHeight;
             Position pos2 = new Position(x, y);
-            Goal goal2 = new Goal(true, pos2);
-            goal1.setTeam(blueTeam);
+            Goal goal2 = new Goal(true, pos2, blueTeam);
             masterBoard.addBoardObject(goal2, pos2);
             blueTeamGoals.add(goal2);
         }
@@ -149,6 +147,7 @@ public class GameMaster {
             Piece piece = new Piece(configuration.getShamProbability());
             piece.setPosition(pos);
             pieces.add(piece);
+            masterBoard.getCells().get(pos).addContent(Piece.class, piece);
         }
         for (int i = pieces.size(); i < configuration.getMaxPieces(); i++) {
             putNewPiece();
@@ -284,7 +283,7 @@ public class GameMaster {
 
         try {
             Method method = this.getClass().getDeclaredMethod("action" + StringUtils.capitalize(request.getAction()), Message.class);
-            logger.info(method.getName());
+            logger.info(method.getName() + " " + request.getPlayerUuid());
             response = (Message) method.invoke(this, request);
 
             //set goals in players goal area in each response if game is ON
@@ -459,6 +458,11 @@ public class GameMaster {
 
         response.setPosition(target);
         response.setStatus(Message.Status.OK);
+
+        // for the purpose of the 1st scenario
+        logger.info(message.getDirection() + " " +
+                response.getPosition().getX() + " " +
+                response.getPosition().getY());
         return response;
     }
 
@@ -519,6 +523,7 @@ public class GameMaster {
             playerPosition = player.getPosition();
             playerPiece = player.getPiece();
             playerTeam = player.getTeam();
+            System.out.println(playerPosition);
 
             if (playerPiece == null)
                 return createErrorMessage();
@@ -526,6 +531,7 @@ public class GameMaster {
             if (masterBoard.getCellByPosition(player.getPosition()).getContent().containsKey(Goal.class)) {
                 goal = (Goal) masterBoard.getCellByPosition(player.getPosition()).getContent().get(Goal.class);
             }
+            System.out.println(goal);
 
         } catch (Exception ex) {
             return createErrorMessage();
@@ -533,6 +539,7 @@ public class GameMaster {
 
         player.placePiece(masterBoard);
 
+        System.out.println("good?: " + playerPiece.getIsGood());
         // good piece
         if (playerPiece.getIsGood()) {
             // empty cell
@@ -559,6 +566,9 @@ public class GameMaster {
 
             // good place
             if (goal.getDiscovered().equals(Goal.goalDiscover.NOT_DISCOVERED)) {
+                System.out.println("good place");
+                System.out.println(goal.getTeam() == playerTeam);
+                System.out.println(playerTeam + " " + goal.getTeam());
                 // good team
                 if (goal.getTeam() == playerTeam) {
                     playerTeam.addPoints(1);
@@ -636,17 +646,20 @@ public class GameMaster {
 
     private Message actionPickUp(Message message) {
 
-        if(mode != gmMode.GAME) return createErrorMessage();
+        if(mode != gmMode.GAME)
+            return createErrorMessage();
 
         try {
-            Piece pickupPiece = (Piece) masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
-
-            if (pickupPiece == null) throw new DeniedMoveException("there is no piece at given position");
-            var player = playerMap.get(message.getPlayerUuid());
+            Player player = playerMap.get(message.getPlayerUuid());
+            Position playerPosition = player.getPosition();
+            System.out.println(masterBoard.getCellByPosition(playerPosition).getContent().get(Piece.class));
+            Piece pickupPiece = (Piece) masterBoard.getCellByPosition(playerPosition).getContent().get(Piece.class);
+            if (pickupPiece == null)
+                    throw new DeniedMoveException("there is no piece at given position");
 
             if (player.getPiece() == null) {
                 player.setPiece(pickupPiece);
-                masterBoard.getCellByPosition(message.getPosition()).removeContent(Piece.class);
+                masterBoard.getCellByPosition(playerPosition).removeContent(Piece.class);
                 pieces.remove(pickupPiece);
             } else {
                 message.setStatus(Message.Status.DENIED);

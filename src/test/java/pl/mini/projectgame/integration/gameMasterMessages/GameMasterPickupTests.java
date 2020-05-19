@@ -22,6 +22,7 @@ public class GameMasterPickupTests {
 
     private Message testMessage;
     private MasterBoard testBoard;
+    Position testPosition = new Position(1, 1);
 
     private Map<Position, Cell> cells;
 
@@ -40,15 +41,14 @@ public class GameMasterPickupTests {
     @BeforeEach
     public void setup() throws IOException {
         GameMasterConfiguration config = new GameMasterConfiguration();
-        Position testPosition = new Position(1, 1);
         Player testPlayer = new Player();
+        testPlayer.setPosition(testPosition);
 
         testBoard = new MasterBoard(config);
         testBoard.getCellByPosition(testPosition).addContent(Piece.class, new Piece(0));
         gameMaster.setMasterBoard(testBoard);
-        testMessage = new Message();
 
-        testMessage.setPosition(testPosition);
+        testMessage = new Message();
         gameMaster.getPlayerMap().put(testPlayer.getPlayerUuid(), testPlayer);
         testMessage.setAction("pickUp");
         testMessage.setPlayerUuid(testPlayer.getPlayerUuid());
@@ -66,10 +66,10 @@ public class GameMasterPickupTests {
     }
 
     @Test
-    public void serverShouldReturnErrorMessage() {
-        testMessage.setPosition(new Position(3, 3));
+    public void serverShouldReturnDeniedMessage() {
+        testBoard.getCellByPosition(testPosition).removeContent(Piece.class);
         Message response = gameMaster.processAndReturn(testMessage);
-        Assert.assertEquals("error", response.getAction());
+        Assert.assertEquals(Message.Status.DENIED, response.getStatus());
     }
 
 
