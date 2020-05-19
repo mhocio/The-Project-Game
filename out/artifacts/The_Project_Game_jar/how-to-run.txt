@@ -1,0 +1,2 @@
+java -cp The-Project-Game.jar -Dconfig-path=$PWD/gameMasterScenarioConfig1.json pl.mini.projectgame.ProjectGameApplication
+
