@@ -1,5 +1,6 @@
 package pl.mini.projectgame.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,8 +16,10 @@ public class Goal extends BoardObject {
     }
 
     private goalDiscover discovered;
+    @JsonIgnore
     private boolean finished = false;
     private boolean real;
+    @JsonIgnore
     private Team team;
 
     public Goal(boolean real, Position pos) {

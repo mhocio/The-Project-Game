@@ -12,7 +12,6 @@ logs/
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
@@ -62,7 +61,6 @@ hs_err_pid*
 ## Plugin-specific files:
 
 # IntelliJ
-/out/
 target/
 
 # mpeltonen/sbt-idea plugin

@@ -5,10 +5,16 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.mini.projectgame.GameMasterConfiguration;
 import pl.mini.projectgame.ProjectGameApplication;
+import pl.mini.projectgame.models.Position;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -27,13 +33,13 @@ public class GameMasterConfigurationTests {
     @Test
     void testParserFromExistingFile_shamProbability() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.getShamProbability(), 0.7, 0.0);
+        assertEquals(70, configFromFile.getShamProbability());
     }
 
     @Test
     void testParserFromExistingFile_maxTeamSize() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
-        assertEquals(configFromFile.getMaxTeamSize(), 12);
+        assertEquals(configFromFile.getMaxTeamSize(), 13);
     }
 
     @Test
@@ -42,20 +48,34 @@ public class GameMasterConfigurationTests {
         assertEquals(configFromFile.getMaxPieces(), 2);
     }
 
-    /* TODO: Position needs method equals
     @Test
     void testParserFromExistingFile_predefinedGoalPositions() {
         GameMasterConfiguration configFromFile = createTestConfigFromFile();
 
-        List<Position> predefinedGoalPositionsTest = new ArrayList<Position>();
+        List<Position> predefinedGoalPositionsTest = new ArrayList<>();
         predefinedGoalPositionsTest.add(new Position(11, 11));
         predefinedGoalPositionsTest.add(new Position(20, 20));
         predefinedGoalPositionsTest.add(new Position(1, 1));
-        Collections.sort(predefinedGoalPositionsTest);
 
-        assertThat(configFromFile.predefinedGoalPositions, is(predefinedGoalPositionsTest));
+        for (Position pos : predefinedGoalPositionsTest) {
+            assertTrue(configFromFile.getPredefinedGoalPositions().contains(pos));
+        }
     }
-     */
+
+    @Test
+    void testParserFromExistingFile_predefinedPiecePositions() {
+        GameMasterConfiguration configFromFile = createTestConfigFromFile();
+
+        List<Position> predefinedPiecePositionsTest = new ArrayList<>();
+        predefinedPiecePositionsTest.add(new Position(10, 10));
+        predefinedPiecePositionsTest.add(new Position(5, 15));
+        predefinedPiecePositionsTest.add(new Position(10, 15));
+        predefinedPiecePositionsTest.add(new Position(5, 20));
+
+        for (Position pos : predefinedPiecePositionsTest) {
+            assertTrue(configFromFile.getPredefinedPiecePositions().contains(pos));
+        }
+    }
 
     @Test
     void testParserFromExistingFile_boardWidth() {

@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import pl.mini.projectgame.GameMaster;
-import pl.mini.projectgame.models.Message;
-import pl.mini.projectgame.models.Position;
+import pl.mini.projectgame.GameMasterConfiguration;
+import pl.mini.projectgame.models.*;
 
 @SpringBootTest
 @ComponentScan
@@ -19,6 +19,10 @@ public class GameMasterDiscoverTests {
     private GameMaster gameMaster;
 
     private Message testMessage;
+    private MasterBoard testBoard;
+
+    private Position testPosition;
+    private Player testPlayer = new Player();
 
     @BeforeAll
     void beforeAll() {
@@ -34,9 +38,18 @@ public class GameMasterDiscoverTests {
     public void setup() {
         testMessage = new Message();
         testMessage.setAction("discover");
-        testMessage.setPosition(new Position(
+        GameMasterConfiguration config = new GameMasterConfiguration();
+
+        testBoard = new MasterBoard(config);
+        gameMaster.setMasterBoard(testBoard);
+
+        testPosition = new Position(
                 gameMaster.getMasterBoard().getWidth() / 2,
-                gameMaster.getMasterBoard().getGoalAreaHeight() + 4));
+                gameMaster.getMasterBoard().getGoalAreaHeight() + 4);
+        testPlayer.setPosition(testPosition);
+
+        gameMaster.getPlayerMap().put(testPlayer.getPlayerUuid(), testPlayer);
+        testMessage.setPlayerUuid(testPlayer.getPlayerUuid());
     }
 
     @Test
@@ -47,23 +60,24 @@ public class GameMasterDiscoverTests {
 
     @Test
     public void serverShouldReturnThreeFields() {
-        testMessage.getPosition().setX(0);
-        testMessage.getPosition().setY(gameMaster.getMasterBoard().getGoalAreaHeight());
+        Position newPos = new Position(0, gameMaster.getMasterBoard().getGoalAreaHeight());
+        testPlayer.setPosition(newPos);
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals(3, response.getFields().size());
     }
 
     @Test
     public void serverShouldReturnFiveFields() {
-        testMessage.getPosition().setY(gameMaster.getMasterBoard().getGoalAreaHeight());
+        testPosition.setY(gameMaster.getMasterBoard().getGoalAreaHeight());
+        testPlayer.setPosition(testPosition);
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals(5, response.getFields().size());
     }
 
     @Test
     public void serverShouldReturnErrorMessage() {
-        testMessage.setPosition(null);
+        testPlayer.setPosition(null);
         Message response = gameMaster.processAndReturn(testMessage);
-        Assert.assertEquals("error", response.getAction());
+        Assert.assertEquals(Message.Status.DENIED, response.getStatus());
     }
 }

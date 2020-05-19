@@ -1,9 +1,12 @@
 {
-    "shamProbability": 0.7,
-    "maxTeamSize": 12,
+    "shamProbability": 70,
+    "maxTeamSize": 13,
     "maxPieces": 2,
     "predefinedGoalPositions": [
         {"x": 11, "y": 11}, {"x": 20, "y": 20}, {"x": 1, "y": 1}
+    ],
+    "predefinedPiecePositions": [
+        {"x": 10, "y": 10}, {"x": 5, "y": 15}, {"x": 10, "y": 15}, {"x": 5, "y": 20}
     ],
     "boardWidth": 20,
      "boardTaskHeight": 10,

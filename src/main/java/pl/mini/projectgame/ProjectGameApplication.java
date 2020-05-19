@@ -11,6 +11,11 @@ import org.springframework.context.annotation.Configuration;
 public class ProjectGameApplication {
 
     public static void main(String[] args) {
+
+        System.out.println("args...: ");
+        for (String arg: args)
+            System.out.println(arg);
+
         SpringApplication app = new SpringApplication(ProjectGameApplication.class);
         app.setWebApplicationType(WebApplicationType.NONE);
         ConfigurableApplicationContext ctx = app.run(args);

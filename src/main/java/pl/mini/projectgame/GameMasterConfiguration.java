@@ -19,10 +19,11 @@ import java.util.List;
 @Component
 public class GameMasterConfiguration {
 
-    double shamProbability;
+    int shamProbability;
     int maxTeamSize;
     int maxPieces;
     List<Position> predefinedGoalPositions;
+    List<Position> predefinedPiecePositions;
 
     int boardWidth;
     int boardTaskHeight;
@@ -37,7 +38,7 @@ public class GameMasterConfiguration {
     int DelayPlace;
 
     void defaultConfiguration() {
-        shamProbability = 0.5;
+        shamProbability = 50;
         maxTeamSize = 4;
         maxPieces = 3;
 
@@ -67,6 +68,12 @@ public class GameMasterConfiguration {
         }
         ret.append("\n");
 
+        ret.append("predefinedPiecePositions: ");
+        for (Position pos : predefinedPiecePositions) {
+            ret.append("( ").append(pos.getX()).append(", ").append(pos.getY()).append(" ), ");
+        }
+        ret.append("\n");
+
         ret.append("boardWidth: ").append(boardWidth).append("\n");
         ret.append("boardTaskHeight: ").append(boardTaskHeight).append("\n");
         ret.append("boardGoalHeight: ").append(boardGoalHeight).append("\n");
@@ -82,13 +89,15 @@ public class GameMasterConfiguration {
 
     public GameMasterConfiguration() {
         this.defaultConfiguration();
-        predefinedGoalPositions = new ArrayList<Position>();
+        predefinedGoalPositions = new ArrayList<>();
+        predefinedPiecePositions = new ArrayList<>();
         predefinedGoalPositions.add(new Position(15, 15));
     }
 
     public void configureFromFile(String filePath) {
         this.defaultConfiguration();
-        predefinedGoalPositions = new ArrayList<Position>();
+        predefinedGoalPositions = new ArrayList<>();
+        predefinedPiecePositions = new ArrayList<>();
 
         JSONParser parser = new JSONParser();
         JSONObject jsonObject;
@@ -97,7 +106,7 @@ public class GameMasterConfiguration {
             jsonObject = (JSONObject) obj;
 
             try {
-                shamProbability = (double) jsonObject.get("shamProbability");
+                shamProbability = Math.toIntExact((long) jsonObject.get("shamProbability"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -181,6 +190,15 @@ public class GameMasterConfiguration {
                 JSONObject PosJSON = goalPositionsIterator.next();
                 Position pos = new Position(Math.toIntExact((long) PosJSON.get("x")), Math.toIntExact((long) PosJSON.get("y")));
                 predefinedGoalPositions.add(pos);
+            }
+
+            PositionsJSONArray = (JSONArray) jsonObject.get("predefinedPiecePositions");
+            goalPositionsIterator = PositionsJSONArray.iterator();
+
+            while (goalPositionsIterator.hasNext()) {
+                JSONObject PosJSON = goalPositionsIterator.next();
+                Position pos = new Position(Math.toIntExact((long) PosJSON.get("x")), Math.toIntExact((long) PosJSON.get("y")));
+                predefinedPiecePositions.add(pos);
             }
 
         } catch (FileNotFoundException e) {

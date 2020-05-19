@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import pl.mini.projectgame.GameMaster;
 import pl.mini.projectgame.GameMasterConfiguration;
+import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
 
 import java.io.*;
@@ -32,6 +33,9 @@ public class CommunicationServerPickupTests {
     private BufferedReader in;
     private ObjectMapper mapper;
     private MasterBoard testBoard;
+
+    Position testPosition = new Position(1, 1);
+    Player testPlayer = new Player();
 
     private Map<Position, Cell> cells;
 
@@ -61,15 +65,13 @@ public class CommunicationServerPickupTests {
     @BeforeEach
     public void setup() throws IOException {
         GameMasterConfiguration config = new GameMasterConfiguration();
-        Position testPosition = new Position(1, 1);
-        Player testPlayer = new Player();
+        testPlayer.setPosition(testPosition);
 
         testBoard = new MasterBoard(config);
         testBoard.getCellByPosition(testPosition).addContent(Piece.class, new Piece(0));
         gameMaster.setMasterBoard(testBoard);
         testMessage = new Message();
 
-        testMessage.setPosition(testPosition);
         gameMaster.getPlayerMap().put(testPlayer.getPlayerUuid(), testPlayer);
         testMessage.setAction("pickUp");
         testMessage.setPlayerUuid(testPlayer.getPlayerUuid());
@@ -94,8 +96,9 @@ public class CommunicationServerPickupTests {
     }
 
     @Test
-    public void serverShouldReturnErrorMessage() throws IOException {
-        testMessage.setPosition(new Position(3, 3));
+    public void serverShouldReturnDeniedMessage() throws IOException {
+        testBoard.getCellByPosition(testPosition).removeContent(Piece.class);
+
         mapper.writeValue(out, testMessage);
         out.flush();
 
@@ -104,8 +107,7 @@ public class CommunicationServerPickupTests {
         cb.flip();
 
         Message response = mapper.readValue(cb.toString(), Message.class);
-        Assert.assertEquals("error", response.getAction());
+        Assert.assertEquals(Message.Status.DENIED, response.getStatus());
     }
-
 
 }

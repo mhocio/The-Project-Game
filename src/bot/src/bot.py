@@ -14,6 +14,8 @@ def bot_function(addr):
     my_player.start()
     my_player.move_right()
     my_player.move_left()
+    my_player.move_down()
+    my_player.move_up()
     my_player.finish()
     my_player.close()
     print("END BOT FUNCTION")
@@ -57,6 +59,7 @@ class Player:
     def reading_thread(self):
         while(True):
             rv = self.recv()
+            rv = {k: v for k, v in rv.items() if v is not None}  # remove Nones from dict
             print("RECV: ", rv)
             if(rv['action'] == "finish"):
                 print("BOT_READ finish")
@@ -73,11 +76,12 @@ class Player:
             elif rv['action'] == 'test' and rv['status'] == "OK":
                 # TODO test piece status update
                 pass
-            elif rv['action'] == 'move' and rv['status'] == "OK":
+            elif rv['action'] == 'move':
+                print("BOT_READ position before: "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+                if rv['status'] == "OK":
+                    self.set_pos(rv['position']['x'], rv['position']['y'])
                 print("BOT_READ move")
-                print("BOT_READ position1 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
-                self.set_pos(rv['position']['x'], rv['position']['y'])
-                print("BOT_READ position2 "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+                print("BOT_READ position after: "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
             elif rv['action'] == 'pickup' and rv['status'] == "OK":
                 self.is_carrying_piece = True
 
@@ -192,6 +196,36 @@ class Player:
         self.writing = False
         print("WRITING after "+str(self.writing))
 
+    def move(self, x, y):
+
+        x_direction = x - self.get_pos_x()
+        y_direction = y - self.get_pos_y()
+        horizontal_mode = True
+
+        while abs(x_direction) > 0 or abs(y_direction) > 0:
+            self.wait()
+            x_direction = x - self.get_pos_x()
+            y_direction = y - self.get_pos_y()
+
+            # prev_pos = (self.get_pos_x(), self.get_pos_y())
+            if horizontal_mode and abs(x_direction) == 0:
+                horizontal_mode = not horizontal_mode
+            if not horizontal_mode and abs(y_direction) == 0:
+                horizontal_mode = not horizontal_mode
+
+            if horizontal_mode and x_direction > 0:
+                self.move_right()
+            elif horizontal_mode and x_direction < 0:
+                self.move_left()
+            elif not horizontal_mode and y_direction > 0:
+                self.move_up()
+            elif not horizontal_mode and y_direction < 0:
+                self.move_down()
+
+            # after_pos = (self.get_pos_x(), self.get_pos_y())
+            # TODO: checking if someone blocked, now going like zigzag
+            horizontal_mode = not horizontal_mode
+
     def pickup(self):
         self.wait()
         MoveMessage={
@@ -247,6 +281,7 @@ class Player:
         print("CLOSING SOCKET")
 
     def send(self, message):
+        print("\n@@@@@ sending @@@@@ : ", message)
         self.socket.sendall(bytes(json.JSONEncoder().encode(message), "utf-8"))
 
     def recv(self):
