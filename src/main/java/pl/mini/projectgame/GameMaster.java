@@ -358,11 +358,16 @@ public class GameMaster {
     private Message actionDiscover(Message message) {
         List<Field> fields = new ArrayList<>();
         Message response = new Message();
+        response.setStatus(Message.Status.DENIED);
+
+        Position playerPosition;
 
         if(mode != gmMode.GAME) return createErrorMessage();
 
         try {
-            Position playerPosition = message.getPosition();
+            Player player = playerMap.get(message.getPlayerUuid());
+            response.setPlayerUuid(message.getPlayerUuid());
+            playerPosition = player.getPosition();
 
             for (int x = -1; x <= 1; x++) {
                 for (int y = -1; y <= 1; y++) {
@@ -399,8 +404,9 @@ public class GameMaster {
             return createErrorMessage();
         }
 
+        response.setStatus(Message.Status.OK);
         response.setAction(message.getAction());
-        response.setPosition(message.getPosition());
+        response.setPosition(playerPosition);
         response.setFields(fields);
 
         return response;
@@ -468,21 +474,25 @@ public class GameMaster {
 
     private Message actionTest(Message message) {
 
-        if(mode != gmMode.GAME) return createErrorMessage();
+        if(mode != gmMode.GAME)
+            return createErrorMessage();
 
         Message response = new Message();
+        response.setAction(message.getAction());
+
         try {
             Player player = playerMap.get(message.getPlayerUuid());
-            Piece piece = (Piece) masterBoard.getCellByPosition(message.getPosition()).getContent().get(Piece.class);
-            var testResult = player.testPiece(piece);
+            response.setPlayerUuid(message.getPlayerUuid());
+
+            var testResult = player.testPiece(player.getPiece());
             response.setTest(testResult);
+
             // if player tests the first time
             if (testResult != null) {
                 response.setStatus(Message.Status.OK);
             } else {
                 response.setStatus(Message.Status.DENIED);
             }
-            response.setAction(message.getAction());
         } catch (Exception e) {
             logger.warn(e.toString());
             return createErrorMessage();

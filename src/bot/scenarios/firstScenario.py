@@ -1,8 +1,12 @@
 import sys
-import bot as bot
+# this mess is needed until we have no package
+from os.path import dirname, join, abspath
+sys.path.insert(0, abspath(join(dirname(__file__), '..')))
+from src import bot
+
+from time import sleep
 from threading import Thread
 from threading import get_ident
-from time import sleep
 
 threads = list()
 n = 1
@@ -14,9 +18,7 @@ def firstBot():
     my_player.start()
     team_color = my_player.team
     if team_color == "RED":
-        # sleep(10)
         my_player.move(10, 10)
-        # sleep(3)
         my_player.pickup()
         my_player.move(4, 0)
         my_player.place()
@@ -25,10 +27,7 @@ def firstBot():
         my_player.pickup()
         my_player.move(8, 2)
         my_player.place()
-    # else:
-    #    my_player.move(4, 36)
-    
-    # my_player.finish()
+
     my_player.close()
     print("END BOT FUNCTION")
 
