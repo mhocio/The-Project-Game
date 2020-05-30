@@ -80,6 +80,12 @@ public class GameMaster {
             if (configFromResourcesFile.exists())
                 config.configureFromFile(configFromResourcesFile.getPath());
 
+            System.out.println("success reading config");
+        } catch (Exception e) {
+            logger.error("error reading config from resources: " + e.toString());
+        }
+
+        try {
             String path = System.getenv("HOME")
                     + "/develop/gameMasterScenarioConfig1.json";
             String context = System.getProperty("config-path");
@@ -90,10 +96,8 @@ public class GameMaster {
             File configFromPathFile = new File(path);
             if (configFromPathFile.exists())
                 config.configureFromFile(path);
-
-            System.out.println("success reading config");
         } catch (Exception e) {
-            logger.error("error reading config: " + e.toString());
+            logger.error("error reading config from file: " + e.toString());
         }
 
         configuration = config;
@@ -208,8 +212,8 @@ public class GameMaster {
         Message message = new Message();
         message.setAction("finish");
         scheduler.shutdownNow();
-//        server.sendToEveryone(message);
-//        server.close();
+        connectionHandler.sendToEveryone(message);
+        //connectionHandler.close();
         logger.info("Game finished");
     }
 

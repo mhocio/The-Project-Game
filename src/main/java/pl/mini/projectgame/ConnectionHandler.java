@@ -140,7 +140,7 @@ public class ConnectionHandler {
         }
     }
 
-    public void sendToEveryone(String message) {
+    public void sendToEveryone(Message message) {
         // TODO: use conn?
         connections.forEach(socket -> {
             try {
