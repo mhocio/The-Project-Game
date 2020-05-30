@@ -11,8 +11,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import pl.mini.projectgame.ConnectionHandler;
 import pl.mini.projectgame.models.Message;
-import pl.mini.projectgame.server.CommunicationServer;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -30,11 +30,11 @@ public class CommunicationServerTests {
     private ObjectMapper mapper;
 
     @Autowired
-    private CommunicationServer server;
+    private ConnectionHandler server;
 
     @BeforeEach
     public void setup() throws IOException {
-        client = new Socket(InetAddress.getLocalHost().getHostName(), 8080);
+        client = new Socket(InetAddress.getLocalHost().getHostName(), 8000);
         out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 

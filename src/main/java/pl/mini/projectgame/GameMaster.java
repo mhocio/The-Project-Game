@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
-import pl.mini.projectgame.server.CommunicationServer;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -52,15 +51,14 @@ public class GameMaster {
 
     private MasterBoard masterBoard;
     private GameMasterConfiguration configuration;
-    private CommunicationServer server;
+    private ConnectionHandler connectionHandler;
     private List<Piece> pieces;
     private int requiredPointsToWin;
     private ScheduledExecutorService scheduler;
 
     @Autowired
-    public GameMaster(GameMasterConfiguration config, MasterBoard board, @Lazy CommunicationServer server) {
-
-        this.server = server;
+    public GameMaster(GameMasterConfiguration config, MasterBoard board, @Lazy ConnectionHandler handler) {
+        connectionHandler = handler;
         playerMap = new HashMap<>();
         lastTeamWasRed = false;
         masterBoard = board;
@@ -210,8 +208,8 @@ public class GameMaster {
         Message message = new Message();
         message.setAction("finish");
         scheduler.shutdownNow();
-        server.sendToEveryone(message);
-        server.close();
+//        server.sendToEveryone(message);
+//        server.close();
         logger.info("Game finished");
     }
 
@@ -741,7 +739,7 @@ public class GameMaster {
                 message.setPosition(p.getPosition());
                 message.setBoard(p.getBoard());
 
-                server.sendToSpecific(message);
+                connectionHandler.sendToSpecific(message);
             }
         }
     }

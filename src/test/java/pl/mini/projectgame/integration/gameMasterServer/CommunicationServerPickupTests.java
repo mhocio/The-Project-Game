@@ -42,7 +42,7 @@ public class CommunicationServerPickupTests {
     @BeforeAll
     void saveConfig() throws IOException {
         cells = gameMaster.getMasterBoard().getCells();
-        client = new Socket(InetAddress.getLocalHost().getHostName(), 8080);
+        client = new Socket(InetAddress.getLocalHost().getHostName(), 8000);
         out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 

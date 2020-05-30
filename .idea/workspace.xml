@@ -1,20 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="GradleLocalSettings">
-    <option name="projectSyncType">
-      <map>
-        <entry key="$PROJECT_DIR$/../Java/IDEA/2019_Rozwiazanie_Software-Engineer-Intern_Poznan" value="PREVIEW" />
-      </map>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4f60cd96-5b5c-4ccf-958c-3866676cd731" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/communication-server/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/communication-server/src/main/java/projectgame/Application.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pl/mini/projectgame/ConnectionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pl/mini/projectgame/GameMaster.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pl/mini/projectgame/GameMaster.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pl/mini/projectgame/server/CommunicationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/communication-server/src/main/java/projectgame/CommunicationServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/communicationServerDelay/CommunicationServerDelayMoveTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/communicationServerDelay/CommunicationServerDelayMoveTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerDiscoverTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerDiscoverTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerMoveTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerMoveTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerPickupTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerPickupTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerPlayerConnectionTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerPlayerConnectionTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerSetupTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerSetupTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerTestTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/integration/gameMasterServer/CommunicationServerTestTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/unit/CommunicationServerTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/pl/mini/projectgame/unit/CommunicationServerTests.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1YrYEe48drT8FWRHXCiqO7LwMm5" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.annotationProcessors" />
   </component>
-  <component name="RunManager">
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="projectgame" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.ProjectGameApplication (1)">
+    <configuration name="CommunicationServerDelayMoveTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="The-Project-Game" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.mini.projectgame.integration.communicationServerDelay.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pl.mini.projectgame.integration.communicationServerDelay" />
+      <option name="MAIN_CLASS_NAME" value="pl.mini.projectgame.integration.communicationServerDelay.CommunicationServerDelayMoveTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CommunicationServerTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="The-Project-Game" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.mini.projectgame.unit.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pl.mini.projectgame.unit" />
+      <option name="MAIN_CLASS_NAME" value="pl.mini.projectgame.unit.CommunicationServerTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="pl.mini.projectgame in The-Project-Game" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="The-Project-Game" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.mini.projectgame.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="pl.mini.projectgame" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="communication-server" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="projectgame.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="SPRING_BOOT_MAIN_CLASS" value="projectgame.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ProjectGameApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="The-Project-Game" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.mini.projectgame.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="SPRING_BOOT_MAIN_CLASS" value="pl.mini.projectgame.ProjectGameApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="ProjectGameApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="project-game" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="pl.mini.projectgame.ProjectGameApplication" />
@@ -22,8 +159,96 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Spring Boot.ProjectGameApplication (1)" />
+        <item itemvalue="Spring Boot.Application" />
+        <item itemvalue="JUnit.pl.mini.projectgame in The-Project-Game" />
+        <item itemvalue="JUnit.CommunicationServerDelayMoveTests" />
+        <item itemvalue="JUnit.CommunicationServerTests" />
+      </list>
+    </recent_temporary>
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4f60cd96-5b5c-4ccf-958c-3866676cd731" name="Default Changelist" comment="" />
+      <created>1590838128018</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1590838128018</updated>
+      <workItem from="1590838130309" duration="13404000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="600" y="114" key="#ProjectGameApplication" timestamp="1590847620647">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="600" y="114" key="#ProjectGameApplication/0.0.1920.1040@0.0.1920.1040" timestamp="1590847620647" />
+    <state x="440" y="94" key="#Project_Structure" timestamp="1590849504004">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="440" y="94" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1590849504004" />
+    <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1590838456905">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590838456905" />
+    <state width="1877" height="230" key="GridCell.Tab.0.bottom" timestamp="1590852982002">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="230" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1590852982002" />
+    <state width="1877" height="230" key="GridCell.Tab.0.center" timestamp="1590852982002">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="230" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1590852982002" />
+    <state width="1877" height="230" key="GridCell.Tab.0.left" timestamp="1590852982002">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="230" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1590852982002" />
+    <state width="1877" height="230" key="GridCell.Tab.0.right" timestamp="1590852982002">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="230" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1590852982002" />
+    <state width="1877" height="230" key="GridCell.Tab.1.bottom" timestamp="1590852982002">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="230" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1590852982002" />
+    <state width="1877" height="230" key="GridCell.Tab.1.center" timestamp="1590852982002">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="230" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1590852982002" />
+    <state width="1877" height="230" key="GridCell.Tab.1.left" timestamp="1590852982002">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="230" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1590852982002" />
+    <state width="1877" height="230" key="GridCell.Tab.1.right" timestamp="1590852982002">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="230" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1590852982002" />
+    <state x="461" y="164" key="SettingsEditor" timestamp="1590851855312">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="164" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1590851855312" />
+    <state x="336" y="130" key="new project wizard" timestamp="1590838219408">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="336" y="130" key="new project wizard/0.0.1920.1040@0.0.1920.1040" timestamp="1590838219408" />
   </component>
 </project>
