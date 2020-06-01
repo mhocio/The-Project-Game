@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.*;
@@ -73,10 +74,8 @@ public class GameMaster {
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
         try {
-            File configFromResourcesFile = new File(
-                    Objects.requireNonNull(ProjectGameApplication.class.getClassLoader().getResource(
-                            "gameMasterScenarioConfig1.json")).getFile()
-            );
+            File configFromResourcesFile = ResourceUtils.getFile("gameMasterScenarioConfig1.json");
+
             if (configFromResourcesFile.exists())
                 config.configureFromFile(configFromResourcesFile.getPath());
 

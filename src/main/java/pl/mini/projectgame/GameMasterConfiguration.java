@@ -8,6 +8,7 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Component;
 import pl.mini.projectgame.models.Position;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
