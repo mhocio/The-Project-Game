@@ -290,19 +290,12 @@ class Player:
     def init_config(self):
         print(self.get_guid())
         print(self.get_host())
-        
-        if self.get_host() == True:
-            message = {
+
+        message = {
                 "action" : "start",
                 "playerUuid": self.get_guid()
             }
-            self.send(message)
-            print("SEND")
-            print(message)
-
-        config = self.recv()
-        print("CONFIG")
-        print(config)
+        config = {"status": "DENIED"}     
 
         # wait until all the players are ready
         while config["status"] == "DENIED":

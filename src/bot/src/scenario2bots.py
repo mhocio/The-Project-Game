@@ -30,7 +30,7 @@ def firstBot():
     my_player.close()
     print("END BOT FUNCTION")
 
-n = 2
+n = 1
 print("First scenario running two bots reaching for two pieces.")
 for index in range(n):
     x = Thread(target = firstBot)
