@@ -4,6 +4,8 @@
 The Project Game server is built Java 14 Spring Boot 2.2.7.
 Bot module is written in Python 3.7 for the purpose of connecting to the game and play it.
 
+On branch [*modules*](https://github.com/mhocio/The-Project-Game/tree/modules) there is a seperation of Game Master and Communication Server, where they can be executed seperately.
+
 ##  Running the game
 In order to process the game you need to: 
 1) Run first the Java server (using JAR file from the command line or from the IDE)
