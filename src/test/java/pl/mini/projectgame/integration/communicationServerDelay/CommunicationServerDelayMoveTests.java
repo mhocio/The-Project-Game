@@ -3,6 +3,7 @@ package pl.mini.projectgame.integration.communicationServerDelay;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.flogger.Flogger;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import pl.mini.projectgame.exceptions.DeniedMoveException;
 import pl.mini.projectgame.models.Message;
 import pl.mini.projectgame.models.Player;
 import pl.mini.projectgame.models.Position;
+import pl.mini.projectgame.models.Team;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -33,10 +35,30 @@ public class CommunicationServerDelayMoveTests {
     private ObjectMapper mapper;
     private Message message;
     private Player player;
+    private Position lastPosition;
+
+    int x;
+    int y;
+
+    private int originalDelay;
+    private boolean result;
+    double mean;
+    int sum;
+    int numOfRuns;
+
+    @BeforeAll
+    void beforeAll() {
+        gameMaster.setMode(GameMaster.gmMode.GAME);
+        originalDelay = gameMaster.getConfiguration().getDelayMove();
+        x = gameMaster.getConfiguration().getBoardWidth()/2;
+        y = gameMaster.getConfiguration().getBoardTaskHeight()/2 +
+                    gameMaster.getConfiguration().getBoardGoalHeight();
+    }
 
     @AfterAll
     void cleanUp() {
         gameMaster.getMasterBoard().getCells().forEach((k, v) -> v.setContent(new HashMap<>()));
+        gameMaster.setMode(GameMaster.gmMode.NONE);
     }
 
     @BeforeEach
@@ -48,17 +70,12 @@ public class CommunicationServerDelayMoveTests {
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
         mapper = new ObjectMapper(jsonFactory);
-
-        message = new Message();
+        gameMaster.getMasterBoard().getCells().forEach((k,v) -> v.setContent(new HashMap<>()));
         player = new Player();
-        message.setAction("move");
-        message.setPlayerUuid(player.getPlayerUuid());
+        player.setPosition(new Position(x, y));
         gameMaster.getPlayerMap().put(player.getPlayerUuid(), player);
-
-        player.setPosition(new Position(1, 1));
         gameMaster.getMasterBoard().addBoardObject(player, player.getPosition());
         gameMaster.setMode(GameMaster.gmMode.GAME);
-        message.setPosition(player.getPosition());
     }
 
     @AfterEach
@@ -69,19 +86,180 @@ public class CommunicationServerDelayMoveTests {
     }
 
     @Test
-    void testMoveActionMessageUp() throws DeniedMoveException, IOException {
+    void testDelayMoveActionMessageUpForRedPlayer() throws DeniedMoveException, IOException {
+        sum = 0;
+        numOfRuns = 50;
+        player.setTeam(new Team(Team.TeamColor.RED));
 
-        // TODO: board generated correctly?
-
-        System.out.println("config delay: " + gameMaster.getConfiguration().getDelayMove());
-        int originalDelay = gameMaster.getConfiguration().getDelayMove();
-        int numOfRuns = 50;
-        long sum = 0;
-
-        for (int i = 0; i < numOfRuns; i++) {
+        for (int i = 1; i <= numOfRuns; i++) {
             message = new Message();
             message.setAction("move");
             message.setDirection(Message.Direction.UP);
+            message.setPlayerUuid(player.getPlayerUuid());
+            message.setPosition(player.getPosition());
+
+            mapper.writeValue(out, message);
+
+            long startTime = System.nanoTime();
+
+            out.flush();
+            CharBuffer cb = CharBuffer.allocate(1024);
+            int ret = in.read(cb);
+            cb.flip();
+            Message response = mapper.readValue(cb.toString(), Message.class);
+
+            long endTime = System.nanoTime();
+
+            if (response.getPosition() != null)
+                player.setPosition(response.getPosition());
+            else
+                player.setPosition(player.getPosition());
+
+            System.out.println("new position: " + player.getPosition());
+
+            long diffInMiliseconds = (endTime - startTime) / 1000000;
+            sum += diffInMiliseconds;
+
+            if (response.getPosition() != null){
+                lastPosition = response.getPosition();
+                assertEquals(new Position(x, y + i), response.getPosition());
+            }
+            else
+                assertEquals(response.getStatus(), Message.Status.DENIED);
+
+            assertEquals("move", response.getAction());
+        }
+
+        assertEquals(lastPosition, new Position(x, gameMaster.getConfiguration().getBoardGoalHeight()
+                                                        + gameMaster.getConfiguration().getBoardTaskHeight() - 1));
+        result = false;
+        mean = sum / numOfRuns;
+        if (Math.abs(originalDelay - mean) < 7.0)
+            result = true;
+
+        System.out.println("mean: " + mean);
+        assertTrue(result);
+    }
+
+    @Test
+    void testDelayMoveActionMessageDownForBluePlayer() throws DeniedMoveException, IOException {
+        numOfRuns = 50;
+        sum = 0;
+        player.setTeam(new Team(Team.TeamColor.BLUE));
+        System.out.println(gameMaster.getMasterBoard().getGoalAreaHeight());
+
+        for (int i = 1; i <= numOfRuns; i++) {
+            message = new Message();
+            message.setAction("move");
+            message.setDirection(Message.Direction.DOWN);
+            message.setPlayerUuid(player.getPlayerUuid());
+            message.setPosition(player.getPosition());
+
+            mapper.writeValue(out, message);
+
+            long startTime = System.nanoTime();
+
+            out.flush();
+            CharBuffer cb = CharBuffer.allocate(1024);
+            int ret = in.read(cb);
+            cb.flip();
+            Message response = mapper.readValue(cb.toString(), Message.class);
+
+            long endTime = System.nanoTime();
+
+            if (response.getPosition() != null)
+                player.setPosition(response.getPosition());
+            else
+                player.setPosition(player.getPosition());
+
+            System.out.println("new position: " + player.getPosition());
+
+            long diffInMiliseconds = (endTime - startTime) / 1000000;
+            sum += diffInMiliseconds;
+
+            if (response.getPosition() != null){
+                lastPosition = response.getPosition();
+                assertEquals(new Position(x, y - i), response.getPosition());
+            }
+            else
+                assertEquals(response.getStatus(), Message.Status.DENIED);
+
+            assertEquals("move", response.getAction());
+        }
+
+        System.out.println("last position: " + lastPosition);
+        System.out.println("goal height: " + gameMaster.getConfiguration().getBoardGoalHeight());
+        assertEquals(lastPosition, new Position(x, gameMaster.getConfiguration().getBoardGoalHeight()));
+
+        result = false;
+        mean = sum / numOfRuns;
+        if (Math.abs(originalDelay - mean) < 7.0)
+            result = true;
+
+        System.out.println("mean: " + mean);
+        assertTrue(result);
+    }
+
+    @Test
+    void testDelayMoveActionMessageLeft() throws DeniedMoveException, IOException {
+        int numOfRuns = 50;
+        long sum = 0;
+        player.setTeam(new Team(Team.TeamColor.RED));
+
+        for (int i = 1; i <= numOfRuns; i++) {
+            message = new Message();
+            message.setAction("move");
+            message.setDirection(Message.Direction.LEFT);
+            message.setPlayerUuid(player.getPlayerUuid());
+            message.setPosition(player.getPosition());
+
+
+            mapper.writeValue(out, message);
+            long startTime = System.nanoTime();
+            out.flush();
+            CharBuffer cb = CharBuffer.allocate(1024);
+            int ret = in.read(cb);
+            cb.flip();
+            Message response = mapper.readValue(cb.toString(), Message.class);
+            long endTime = System.nanoTime();
+
+            if (response.getPosition() != null)
+                player.setPosition(response.getPosition());
+            else
+                player.setPosition(player.getPosition());
+
+            System.out.println("new position: " + player.getPosition());
+
+            long diffInMiliseconds = (endTime - startTime) / 1000000;
+            sum += diffInMiliseconds;
+
+            if (response.getPosition() != null)
+                assertEquals(new Position(x - i, y), response.getPosition());
+            else
+                assertEquals(response.getStatus(), Message.Status.DENIED);
+
+            assertEquals("move", response.getAction());
+        }
+
+        result = false;
+        mean = sum / numOfRuns;
+        if (Math.abs(originalDelay - mean) < 7.0)
+            result = true;
+
+        System.out.println("mean: " + mean);
+        assertTrue(result);
+    }
+
+    @Test
+    void testDelayMoveActionMessageRight() throws DeniedMoveException, IOException {
+        numOfRuns = 50;
+        sum = 0;
+        player.setTeam(new Team(Team.TeamColor.RED));
+
+        for (int i = 1; i <= numOfRuns; i++) {
+            message = new Message();
+            message.setAction("move");
+            message.setDirection(Message.Direction.RIGHT);
             message.setPlayerUuid(player.getPlayerUuid());
             message.setPosition(player.getPosition());
 
@@ -105,15 +283,15 @@ public class CommunicationServerDelayMoveTests {
             sum += diffInMiliseconds;
 
             if (response.getPosition() != null)
-                assertEquals(new Position(1, 2 + i), response.getPosition());
+                assertEquals(new Position(x + i, y), response.getPosition());
             else
                 assertEquals(response.getStatus(), Message.Status.DENIED);
 
             assertEquals("move", response.getAction());
         }
 
-        boolean result = false;
-        double mean = sum / numOfRuns;
+        result = false;
+        mean = sum / numOfRuns;
         if (Math.abs(originalDelay - mean) < 7.0)
             result = true;
 

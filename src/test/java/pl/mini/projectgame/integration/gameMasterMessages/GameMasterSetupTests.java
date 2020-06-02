@@ -61,5 +61,4 @@ public class GameMasterSetupTests {
         Message response = gameMaster.processAndReturn(testMessage);
         Assert.assertEquals("error", response.getAction());
     }
-
 }
