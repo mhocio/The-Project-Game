@@ -25,6 +25,8 @@ public class Message {
     private Team.TeamColor teamColor;
     private String team;
     private Team.TeamRole teamRole;
+    private List<String> teamGuids;
+
     private boolean host;
     private UUID playerUuid;
     private String playerGuid;

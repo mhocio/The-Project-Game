@@ -787,6 +787,10 @@ public class GameMaster {
                 message.setPosition(p.getPosition());
                 message.setBoard(p.getBoard());
 
+                for (Map.Entry<Player, Team.TeamRole> teammate : p.getTeam().getPlayers().entrySet()) {
+                    message.getTeamGuids().add(teammate.getKey().getPlayerUuid().toString());
+                }
+
                 connectionHandler.sendToSpecific(message);
             //}
         }
