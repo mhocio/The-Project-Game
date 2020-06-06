@@ -28,6 +28,7 @@ public class Message {
 
     private boolean host;
     private String playerUuid;
+
     private String playerGuid;
     private int portNumber;
 

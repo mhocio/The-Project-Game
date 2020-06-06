@@ -739,8 +739,6 @@ public class GameMaster {
 
         startGame();
         message.setPlayerUuid(playerMessaged.getPlayerUuid());
-
-        // TODO
         message.setPlayerGuid(playerMessaged.getPlayerUuid().toString());
 
         message.setAction("start");
@@ -830,6 +828,7 @@ public class GameMaster {
                 var message = new Message();
                 message.setPlayerUuid(p.getPlayerUuid());
                 message.setPlayerGuid(p.getPlayerUuid().toString());
+
                 message.setAction("start");
                 message.setStatus(Message.Status.OK);
                 message.setTeam(capitalize(p.getTeam().getColor().toString()));
