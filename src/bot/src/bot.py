@@ -47,7 +47,7 @@ class Player:
     writing = True
     is_carrying_piece = False
 
-    def __init__(self, _host = '127.0.0.1', _port = 8080):
+    def __init__(self, _host = '127.0.0.1', _port = 8000):
         self.HOST = _host
         self.PORT = _port
         self.GUID = '0000'
@@ -61,29 +61,38 @@ class Player:
             rv = self.recv()
             rv = {k: v for k, v in rv.items() if v is not None}  # remove Nones from dict
             print("RECV: ", rv)
+
             if(rv['action'] == "finish"):
                 print("BOT_READ finish")
                 break
+
             # elif rv['action'] == 'start' and rv['status'] == "OK":
             #     print("BOT_READ start")
             #     self.writing = False
             #     pass
             # response for start message from host
+
             elif rv['action'] == 'discover' and rv['status'] == "OK":
                 print("BOT_READ discover")
                 for field in rv['fields']:
-                    self.board.set_cell(field['x'], field['y'], field['cell']['distance'])
+                    self.board.set_cell(field['position']['x'], field['position']['y'], field['cell']['distance'])
+
             elif rv['action'] == 'test' and rv['status'] == "OK":
-                # TODO test piece status update
+                # TODO FILIP test piece status update
                 pass
+
             elif rv['action'] == 'move':
                 print("BOT_READ position before: "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
                 if rv['status'] == "OK":
                     self.set_pos(rv['position']['x'], rv['position']['y'])
                 print("BOT_READ move")
                 print("BOT_READ position after: "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
+
             elif rv['action'] == 'pickup' and rv['status'] == "OK":
                 self.is_carrying_piece = True
+
+            elif rv['action'] == 'place' and rv['status'] == "OK":
+                self.is_carrying_piece = False
 
             self.writing = True
 
@@ -120,26 +129,22 @@ class Player:
             pass
         print("WRITING "+str(self.writing))
 
-    def place_piece(self):
-        self.wait()
-        TestMessage={
-            "action": "test",
-            "playerUuid": self.get_guid()
-            }
-        self.send(TestMessage)
-        self.writing = False
+    # def place_piece(self):
+    #     self.wait()
+    #     TestMessage={
+    #         "action": "test",
+    #         "playerGuid": self.get_guid()
+    #         }
+    #     self.send(TestMessage)
+    #     self.writing = False
 
     def move_right(self):
         self.wait()
         print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
-            "playerUuid": self.get_guid(),
-            "direction": "RIGHT",
-            "position" : {
-                "x" : self.get_pos_x(),
-                "y" : self.get_pos_y()
-            }
+            "playerGuid": self.get_guid(),
+            "direction": "Right",
         }
         self.send(MoveMessage)
         self.writing = False
@@ -151,12 +156,8 @@ class Player:
         print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
-            "playerUuid": self.get_guid(),
-            "direction": "LEFT",
-            "position" : {
-                "x" : self.get_pos_x(),
-                "y" : self.get_pos_y()
-            }
+            "playerGuid": self.get_guid(),
+            "direction": "Left",
         }
         self.send(MoveMessage)
         self.writing = False
@@ -169,12 +170,8 @@ class Player:
         print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
-            "playerUuid": self.get_guid(),
-            "direction": "UP",
-            "position" : {
-                "x" : self.get_pos_x(),
-                "y" : self.get_pos_y()
-            }
+            "playerGuid": self.get_guid(),
+            "direction": "Up",
         }
         self.send(MoveMessage)
         self.writing = False
@@ -185,12 +182,8 @@ class Player:
         print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
-            "playerUuid": self.get_guid(),
-            "direction": "DOWN",
-            "position" : {
-                "x" : self.get_pos_x(),
-                "y" : self.get_pos_y()
-            }
+            "playerGuid": self.get_guid(),
+            "direction": "Down",
         }
         self.send(MoveMessage)
         self.writing = False
@@ -229,8 +222,8 @@ class Player:
     def pickup(self):
         self.wait()
         MoveMessage={
-            "action": "pickUp",
-            "playerUuid": self.get_guid(),
+            "action": "pickup",
+            "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
         self.writing = False
@@ -239,7 +232,7 @@ class Player:
         self.wait()
         MoveMessage={
             "action": "test",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
         self.writing = False
@@ -248,7 +241,7 @@ class Player:
         self.wait()
         MoveMessage={
             "action": "place",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
         self.writing = False
@@ -257,7 +250,11 @@ class Player:
         self.wait()
         MoveMessage={
             "action": "discover",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
+            "position": {
+                "x": self.get_pos_x,
+                "y": self.get_pos_y
+            }
         }
         self.send(MoveMessage)
         self.writing = False
@@ -266,7 +263,7 @@ class Player:
         self.wait()
         MoveMessage={
             "action": "finish",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
         self.writing = False
@@ -293,7 +290,7 @@ class Player:
 
         message = {
                 "action" : "start",
-                "playerUuid": self.get_guid()
+                "playerGuid": self.get_guid()
             }
         config = {"status": "DENIED"}     
 
@@ -308,8 +305,8 @@ class Player:
             print("CONFIG while")
             print(config)
 
-        if config["action"] == "startGame":
-                self.set_board(config["board"]["width"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
+        if config["action"] == "start":
+                self.set_board(config["board"]["boardWidth"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
                 self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
 
                 if config['status'] == 'OK':
@@ -330,7 +327,7 @@ class Player:
         print(connected)
 
         if "status" in connected and connected["status"] == "OK":
-            self.set_guid(connected["playerUuid"])
+            self.set_guid(connected["playerGuid"])
             self.set_role(connected["teamRole"])
             self.set_team(connected["teamColor"])
             self.set_host(connected["host"])
@@ -338,7 +335,7 @@ class Player:
             print(self.get_guid())
             message = {
                 "action" : "ready",
-                "playerUuid": self.get_guid(),
+                "playerGuid": self.get_guid(),
                 "status" : "YES"
             }
             
