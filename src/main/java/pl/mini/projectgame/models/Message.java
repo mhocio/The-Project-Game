@@ -42,4 +42,6 @@ public class Message {
     private List<Goal> goals;
     private Direction direction;
     private Board board;
+
+    private String result;
 }

@@ -27,6 +27,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GameMaster {
 
     private int CS_PORT_NUMBER = 8080;
+    private int MAX_TEAM_SIZE = 1;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -72,7 +73,7 @@ public class GameMaster {
         redTeamGoals = new ArrayList<>();
 
         pieces = new ArrayList<>();
-        mode = gmMode.NONE;
+        mode = gmMode.LOBBY;
         scheduler = Executors.newSingleThreadScheduledExecutor();
 
         try {
@@ -199,7 +200,7 @@ public class GameMaster {
     }
 
     public void finishGame(Team.TeamColor color) {
-        mode = gmMode.NONE;
+        mode = gmMode.LOBBY;
 
         logger.info("Red team points: " + redTeam.getPoints());
         logger.info("Blue team points: " + blueTeam.getPoints());
@@ -211,7 +212,13 @@ public class GameMaster {
         }
 
         Message message = new Message();
-        message.setAction("finish");
+        message.setAction("end");
+
+        if (color.equals(Team.TeamColor.RED))
+            message.setResult("Red");
+        else if (color.equals(Team.TeamColor.BLUE))
+            message.setResult("Blue");
+
         scheduler.shutdownNow();
         connectionHandler.sendToEveryone(message);
         //connectionHandler.close();
@@ -352,10 +359,11 @@ public class GameMaster {
             team.addPlayer(player);
             playerMap.put(player.getPlayerUuid(), player);
 
+            /*
             if (mode == gmMode.NONE) {
                 player.setHost(true);
                 mode = gmMode.LOBBY;
-            }
+            }*/
 
             response.setAction(message.getAction());
             response.setPortNumber(CS_PORT_NUMBER);
@@ -371,6 +379,19 @@ public class GameMaster {
         }
 
         // TODO: set host to some player if host disconnects
+
+        if (redTeam.isFull() && blueTeam.isFull()) {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    logger.error(e.getStackTrace().toString());
+                }
+                logger.info("starting the game");
+                startGame();
+            }).start();
+        }
 
         return response;
     }
@@ -787,9 +808,11 @@ public class GameMaster {
                 message.setPosition(p.getPosition());
                 message.setBoard(p.getBoard());
 
-                for (Map.Entry<Player, Team.TeamRole> teammate : p.getTeam().getPlayers().entrySet()) {
-                    message.getTeamGuids().add(teammate.getKey().getPlayerUuid().toString());
-                }
+                List<String> guids = new ArrayList<>();
+                for (Map.Entry<Player, Team.TeamRole> teammate : p.getTeam().getPlayers().entrySet())
+                    guids.add(teammate.getKey().getPlayerUuid().toString());
+                
+                message.setTeamGuids(guids);
 
                 connectionHandler.sendToSpecific(message);
             //}
