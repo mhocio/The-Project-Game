@@ -19,6 +19,9 @@ public class CommunicationServer {
 
     private final int GAME_MASTER_PORT = 8000;
     private final String GAME_MASTER_IP = "127.0.0.1";
+
+    private final int COMMUNICATION_SERVER_PORT = 8080;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ServerSocket serverSocket;
 
@@ -30,7 +33,7 @@ public class CommunicationServer {
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
 
-        serverSocket = new ServerSocket(8080);
+        serverSocket = new ServerSocket(COMMUNICATION_SERVER_PORT);
         threads = new ArrayList<>();
         connections = new HashSet<>();
 
@@ -40,7 +43,7 @@ public class CommunicationServer {
     }
 
     private void listen() {
-        logger.info("Server is listening on port 8080...");
+        logger.info("Server is listening on port " + COMMUNICATION_SERVER_PORT + "...");
         while (true) {
             try {
                 if (!serverSocket.isClosed()) {

@@ -23,10 +23,12 @@ public class Message {
 
     private Player player;
     private Team.TeamColor teamColor;
+    private String team;
     private Team.TeamRole teamRole;
     private boolean host;
     private UUID playerUuid;
     private String playerGuid;
+    private int portNumber;
 
     private String action;
     private Status status;

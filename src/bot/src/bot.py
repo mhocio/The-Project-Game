@@ -308,8 +308,8 @@ class Player:
             print("CONFIG while")
             print(config)
 
-        if config["action"] == "startGame":
-                self.set_board(config["board"]["width"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
+        if config["action"] == "start":
+                self.set_board(config["board"]["boardWidth"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
                 self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
 
                 if config['status'] == 'OK':

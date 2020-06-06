@@ -26,6 +26,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @Setter
 public class GameMaster {
 
+    private int CS_PORT_NUMBER = 8080;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public enum GameMasterStatus {
@@ -134,10 +136,10 @@ public class GameMaster {
             int x = goalPos.getX();
             int y = goalPos.getY();
 
-            if (x >= masterBoard.getWidth() || y >= masterBoard.getTaskAreaHeight()) {
+            if (x >= masterBoard.getBoardWidth() || y >= masterBoard.getTaskAreaHeight()) {
                 Position pos;
                 do {
-                    x = random.nextInt(board.getWidth());
+                    x = random.nextInt(board.getBoardWidth());
                     y = random.nextInt(board.getGoalAreaHeight());
                     pos = new Position(x, y);
                 } while (masterBoard.getCellByPosition(pos).getContent().containsKey(Goal.class));
@@ -175,12 +177,12 @@ public class GameMaster {
             do {
                 if (player.getTeam().getColor() == Team.TeamColor.RED) {
                     position = new Position(
-                            random.nextInt(board.getWidth()),
+                            random.nextInt(board.getBoardWidth()),
                             random.nextInt(board.getGoalAreaHeight()));
 
                 } else {
                     position = new Position(
-                            random.nextInt(board.getWidth()),
+                            random.nextInt(board.getBoardWidth()),
                             random.nextInt() % board.getGoalAreaHeight()
                                     + board.getGoalAreaHeight()
                                     + board.getTaskAreaHeight());
@@ -246,7 +248,7 @@ public class GameMaster {
 
         target.setY(ThreadLocalRandom.current().nextInt(0, masterBoard.getTaskAreaHeight())
                     + masterBoard.getGoalAreaHeight());
-        target.setX(ThreadLocalRandom.current().nextInt(0, masterBoard.getWidth()));
+        target.setX(ThreadLocalRandom.current().nextInt(0, masterBoard.getBoardWidth()));
 
         while (masterBoard.getCells().get(target).getContent().containsKey(Player.class)
             || masterBoard.getCells().get(target).getContent().containsKey(Piece.class)) {
@@ -254,7 +256,7 @@ public class GameMaster {
             //target.setX(random.nextInt(masterBoard.getWidth()));
             target.setY(ThreadLocalRandom.current().nextInt(0, masterBoard.getTaskAreaHeight())
                     + masterBoard.getGoalAreaHeight());
-            target.setX(ThreadLocalRandom.current().nextInt(0, masterBoard.getWidth()));
+            target.setX(ThreadLocalRandom.current().nextInt(0, masterBoard.getBoardWidth()));
 
         }
 
@@ -302,8 +304,7 @@ public class GameMaster {
             Method method = this.getClass().getDeclaredMethod("action" + StringUtils.capitalize(request.getAction()), Message.class);
             logger.info(method.getName() + " " + request.getPlayerUuid());
 
-
-            if (request.getPlayerUuid() == null)
+            if (request.getPlayerUuid() == null && request.getPlayerGuid() != null)
                 request.setPlayerUuid(UUID.fromString(request.getPlayerGuid()));
 
             response = (Message) method.invoke(this, request);
@@ -314,14 +315,16 @@ public class GameMaster {
                 response.setGoals(getGoals(player));
             }
 
-            response.setPlayerGuid(request.getPlayerUuid().toString());
+            if (response.getPlayerUuid() != null)
+                response.setPlayerGuid(response.getPlayerUuid().toString());
+
         } catch (Exception e) {
-            logger.warn(e.getMessage());
-            System.out.println(createErrorMessage());
+            logger.warn(e.toString());
+            logger.warn(createErrorMessage().toString());
             return createErrorMessage();
         }
 
-        System.out.println(response);
+        logger.info(response.toString());
         return response;
     }
 
@@ -343,8 +346,8 @@ public class GameMaster {
         try {
             player = new Player(team);
 
-            //if (playerGuid != null && playerGuid != "")
-                //player.setPlayerUuid(UUID.fromString(playerGuid));
+            if (playerGuid != null && playerGuid != "")
+                player.setPlayerUuid(UUID.fromString(playerGuid));
 
             team.addPlayer(player);
             playerMap.put(player.getPlayerUuid(), player);
@@ -355,6 +358,7 @@ public class GameMaster {
             }
 
             response.setAction(message.getAction());
+            response.setPortNumber(CS_PORT_NUMBER);
             response.setPlayerUuid(player.getPlayerUuid());
             response.setTeamColor(player.getTeam().getTeamColor());
             response.setTeamRole(player.getTeam().getPlayerRole(player));
@@ -414,7 +418,7 @@ public class GameMaster {
 
                     if (position.equals(playerPosition)) continue;
 
-                    if (position.getX() >= masterBoard.getWidth()
+                    if (position.getX() >= masterBoard.getBoardWidth()
                             || position.getX() < 0
                             || position.getY() < masterBoard.getGoalAreaHeight()
                             || position.getY() >= masterBoard.getGoalAreaHeight() + masterBoard.getTaskAreaHeight()) {
@@ -638,6 +642,11 @@ public class GameMaster {
         return response;
     }
 
+    /**
+     * Method do NOT used in this scenario
+     * @param message
+     * @return
+     */
     private Message actionReady(Message message) {
 
         if(mode != gmMode.LOBBY) return createErrorMessage();
@@ -653,6 +662,11 @@ public class GameMaster {
         return message;
     }
 
+    /**
+     * Method do NOT used in this scenario
+     * @param message
+     * @return
+     */
     private Message actionStart(Message message) {
         Player playerMessaged;
 
@@ -683,7 +697,7 @@ public class GameMaster {
 
         startGame();
         message.setPlayerUuid(playerMessaged.getPlayerUuid());
-        message.setAction("startGame");
+        message.setAction("start");
         message.setStatus(Message.Status.OK);
         message.setPosition(playerMessaged.getPosition());
         message.setBoard(playerMessaged.getBoard());
@@ -751,19 +765,30 @@ public class GameMaster {
         return message;
     }
 
+    private String capitalize(String str) {
+        System.out.println(str);
+        if(str == null || str.isEmpty()) {
+            return str;
+        }
+
+        str = str.toLowerCase();
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
     private void sendStartGameMessage() {
 
         for(Player p : playerMap.values()) {
-            if(!p.isHost()) {
+            //if(!p.isHost()) {
                 var message = new Message();
                 message.setPlayerUuid(p.getPlayerUuid());
-                message.setAction("startGame");
+                message.setAction("start");
                 message.setStatus(Message.Status.OK);
+                message.setTeam(capitalize(p.getTeam().getColor().toString()));
                 message.setPosition(p.getPosition());
                 message.setBoard(p.getBoard());
 
                 connectionHandler.sendToSpecific(message);
-            }
+            //}
         }
     }
 }
