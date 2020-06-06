@@ -81,7 +81,7 @@ public class CommunicationServerDelayMoveTests {
         for (int i = 0; i < numOfRuns; i++) {
             message = new Message();
             message.setAction("move");
-            message.setDirection(Message.Direction.UP);
+            message.setDirection(Message.Direction.Up);
             message.setPlayerUuid(player.getPlayerUuid());
             message.setPosition(player.getPosition());
 

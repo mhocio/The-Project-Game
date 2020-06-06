@@ -22,6 +22,9 @@ import java.util.*;
 
 @Component
 public class ConnectionHandler {
+
+    private final int MAX_BUFFER_SIZE = 5012;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ServerSocket serverSocket;
     @Getter
@@ -93,7 +96,7 @@ public class ConnectionHandler {
                 if (reader.ready()) {
                     long startTime = System.nanoTime();
 
-                    CharBuffer cb = CharBuffer.allocate(1024);
+                    CharBuffer cb = CharBuffer.allocate(MAX_BUFFER_SIZE);
                     if (reader.read(cb) < 0) {
                         logger.warn("Error while reading InputStream!");
                         return;

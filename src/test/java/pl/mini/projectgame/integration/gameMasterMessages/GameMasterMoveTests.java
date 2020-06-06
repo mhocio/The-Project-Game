@@ -54,7 +54,7 @@ public class GameMasterMoveTests {
 
     @Test
     void testMoveActionMessageUp() throws DeniedMoveException {
-        message.setDirection(Message.Direction.UP);
+        message.setDirection(Message.Direction.Up);
 
         Message response = gameMaster.processAndReturn(message);
         assertEquals(new Position(1, 2), response.getPosition());
@@ -62,7 +62,7 @@ public class GameMasterMoveTests {
 
     @Test
     void testMoveActionMessageDown() throws DeniedMoveException {
-        message.setDirection(Message.Direction.DOWN);
+        message.setDirection(Message.Direction.Down);
 
         Message response = gameMaster.processAndReturn(message);
         assertEquals(new Position(1, 0), response.getPosition());
@@ -70,7 +70,7 @@ public class GameMasterMoveTests {
 
     @Test
     void testMoveActionMessageLeft() throws DeniedMoveException {
-        message.setDirection(Message.Direction.LEFT);
+        message.setDirection(Message.Direction.Left);
 
         Message response = gameMaster.processAndReturn(message);
         assertEquals(new Position(0, 1), response.getPosition());
@@ -78,7 +78,7 @@ public class GameMasterMoveTests {
 
     @Test
     void testMoveActionMessageRight() throws DeniedMoveException {
-        message.setDirection(Message.Direction.RIGHT);
+        message.setDirection(Message.Direction.Right);
 
         Message response = gameMaster.processAndReturn(message);
         assertEquals(new Position(2, 1), response.getPosition());

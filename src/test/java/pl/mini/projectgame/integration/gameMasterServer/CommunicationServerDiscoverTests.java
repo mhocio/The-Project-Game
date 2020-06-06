@@ -66,7 +66,7 @@ public class CommunicationServerDiscoverTests {
         gameMaster.setMasterBoard(testBoard);
 
         testPosition = new Position(
-                gameMaster.getMasterBoard().getWidth() / 2,
+                gameMaster.getMasterBoard().getBoardWidth() / 2,
                 gameMaster.getMasterBoard().getGoalAreaHeight() + 4);
         testPlayer.setPosition(testPosition);
 

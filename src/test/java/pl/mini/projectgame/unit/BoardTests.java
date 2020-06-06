@@ -29,7 +29,7 @@ public class BoardTests {
 
     @Test
     public void allCellsShouldBeCreated() {
-        int expected = board.getWidth() * board.getHeight();
+        int expected = board.getBoardWidth() * board.getHeight();
         int actual = board.getCells().size();
         Assert.assertEquals(expected, actual);
     }
@@ -37,7 +37,7 @@ public class BoardTests {
     @Test
     public void checkIfConfigurationWasApplied() {
         int expected = configuration.getBoardWidth();
-        int actual = board.getWidth();
+        int actual = board.getBoardWidth();
         Assert.assertEquals(expected, actual);
     }
 
@@ -45,7 +45,7 @@ public class BoardTests {
     public void checkIfRandomCellCreatedCorrectly() {
         Random random = new Random();
         var expected = new Position(
-                random.nextInt(board.getWidth()),
+                random.nextInt(board.getBoardWidth()),
                 random.nextInt(board.getHeight()));
 
         var actual = board.getCells().get(expected).getPosition();

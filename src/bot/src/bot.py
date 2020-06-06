@@ -5,7 +5,7 @@ from enum import Enum
 from threading import Thread
 from time import sleep 
 
-BUFFER_SIZE = 1024
+BUFFER_SIZE = 50000
 
 def bot_function(addr):
     print("I'm " + str(get_ident()))
@@ -61,7 +61,7 @@ class Player:
             rv = self.recv()
             rv = {k: v for k, v in rv.items() if v is not None}  # remove Nones from dict
             print("RECV: ", rv)
-            if(rv['action'] == "finish"):
+            if(rv['action'] == "end"):
                 print("BOT_READ finish")
                 break
             # elif rv['action'] == 'start' and rv['status'] == "OK":
@@ -135,7 +135,7 @@ class Player:
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
-            "direction": "RIGHT",
+            "direction": "Right",
             "position" : {
                 "x" : self.get_pos_x(),
                 "y" : self.get_pos_y()
@@ -152,7 +152,7 @@ class Player:
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
-            "direction": "LEFT",
+            "direction": "Left",
             "position" : {
                 "x" : self.get_pos_x(),
                 "y" : self.get_pos_y()
@@ -170,7 +170,7 @@ class Player:
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
-            "direction": "UP",
+            "direction": "Up",
             "position" : {
                 "x" : self.get_pos_x(),
                 "y" : self.get_pos_y()
@@ -186,7 +186,7 @@ class Player:
         MoveMessage={
             "action": "move",
             "playerUuid": self.get_guid(),
-            "direction": "DOWN",
+            "direction": "Down",
             "position" : {
                 "x" : self.get_pos_x(),
                 "y" : self.get_pos_y()
@@ -285,7 +285,8 @@ class Player:
         self.socket.sendall(bytes(json.JSONEncoder().encode(message), "utf-8"))
 
     def recv(self):
-        return json.loads(self.socket.recv(BUFFER_SIZE))
+        message_string = self.socket.recv(BUFFER_SIZE)
+        return json.loads(message_string)
 
     def init_config(self):
         print(self.get_guid())
@@ -298,18 +299,19 @@ class Player:
         config = {"status": "DENIED"}     
 
         # wait until all the players are ready
-        while config["status"] == "DENIED":
+        
+        while config["status"] != "OK":
             sleep(5)
-            if self.get_host() == True:
+            '''if self.get_host() == True:
                 self.send(message)
                 print("SEND")
-                print(message)
+                print(message)'''
             config = self.recv()
             print("CONFIG while")
             print(config)
 
-        if config["action"] == "startGame":
-                self.set_board(config["board"]["width"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
+        if config["action"] == "start":
+                self.set_board(config["board"]["boardWidth"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
                 self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
 
                 if config['status'] == 'OK':
@@ -328,8 +330,28 @@ class Player:
         connected = self.recv()
         print("CONNECTED")
         print(connected)
+        
+        config = {"status": "DENIED"}     
+        # wait for start
+        
+        while config["status"] != "OK":
+            sleep(1)
+            config = self.recv()
+            print("startMessage while")
+            print(config)
+            
+        if config["action"] == "start":
+                self.set_board(config["board"]["boardWidth"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
+                self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
+                print(config["team"])
+                self.set_team(config["team"])
+                self.set_guid(config["playerUuid"])
 
-        if "status" in connected and connected["status"] == "OK":
+                if config['status'] == 'OK':
+                    self.x = Thread(target = self.reading_thread)
+                    self.x.start()
+
+        '''if "status" in connected and connected["status"] == "OK":
             self.set_guid(connected["playerUuid"])
             self.set_role(connected["teamRole"])
             self.set_team(connected["teamColor"])
@@ -349,4 +371,4 @@ class Player:
             print(ready)
 
             if "status" in ready and ready["status"] == "OK":
-                self.init_config()
+                self.init_config()'''

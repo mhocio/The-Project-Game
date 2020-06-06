@@ -74,7 +74,7 @@ public class CommunicationServerMoveTests {
 
     @Test
     void testMoveActionMessageUp() throws DeniedMoveException, IOException {
-        message.setDirection(Message.Direction.UP);
+        message.setDirection(Message.Direction.Up);
 
         mapper.writeValue(out, message);
         out.flush();
@@ -89,7 +89,7 @@ public class CommunicationServerMoveTests {
 
     @Test
     void testMoveActionMessageDown() throws DeniedMoveException, IOException {
-        message.setDirection(Message.Direction.DOWN);
+        message.setDirection(Message.Direction.Down);
 
         mapper.writeValue(out, message);
         out.flush();
@@ -104,7 +104,7 @@ public class CommunicationServerMoveTests {
 
     @Test
     void testMoveActionMessageLeft() throws DeniedMoveException, IOException {
-        message.setDirection(Message.Direction.LEFT);
+        message.setDirection(Message.Direction.Left);
 
         mapper.writeValue(out, message);
         out.flush();
@@ -119,7 +119,7 @@ public class CommunicationServerMoveTests {
 
     @Test
     void testMoveActionMessageRight() throws DeniedMoveException, IOException {
-        message.setDirection(Message.Direction.RIGHT);
+        message.setDirection(Message.Direction.Right);
 
         mapper.writeValue(out, message);
         out.flush();

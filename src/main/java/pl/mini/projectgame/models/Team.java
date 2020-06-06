@@ -37,6 +37,11 @@ public class Team {
         maxTeamSize = 4;
     }
 
+    public boolean isFull() {
+        System.out.println(size + " " + maxTeamSize);
+        return maxTeamSize == size;
+    }
+
     public enum TeamColor {
         RED, BLUE
     }

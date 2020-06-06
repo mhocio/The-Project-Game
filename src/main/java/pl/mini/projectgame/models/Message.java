@@ -1,9 +1,6 @@
 package pl.mini.projectgame.models;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,18 +13,24 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class Message {
     public enum Status {OK, DENIED, YES, NO}
 
-    public enum Direction {UP, DOWN, LEFT, RIGHT}
+    public enum Direction {Up, Down, Left, Right}
 
-    public enum placementResult {CORRECT, POINTLESS}
+    public enum placementResult {Correct, Pointless}
 
     private Player player;
     private Team.TeamColor teamColor;
+    private String team;
     private Team.TeamRole teamRole;
+    private List<String> teamGuids;
+
     private boolean host;
     private UUID playerUuid;
+    private String playerGuid;
+    private int portNumber;
 
     private String action;
     private Status status;
@@ -39,4 +42,6 @@ public class Message {
     private List<Goal> goals;
     private Direction direction;
     private Board board;
+
+    private String result;
 }
