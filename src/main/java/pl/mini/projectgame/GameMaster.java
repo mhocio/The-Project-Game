@@ -39,7 +39,7 @@ public class GameMaster {
     }
     public gmMode mode;
 
-    private Map<UUID, Player> playerMap;
+    private Map<String, Player> playerMap;
 
     private boolean lastTeamWasRed;
     private int portNumber;
@@ -318,7 +318,7 @@ public class GameMaster {
             logger.info(method.getName() + " " + request.getPlayerUuid());
 
             if (request.getPlayerUuid() == null && request.getPlayerGuid() != null)
-                request.setPlayerUuid(UUID.fromString(request.getPlayerGuid()));
+                request.setPlayerUuid(request.getPlayerGuid());
 
             response = (Message) method.invoke(this, request);
 
@@ -360,7 +360,7 @@ public class GameMaster {
             player = new Player(team);
 
             if (playerGuid != null && playerGuid != "")
-                player.setPlayerUuid(UUID.fromString(playerGuid));
+                player.setPlayerUuid(playerGuid);
 
             team.addPlayer(player);
             playerMap.put(player.getPlayerUuid(), player);
@@ -739,6 +739,10 @@ public class GameMaster {
 
         startGame();
         message.setPlayerUuid(playerMessaged.getPlayerUuid());
+
+        // TODO
+        message.setPlayerGuid(playerMessaged.getPlayerUuid().toString());
+
         message.setAction("start");
         message.setStatus(Message.Status.OK);
         message.setPosition(playerMessaged.getPosition());
@@ -825,6 +829,7 @@ public class GameMaster {
             //if(!p.isHost()) {
                 var message = new Message();
                 message.setPlayerUuid(p.getPlayerUuid());
+                message.setPlayerGuid(p.getPlayerUuid().toString());
                 message.setAction("start");
                 message.setStatus(Message.Status.OK);
                 message.setTeam(capitalize(p.getTeam().getColor().toString()));
