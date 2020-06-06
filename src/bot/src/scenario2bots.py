@@ -20,7 +20,7 @@ def firstBot():
     dist_to_blue_goal_area = 36
     
     team_color = my_player.team
-    if team_color == "RED":
+    if team_color == "BLUE":
         placePieceFrom(my_player, 10, 10, 4, 0)
         placePieceFrom(my_player, 5, 15, 8, 2)
     else:
