@@ -301,6 +301,11 @@ public class GameMaster {
         try {
             Method method = this.getClass().getDeclaredMethod("action" + StringUtils.capitalize(request.getAction()), Message.class);
             logger.info(method.getName() + " " + request.getPlayerUuid());
+
+
+            if (request.getPlayerUuid() == null)
+                request.setPlayerUuid(UUID.fromString(request.getPlayerGuid()));
+
             response = (Message) method.invoke(this, request);
 
             //set goals in players goal area in each response if game is ON
@@ -308,11 +313,15 @@ public class GameMaster {
                 Player player = playerMap.get(request.getPlayerUuid());
                 response.setGoals(getGoals(player));
             }
+
+            response.setPlayerGuid(request.getPlayerUuid().toString());
         } catch (Exception e) {
             logger.warn(e.getMessage());
+            System.out.println(createErrorMessage());
             return createErrorMessage();
         }
 
+        System.out.println(response);
         return response;
     }
 
@@ -321,11 +330,22 @@ public class GameMaster {
         Team team = lastTeamWasRed ? blueTeam : redTeam;
         lastTeamWasRed = !lastTeamWasRed;
         Player player;
+        String playerGuid = null;
 
         if (mode == gmMode.GAME) return createErrorMessage();
 
         try {
+            playerGuid = message.getPlayerGuid();
+        } catch (Exception e) {
+            logger.warn("Error reading player Guid");
+        }
+
+        try {
             player = new Player(team);
+
+            //if (playerGuid != null && playerGuid != "")
+                //player.setPlayerUuid(UUID.fromString(playerGuid));
+
             team.addPlayer(player);
             playerMap.put(player.getPlayerUuid(), player);
 
