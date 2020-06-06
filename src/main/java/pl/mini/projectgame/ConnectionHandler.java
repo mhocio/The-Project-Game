@@ -33,7 +33,7 @@ public class ConnectionHandler {
     @Getter
     private final Set<Socket> connections;
     @Getter
-    private final Map<UUID, Socket> conn;
+    private final Map<String, Socket> conn;
     private final GameMaster gameMaster;
     private final ObjectMapper objectMapper;
 

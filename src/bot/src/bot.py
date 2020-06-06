@@ -1,5 +1,7 @@
 import socket
 import json
+import string
+import random
 from threading import get_ident
 from enum import Enum
 from threading import Thread
@@ -20,6 +22,9 @@ def bot_function(addr):
     my_player.close()
     print("END BOT FUNCTION")
 
+def randomString(stringLength = 8):
+    letters = string.ascii_letters
+    return ''.join(random.choice(letters) for i in range(stringLength))
 
 class Role(Enum):
     LEADER: 1
@@ -124,7 +129,7 @@ class Player:
         self.wait()
         TestMessage={
             "action": "test",
-            "playerUuid": self.get_guid()
+            "playerGuid": self.get_guid()
             }
         self.send(TestMessage)
         self.writing = False
@@ -134,7 +139,7 @@ class Player:
         print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
             "direction": "Right",
             "position" : {
                 "x" : self.get_pos_x(),
@@ -151,7 +156,7 @@ class Player:
         print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
             "direction": "Left",
             "position" : {
                 "x" : self.get_pos_x(),
@@ -169,7 +174,7 @@ class Player:
         print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
             "direction": "Up",
             "position" : {
                 "x" : self.get_pos_x(),
@@ -185,7 +190,7 @@ class Player:
         print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
             "direction": "Down",
             "position" : {
                 "x" : self.get_pos_x(),
@@ -230,7 +235,7 @@ class Player:
         self.wait()
         MoveMessage={
             "action": "pickUp",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
         self.writing = False
@@ -239,7 +244,7 @@ class Player:
         self.wait()
         MoveMessage={
             "action": "test",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
         self.writing = False
@@ -248,7 +253,7 @@ class Player:
         self.wait()
         MoveMessage={
             "action": "place",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
         self.writing = False
@@ -257,7 +262,7 @@ class Player:
         self.wait()
         MoveMessage={
             "action": "discover",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
         self.writing = False
@@ -266,7 +271,7 @@ class Player:
         self.wait()
         MoveMessage={
             "action": "finish",
-            "playerUuid": self.get_guid(),
+            "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
         self.writing = False
@@ -294,7 +299,7 @@ class Player:
 
         message = {
                 "action" : "start",
-                "playerUuid": self.get_guid()
+                "playerGuid": self.get_guid()
             }
         config = {"status": "DENIED"}     
 
@@ -322,6 +327,7 @@ class Player:
     def start(self):
         message = {
             "action" : "connect",
+            # "playerGuid" : randomString(),
         }
 
         self.send(message)
@@ -345,14 +351,14 @@ class Player:
                 self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
                 print(config["team"])
                 self.set_team(config["team"])
-                self.set_guid(config["playerUuid"])
+                self.set_guid(config["playerGuid"])
 
                 if config['status'] == 'OK':
                     self.x = Thread(target = self.reading_thread)
                     self.x.start()
 
         '''if "status" in connected and connected["status"] == "OK":
-            self.set_guid(connected["playerUuid"])
+            self.set_guid(connected["playerGuid"])
             self.set_role(connected["teamRole"])
             self.set_team(connected["teamColor"])
             self.set_host(connected["host"])
@@ -360,7 +366,7 @@ class Player:
             print(self.get_guid())
             message = {
                 "action" : "ready",
-                "playerUuid": self.get_guid(),
+                "playerGuid": self.get_guid(),
                 "status" : "YES"
             }
             

@@ -3,7 +3,6 @@ package pl.mini.projectgame.models;
 import lombok.*;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author buensons
@@ -28,7 +27,8 @@ public class Message {
     private List<String> teamGuids;
 
     private boolean host;
-    private UUID playerUuid;
+    private String playerUuid;
+
     private String playerGuid;
     private int portNumber;
 
