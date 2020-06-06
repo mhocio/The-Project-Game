@@ -27,7 +27,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GameMaster {
 
     private int CS_PORT_NUMBER = 8080;
-    private int MAX_TEAM_SIZE = 1;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -195,6 +194,13 @@ public class GameMaster {
             player.setBoard(board);
             player.setPosition(position);
         }
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         sendStartGameMessage();
         logger.info("The game has started!");
     }
@@ -369,6 +375,7 @@ public class GameMaster {
             response.setPortNumber(CS_PORT_NUMBER);
             response.setPlayerUuid(player.getPlayerUuid());
             response.setTeamColor(player.getTeam().getTeamColor());
+            response.setTeam(capitalize(player.getTeam().getTeamColor().toString()));
             response.setTeamRole(player.getTeam().getPlayerRole(player));
             response.setHost(player.isHost());
             response.setStatus(Message.Status.OK);
@@ -458,6 +465,19 @@ public class GameMaster {
                     // if there is no pieces on the board
                     minDistance = minDistance == Integer.MAX_VALUE ? -1 : minDistance;
                     currentCell.setDistance(minDistance);
+
+                    if (currentCell.getContent().get(Piece.class) == null)
+                        currentCell.setCellState("Empty");
+                    else
+                        currentCell.setCellState("Piece");
+
+                    if (currentCell.getContent().get(Player.class) != null) {
+                        Player p = (Player) currentCell.getContent().get(Player.class);
+                        currentCell.setPlayerGuid(p.getPlayerUuid().toString());
+                    } else {
+                        currentCell.setPlayerGuid("null");
+                    }
+
                     fields.add(new Field(currentCell));
                 }
             }
@@ -497,19 +517,19 @@ public class GameMaster {
         if(direction == null || source == null) return createErrorMessage();
 
         switch (direction) {
-            case UP:
+            case Up:
                 target.setX(source.getX());
                 target.setY(source.getY() + 1);
                 break;
-            case DOWN:
+            case Down:
                 target.setX(source.getX());
                 target.setY(source.getY() - 1);
                 break;
-            case LEFT:
+            case Left:
                 target.setX(source.getX() - 1);
                 target.setY(source.getY());
                 break;
-            case RIGHT:
+            case Right:
                 target.setX(source.getX() + 1);
                 target.setY(source.getY());
                 break;
@@ -526,6 +546,7 @@ public class GameMaster {
 
         response.setPosition(target);
         response.setStatus(Message.Status.OK);
+        response.setPlayerGuid(player.getPlayerUuid().toString());
 
         // for the purpose of the 1st scenario
         logger.info(message.getDirection() + " " +
@@ -581,7 +602,7 @@ public class GameMaster {
         Message response = new Message();
         response.setAction(message.getAction());
         response.setStatus(Message.Status.OK);
-        response.setPlacementResult(Message.placementResult.CORRECT);
+        response.setPlacementResult(Message.placementResult.Correct);
 
         Player player;
         Position playerPosition;
@@ -616,7 +637,7 @@ public class GameMaster {
         if (playerPiece.getIsGood()) {
             // empty cell
             if (goal == null) {
-                response.setPlacementResult(Message.placementResult.POINTLESS);
+                response.setPlacementResult(Message.placementResult.Pointless);
                 if (playerTeam == blueTeam) {
                     Goal newGoal = new Goal(false, playerPosition, blueTeam);
                     masterBoard.addBoardObject(new Goal(false, playerPosition), playerPosition);
@@ -632,7 +653,7 @@ public class GameMaster {
             // discovered cell
             if (goal.getDiscovered().equals(Goal.goalDiscover.DISCOVERED_NON_GOAL)
                     || goal.getDiscovered().equals(Goal.goalDiscover.DISCOVERED_GOAL)) {
-                response.setPlacementResult(Message.placementResult.POINTLESS);
+                response.setPlacementResult(Message.placementResult.Pointless);
                 return response;
             }
 
@@ -648,7 +669,7 @@ public class GameMaster {
                     checkWinningState();
                 } else {
                     // wrong team
-                    response.setPlacementResult(Message.placementResult.POINTLESS);
+                    response.setPlacementResult(Message.placementResult.Pointless);
                     response.setStatus(Message.Status.DENIED);
                 }
                 return response;
@@ -656,7 +677,7 @@ public class GameMaster {
 
         } else {
             // sham piece
-            response.setPlacementResult(Message.placementResult.POINTLESS);
+            response.setPlacementResult(Message.placementResult.Pointless);
             return response;
         }
 
@@ -734,7 +755,9 @@ public class GameMaster {
         try {
             Player player = playerMap.get(message.getPlayerUuid());
             Position playerPosition = player.getPosition();
-            System.out.println(masterBoard.getCellByPosition(playerPosition).getContent().get(Piece.class));
+            logger.info("player position: " + playerPosition.toString());
+            logger.info(masterBoard.getCellByPosition(playerPosition).getContent().get(Piece.class).toString());
+
             Piece pickupPiece = (Piece) masterBoard.getCellByPosition(playerPosition).getContent().get(Piece.class);
             if (pickupPiece == null)
                     throw new DeniedMoveException("there is no piece at given position");
@@ -811,7 +834,7 @@ public class GameMaster {
                 List<String> guids = new ArrayList<>();
                 for (Map.Entry<Player, Team.TeamRole> teammate : p.getTeam().getPlayers().entrySet())
                     guids.add(teammate.getKey().getPlayerUuid().toString());
-                
+
                 message.setTeamGuids(guids);
 
                 connectionHandler.sendToSpecific(message);

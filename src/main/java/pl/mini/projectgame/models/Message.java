@@ -17,9 +17,9 @@ import java.util.UUID;
 public class Message {
     public enum Status {OK, DENIED, YES, NO}
 
-    public enum Direction {UP, DOWN, LEFT, RIGHT}
+    public enum Direction {Up, Down, Left, Right}
 
-    public enum placementResult {CORRECT, POINTLESS}
+    public enum placementResult {Correct, Pointless}
 
     private Player player;
     private Team.TeamColor teamColor;
