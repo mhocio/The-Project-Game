@@ -474,8 +474,6 @@ public class GameMaster {
                     if (currentCell.getContent().get(Player.class) != null) {
                         Player p = (Player) currentCell.getContent().get(Player.class);
                         currentCell.setPlayerGuid(p.getPlayerUuid().toString());
-                    } else {
-                        currentCell.setPlayerGuid("null");
                     }
 
                     fields.add(new Field(currentCell));
@@ -507,7 +505,8 @@ public class GameMaster {
         try {
             player = playerMap.get(message.getPlayerUuid());
             direction = message.getDirection();
-            source = message.getPosition();
+            // source = message.getPosition();
+            source = player.getPosition();
             response.setAction(message.getAction());
         } catch (Exception e) {
             logger.warn(e.getMessage());
@@ -545,6 +544,7 @@ public class GameMaster {
         }
 
         response.setPosition(target);
+        response.setDirection(message.getDirection());
         response.setStatus(Message.Status.OK);
         response.setPlayerGuid(player.getPlayerUuid().toString());
 
@@ -749,7 +749,7 @@ public class GameMaster {
         return message;
     }
 
-    private Message actionPickUp(Message message) {
+    private Message actionPickup(Message message) {
 
         if(mode != gmMode.GAME)
             return createErrorMessage();
@@ -757,12 +757,12 @@ public class GameMaster {
         try {
             Player player = playerMap.get(message.getPlayerUuid());
             Position playerPosition = player.getPosition();
-            logger.info("player position: " + playerPosition.toString());
-            logger.info(masterBoard.getCellByPosition(playerPosition).getContent().get(Piece.class).toString());
 
             Piece pickupPiece = (Piece) masterBoard.getCellByPosition(playerPosition).getContent().get(Piece.class);
-            if (pickupPiece == null)
-                    throw new DeniedMoveException("there is no piece at given position");
+            if (pickupPiece == null) {
+                message.setStatus(Message.Status.DENIED);
+                return message;
+            }
 
             if (player.getPiece() == null) {
                 player.setPiece(pickupPiece);
@@ -831,6 +831,7 @@ public class GameMaster {
 
                 message.setAction("start");
                 message.setStatus(Message.Status.OK);
+                message.setTeamSize(p.getTeam().getSize());
                 message.setTeam(capitalize(p.getTeam().getColor().toString()));
                 message.setPosition(p.getPosition());
                 message.setBoard(p.getBoard());
