@@ -23,10 +23,10 @@ def firstBot():
     team_color = my_player.team
     print(my_player.team == None)
     print("team color: " + str(my_player.team))
-    if team_color == "Red":
+    if team_color == "Blue":
         placePieceFrom(my_player, 10, 10, 4, 0)
         placePieceFrom(my_player, 5, 15, 8, 2)
-    elif team_color == "Blue":
+    elif team_color == "Red":
         placePieceFrom(my_player, 10, 15, 4, 0 + dist_to_blue_goal_area)
         placePieceFrom(my_player, 5, 20, 8, 2 + dist_to_blue_goal_area)
     

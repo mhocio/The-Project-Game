@@ -175,7 +175,7 @@ class Player:
         MoveMessage={
             "action": "move",
             "playerGuid": self.get_guid(),
-            "direction": "Up",
+            "direction": "Down",
             "position" : {
                 "x" : self.get_pos_x(),
                 "y" : self.get_pos_y()
@@ -191,7 +191,7 @@ class Player:
         MoveMessage={
             "action": "move",
             "playerGuid": self.get_guid(),
-            "direction": "Down",
+            "direction": "Up",
             "position" : {
                 "x" : self.get_pos_x(),
                 "y" : self.get_pos_y()

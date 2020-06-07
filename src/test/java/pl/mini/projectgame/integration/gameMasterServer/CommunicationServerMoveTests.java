@@ -84,7 +84,7 @@ public class CommunicationServerMoveTests {
         cb.flip();
 
         Message response = mapper.readValue(cb.toString(), Message.class);
-        assertEquals(new Position(1, 2), response.getPosition());
+        assertEquals(new Position(1, 0), response.getPosition());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class CommunicationServerMoveTests {
         cb.flip();
 
         Message response = mapper.readValue(cb.toString(), Message.class);
-        assertEquals(new Position(1, 0), response.getPosition());
+        assertEquals(new Position(1, 2), response.getPosition());
     }
 
     @Test

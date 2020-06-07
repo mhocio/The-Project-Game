@@ -57,7 +57,7 @@ public class GameMasterMoveTests {
         message.setDirection(Message.Direction.Up);
 
         Message response = gameMaster.processAndReturn(message);
-        assertEquals(new Position(1, 2), response.getPosition());
+        assertEquals(new Position(1, 0), response.getPosition());
     }
 
     @Test
@@ -65,7 +65,7 @@ public class GameMasterMoveTests {
         message.setDirection(Message.Direction.Down);
 
         Message response = gameMaster.processAndReturn(message);
-        assertEquals(new Position(1, 0), response.getPosition());
+        assertEquals(new Position(1, 2), response.getPosition());
     }
 
     @Test
