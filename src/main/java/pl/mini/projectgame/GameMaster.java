@@ -147,13 +147,13 @@ public class GameMaster {
             }
 
             Position pos1 = new Position(x, y);
-            Goal goal1 = new Goal(true, pos1, redTeam);
+            Goal goal1 = new Goal(true, pos1, blueTeam);
             masterBoard.addBoardObject(goal1, pos1);
             redTeamGoals.add(goal1);
 
             y += configuration.boardTaskHeight + configuration.boardGoalHeight;
             Position pos2 = new Position(x, y);
-            Goal goal2 = new Goal(true, pos2, blueTeam);
+            Goal goal2 = new Goal(true, pos2, redTeam);
             masterBoard.addBoardObject(goal2, pos2);
             blueTeamGoals.add(goal2);
         }
@@ -176,7 +176,7 @@ public class GameMaster {
 
         for (Player player : playerMap.values()) {
             do {
-                if (player.getTeam().getColor() == Team.TeamColor.RED) {
+                if (player.getTeam().getColor() == Team.TeamColor.BLUE) {
                     position = new Position(
                             random.nextInt(board.getBoardWidth()),
                             random.nextInt(board.getGoalAreaHeight()));
@@ -517,11 +517,11 @@ public class GameMaster {
         if(direction == null || source == null) return createErrorMessage();
 
         switch (direction) {
-            case Up:
+            case Down:
                 target.setX(source.getX());
                 target.setY(source.getY() + 1);
                 break;
-            case Down:
+            case Up:
                 target.setX(source.getX());
                 target.setY(source.getY() - 1);
                 break;
