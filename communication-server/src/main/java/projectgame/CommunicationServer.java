@@ -130,7 +130,8 @@ public class CommunicationServer {
         cb.flip();
 
         var message = cb.toString();
-        out.write(message);
+        // out.write(message);
+        out.write(message + "\n");
         out.flush();
     }
 

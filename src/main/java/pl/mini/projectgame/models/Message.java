@@ -23,6 +23,7 @@ public class Message {
     private Player player;
     private Team.TeamColor teamColor;
     private String team;
+    private int teamSize;
     private Team.TeamRole teamRole;
     private List<String> teamGuids;
 

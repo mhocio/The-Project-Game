@@ -234,7 +234,7 @@ class Player:
     def pickup(self):
         self.wait()
         MoveMessage={
-            "action": "pickUp",
+            "action": "pickup",
             "playerGuid": self.get_guid(),
         }
         self.send(MoveMessage)
