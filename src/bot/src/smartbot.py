@@ -4,21 +4,26 @@ from threading import get_ident
 from enum import Enum
 from threading import Thread
 from time import sleep 
+from random import randrange
 
 BUFFER_SIZE = 1024
 
 def bot_function(addr):
     print("I'm " + str(get_ident()))
     my_player = Player(_host=addr)
-    
     my_player.start()
-    my_player.move_right()
-    my_player.move_left()
-    my_player.move_down()
-    my_player.move_up()
+
+    while(True):
+        my_player.leaveGoalArea()
+        my_player.discoverAndTryToPickUpAll()
+        if(my_player.is_carrying_piece):
+            my_player.test()
+            if(my_player.is_carrying_piece):
+                my_player.goAndPlacePiece()
+    
     my_player.finish()
     my_player.close()
-    print("END BOT FUNCTION")
+    
 
 
 class Role(Enum):
@@ -363,3 +368,46 @@ class Player:
 
             if "status" in ready and ready["status"] == "OK":
                 self.init_config()
+    
+    
+    def discoverAndTryToPickUpAll(self):
+        self.discover()
+        px=self.get_pos_x()
+        py=self.get_pos_y()
+        minVal = self.board.get_cell(self.get_pos_x(),self.get_pos_y())
+        for ix in range(self.get_pos_x()-1,self.get_pos_x()+1):
+            for iy in range(self.get_pos_y()-1,self.get_pos_y()+1):
+                if(self.board.get_cell(ix,iy)<minVal):
+                    px=ix
+                    py=iy
+                    minVal=self.board.get_cell(ix,iy)
+        if((abs(self.get_pos_x()-px)+abs(self.get_pos_y()-py))<2):
+            self.move(self.get_pos_x()+(self.get_pos_x()-px)*minVal,self.get_pos_y()+(self.get_pos_y()-py)*minVal)
+            self.pickup()
+        else:
+            for i in range(0,minVal):
+                if(self.get_pos_x+(self.get_pos_x-px)*i<0 or self.get_pos_x()+(self.get_pos_x()-px)*i > len(self.board.cells) 
+                or self.get_pos_y+(self.get_pos_y-py)*(minVal-i)< 0 or self.get_pos_y+(self.get_pos_y-py)*(minVal-i) > len(self.board.cells[0])):
+                    continue
+                self.move(self.get_pos_x()+(self.get_pos_x()-px)*i,self.get_pos_y+(self.get_pos_y-py)*(minVal-i))
+                self.pickup()
+                if(self.is_carrying_piece):
+                    break
+        
+    def leaveGoalArea(self):
+        while(self.get_pos_y()<self.board.goal_area_height):
+            self.move_up()
+
+        while(self.get_pos_y()>=len(self.board.cells[0])-self.board.goal_area_height):
+            self.move_down()
+
+    def goAndPlacePiece(self):
+        if self.team == "RED":
+            self.move(randrange(len(self.board.cells)),randrange(self.board.goal_area_height))
+            self.place()
+        else:
+            self.move(randrange(len(self.board.cells)),self.board.cells[0]-self.board.goal_area_height+randrange(self.board.goal_area_height))
+            self.place()
+
+
+

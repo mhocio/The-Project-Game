@@ -8,6 +8,11 @@ threads = list()
 
 def placePieceFrom(my_player, x_piece, y_piece, x_goal, y_goal):
     my_player.move(x_piece, y_piece)
+    my_player.board.show()
+    my_player.move_down()
+    my_player.discover()
+    my_player.board.show()
+    my_player.move_up()
     my_player.pickup()
     my_player.move(x_goal, y_goal)
     my_player.place()

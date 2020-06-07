@@ -1,29 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="GradleLocalSettings">
-    <option name="projectSyncType">
-      <map>
-        <entry key="$PROJECT_DIR$/../Java/IDEA/2019_Rozwiazanie_Software-Engineer-Intern_Poznan" value="PREVIEW" />
-      </map>
+  <component name="ChangeListManager">
+    <list default="true" id="43791bd0-2538-4f5a-9195-5e1425df2c5b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/bot/scenarios/firstScenario.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/bot/scenarios/firstScenario.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/bot/src/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/bot/src/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/bot/src/scenario2bots.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/bot/src/scenario2bots.py" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
     </option>
   </component>
   <component name="ProjectId" id="1YrYEe48drT8FWRHXCiqO7LwMm5" />
   <component name="PropertiesComponent">
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Downloads/gosia_CG5" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Java" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
   </component>
   <component name="RunManager">
     <configuration name="ProjectGameApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="project-game" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="pl.mini.projectgame.ProjectGameApplication" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method v="2" />
     </configuration>
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="43791bd0-2538-4f5a-9195-5e1425df2c5b" name="Default Changelist" comment="" />
+      <created>1589107506000</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1589107506000</updated>
+      <workItem from="1589107509547" duration="11465000" />
+      <workItem from="1589443640646" duration="874000" />
+      <workItem from="1591285810127" duration="13846000" />
+      <workItem from="1591433430703" duration="7134000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

@@ -1,0 +1,10 @@
+2020-06-06 10:42:52.827  INFO 14888 --- [main] p.m.projectgame.ProjectGameApplication   : Starting ProjectGameApplication on DESKTOP-S516D9I with PID 14888 (C:\Users\Lenovo\code\software\The-Project-Game\target\classes started by Lenovo in C:\Users\Lenovo\code\software\The-Project-Game)
+2020-06-06 10:42:52.847  INFO 14888 --- [main] p.m.projectgame.ProjectGameApplication   : No active profile set, falling back to default profiles: default
+2020-06-06 10:42:55.747  INFO 14888 --- [Listening] p.m.p.server.CommunicationServer         : Server is listening on port 8080...
+2020-06-06 10:42:56.483  INFO 14888 --- [main] p.m.projectgame.ProjectGameApplication   : Started ProjectGameApplication in 4.474 seconds (JVM running for 6.514)
+2020-06-06 10:43:14.846  INFO 14888 --- [Listening] p.m.p.server.CommunicationServer         : New player connected from /127.0.0.1
+2020-06-06 10:43:14.848  INFO 14888 --- [Listening] p.m.p.server.CommunicationServer         : New player connected from /127.0.0.1
+2020-06-06 10:51:41.055  INFO 14328 --- [main] p.m.projectgame.ProjectGameApplication   : Starting ProjectGameApplication on DESKTOP-S516D9I with PID 14328 (C:\Users\Lenovo\code\software\The-Project-Game\target\classes started by Lenovo in C:\Users\Lenovo\code\software\The-Project-Game)
+2020-06-06 10:51:41.065  INFO 14328 --- [main] p.m.projectgame.ProjectGameApplication   : No active profile set, falling back to default profiles: default
+2020-06-06 10:51:41.976  INFO 14328 --- [Listening] p.m.p.server.CommunicationServer         : Server is listening on port 8080...
+2020-06-06 10:51:42.181  INFO 14328 --- [main] p.m.projectgame.ProjectGameApplication   : Started ProjectGameApplication in 2.019 seconds (JVM running for 4.297)

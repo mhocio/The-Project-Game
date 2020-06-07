@@ -2,19 +2,19 @@ import sys
 # this mess is needed until we have no package
 from os.path import dirname, join, abspath
 sys.path.insert(0, abspath(join(dirname(__file__), '..')))
-from src import bot
+from src import smartbot
 
 from time import sleep
 from threading import Thread
 from threading import get_ident
 
 threads = list()
-n = 1
+n = 2
 
 def firstBot():
     print("I'm " + str(get_ident()))
-    my_player = bot.Player()
-    
+    my_player = smartbot.Player()
+   
     my_player.start()
     team_color = my_player.team
     if team_color == "RED":
