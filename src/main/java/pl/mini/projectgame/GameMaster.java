@@ -495,6 +495,7 @@ public class GameMaster {
 
     private Message actionMove(Message message) {
         Message response = new Message();
+        response.setDirection(message.getDirection());
         Position target = new Position();
 
         if(mode != gmMode.GAME) return createErrorMessage();
@@ -506,7 +507,6 @@ public class GameMaster {
         try {
             player = playerMap.get(message.getPlayerUuid());
             direction = message.getDirection();
-            // source = message.getPosition();
             source = player.getPosition();
             response.setAction(message.getAction());
         } catch (Exception e) {
@@ -540,12 +540,14 @@ public class GameMaster {
         } catch (Exception e) {
             logger.warn(e.toString());
             response.setStatus(Message.Status.DENIED);
-            response.setPosition(null);
+            response.setPlayerGuid(player.getPlayerUuid().toString());
+
+            // response.setPosition(null);
+            response.setPosition(source);
             return response;
         }
 
         response.setPosition(target);
-        response.setDirection(message.getDirection());
         response.setStatus(Message.Status.OK);
         response.setPlayerGuid(player.getPlayerUuid().toString());
 

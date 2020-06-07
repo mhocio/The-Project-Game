@@ -199,7 +199,7 @@ public class ConnectionHandler {
         switch (action) {
             case "place":
                 return gameMaster.getConfiguration().getDelayPlace();
-            case "pick":
+            case "pickup":
                 return gameMaster.getConfiguration().getDelayPick();
             case "test":
                 return gameMaster.getConfiguration().getDelayTest();
