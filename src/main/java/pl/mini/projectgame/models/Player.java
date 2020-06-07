@@ -91,13 +91,18 @@ public class Player extends BoardObject {
         return host;
     }
 
-    public Boolean testPiece(Piece piece) {
+    public Boolean testPiece() {
         lastAction = ActionType.TEST;
-        if (piece == null || piece.getTestedPlayers().contains(this)) {
+        if (piece == null || piece.getTestedPlayers().contains(this))
             return null;
+
+        piece.getTestedPlayers().add(this);
+
+        if (piece.getIsGood()) {
+            return true;
         } else {
-            piece.getTestedPlayers().add(this);
-            return piece.getIsGood();
+            piece = null;
+            return false;
         }
     }
 

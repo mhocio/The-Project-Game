@@ -43,8 +43,8 @@ public class GameMasterConfiguration {
         maxTeamSize = 1;
         maxPieces = 3;
 
-        boardWidth = 10;
-        boardTaskHeight = 10;
+        boardWidth = 20;
+        boardTaskHeight = 20;
         boardGoalHeight = 5;
 
         DelayDestroyPiece = 2950;
