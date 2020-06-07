@@ -78,10 +78,11 @@ public class GameMaster {
         try {
             File configFromResourcesFile = ResourceUtils.getFile("gameMasterScenarioConfig1.json");
 
-            if (configFromResourcesFile.exists())
+            if (configFromResourcesFile.exists()) {
                 config.configureFromFile(configFromResourcesFile.getPath());
-
-            System.out.println("success reading config");
+                logger.info("success reading config from resources");
+            } else
+                logger.warn("error reading config from resources: file does not exists");
         } catch (Exception e) {
             logger.error("error reading config from resources: " + e.toString());
         }
@@ -90,7 +91,7 @@ public class GameMaster {
             String path = System.getenv("HOME")
                     + "/develop/gameMasterScenarioConfig1.json";
             String context = System.getProperty("config-path");
-            System.out.println("context: " + context);
+            logger.info("Reading config from file, context: " + context);
             if (context != null)
                 path = context;
 
@@ -567,7 +568,14 @@ public class GameMaster {
             Player player = playerMap.get(message.getPlayerUuid());
             response.setPlayerUuid(message.getPlayerUuid());
 
-            var testResult = player.testPiece(player.getPiece());
+            Piece playerPiece = player.getPiece();
+
+            if (playerPiece == null) {
+                response.setStatus(Message.Status.DENIED);
+                return response;
+            }
+
+            var testResult = player.testPiece();
             response.setTest(testResult);
 
             // if player tests the first time
