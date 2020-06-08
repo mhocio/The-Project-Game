@@ -6,21 +6,37 @@ from threading import get_ident
 from enum import Enum
 from threading import Thread
 from time import sleep 
+from random import randrange
 
 BUFFER_SIZE = 50000
 
 def bot_function(addr):
+    # print("I'm " + str(get_ident()))
+    # my_player = Player(_host=addr)
+    
+    # my_player.start()
+    # my_player.move_right()
+    # my_player.move_left()
+    # my_player.move_down()
+    # my_player.move_up()
+    # my_player.finish()
+    # my_player.close()
+    # print("END BOT FUNCTION")
+
     print("I'm " + str(get_ident()))
     my_player = Player(_host=addr)
-    
     my_player.start()
-    my_player.move_right()
-    my_player.move_left()
-    my_player.move_down()
-    my_player.move_up()
+
+    while(True):
+        my_player.leaveGoalArea()
+        my_player.discoverAndTryToPickUpAll()
+        if(my_player.is_carrying_piece):
+            my_player.test()
+            if(my_player.is_carrying_piece):
+                my_player.goAndPlacePiece()
+    
     my_player.finish()
     my_player.close()
-    print("END BOT FUNCTION")
 
 def randomString(stringLength = 8):
     letters = string.ascii_letters
@@ -40,12 +56,21 @@ class Board:
     def __init__(self, x, y, h):
         self.cells = [[0 for col in range(x)] for row in range(y)]
         self.goal_area_height = h
+        self.board_height = y
+        self.board_width = x
 
     def set_cell(self, x, y, d):
-        self.cells[x][y] = d
+        self.cells[y][x] = d
     
     def get_cell(self, x, y):
-        return self.cells[x][y]
+        return self.cells[y][x]
+
+    def show(self):
+        for r in self.cells:
+            for c in r:
+                print(c,end = " ")
+            print()
+        print('\n')
 
 
 class Player:
@@ -67,7 +92,6 @@ class Player:
             rv = {k: v for k, v in rv.items() if v is not None}  # remove Nones from dict
             print("RECV: ", rv)
             if(rv['action'] == "end"):
-                print("BOT_READ finish")
                 break
             # elif rv['action'] == 'start' and rv['status'] == "OK":
             #     print("BOT_READ start")
@@ -75,18 +99,14 @@ class Player:
             #     pass
             # response for start message from host
             elif rv['action'] == 'discover' and rv['status'] == "OK":
-                print("BOT_READ discover")
                 for field in rv['fields']:
                     self.board.set_cell(field['x'], field['y'], field['cell']['distance'])
             elif rv['action'] == 'test' and rv['status'] == "OK":
                 # TODO test piece status update
                 pass
             elif rv['action'] == 'move':
-                print("BOT_READ position before: "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
                 if rv['status'] == "OK":
                     self.set_pos(rv['position']['x'], rv['position']['y'])
-                print("BOT_READ move")
-                print("BOT_READ position after: "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
             elif rv['action'] == 'pickup' and rv['status'] == "OK":
                 self.is_carrying_piece = True
 
@@ -123,7 +143,6 @@ class Player:
     def wait(self):
         while(self.writing == False):
             pass
-        print("WRITING "+str(self.writing))
 
     def place_piece(self):
         self.wait()
@@ -136,7 +155,6 @@ class Player:
 
     def move_right(self):
         self.wait()
-        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerGuid": self.get_guid(),
@@ -148,12 +166,9 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
-        print("WRITING after "+str(self.writing))
 
     def move_left(self):
         self.wait()
-        print("POSITION before "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
-        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerGuid": self.get_guid(),
@@ -165,13 +180,10 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
-        print("POSITION after "+str(self.get_pos_x())+" "+str(self.get_pos_y()))
-        print("WRITING after "+str(self.writing))
 
 
-    def move_up(self):
+    def move_down(self):
         self.wait()
-        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerGuid": self.get_guid(),
@@ -183,11 +195,9 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
-        print("WRITING after "+str(self.writing))
         
-    def move_down(self):
+    def move_up(self):
         self.wait()
-        print("WRITING before "+str(self.writing))
         MoveMessage={
             "action": "move",
             "playerGuid": self.get_guid(),
@@ -199,7 +209,6 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
-        print("WRITING after "+str(self.writing))
 
     def move(self, x, y):
 
@@ -223,13 +232,15 @@ class Player:
             elif horizontal_mode and x_direction < 0:
                 self.move_left()
             elif not horizontal_mode and y_direction > 0:
-                self.move_up()
-            elif not horizontal_mode and y_direction < 0:
                 self.move_down()
+            elif not horizontal_mode and y_direction < 0:
+                self.move_up()
 
             # after_pos = (self.get_pos_x(), self.get_pos_y())
             # TODO: checking if someone blocked, now going like zigzag
             horizontal_mode = not horizontal_mode
+
+            self.board.show()
 
     def pickup(self):
         self.wait()
@@ -327,7 +338,7 @@ class Player:
     def start(self):
         message = {
             "action" : "connect",
-            # "playerGuid" : randomString(),
+            "playerGuid" : randomString(),
         }
 
         self.send(message)
@@ -347,7 +358,7 @@ class Player:
             print(config)
             
         if config["action"] == "start":
-                self.set_board(config["board"]["boardWidth"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
+                self.set_board(config["board"]["boardWidth"], config["board"]["taskAreaHeight"] + 2 * config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
                 self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
                 print(config["team"])
                 self.set_team(config["team"])
@@ -378,3 +389,47 @@ class Player:
 
             if "status" in ready and ready["status"] == "OK":
                 self.init_config()'''
+
+    def discoverAndTryToPickUpAll(self):
+        self.discover()
+        px=self.get_pos_x()
+        py=self.get_pos_y()
+        self.board.show()
+        # minVal = self.board.get_cell(self.get_pos_x(),self.get_pos_y())
+        minVal = self.board.board_height * self.board.board_width
+        for ix in range(self.get_pos_x()-1,self.get_pos_x()+1):
+            for iy in range(self.get_pos_y()-1,self.get_pos_y()+1):
+                if self.board.get_cell(ix,iy)<minVal and not (ix == self.get_pos_x() and iy == self.get_pos_y()):
+                    px=ix
+                    py=iy
+                    minVal=self.board.get_cell(ix,iy)
+        print("MINVAL:", minVal, " AT:", px, py)
+        if((abs(self.get_pos_x()-px)+abs(self.get_pos_y()-py))<2):
+            print("HV: ", self.get_pos_x()+(px-self.get_pos_x())*minVal,self.get_pos_y()+(py-self.get_pos_y())*minVal)
+            self.move(self.get_pos_x()+(px-self.get_pos_x())*minVal,self.get_pos_y()+(py-self.get_pos_y())*minVal)
+            self.pickup()
+        else:
+            for i in range(0,minVal):
+                if(self.get_pos_x()+(px-self.get_pos_x())*i<0 or self.get_pos_x()+(px-self.get_pos_x())*i > self.board.board_width 
+                or self.get_pos_y()+(py-self.get_pos_y())*(minVal-i)< 0 or self.get_pos_y()+(py-self.get_pos_y())*(minVal-i) > self.board.board_height):
+                    continue
+                print("D: ", self.get_pos_x()+(px-self.get_pos_x())*i, self.get_pos_y()+(py-self.get_pos_y())*(minVal-i))
+                self.move(self.get_pos_x()+(px-self.get_pos_x())*i, self.get_pos_y()+(py-self.get_pos_y())*(minVal-i))
+                self.pickup()
+                if(self.is_carrying_piece):
+                    break
+        
+    def leaveGoalArea(self):
+        while(self.get_pos_y()<self.board.goal_area_height):
+            self.move_down()
+
+        while(self.get_pos_y()>=self.board.board_height-self.board.goal_area_height):
+            self.move_up()
+
+    def goAndPlacePiece(self):
+        if self.team == "RED":
+            self.move(randrange(self.board.board_width),self.board.board_height-self.board.goal_area_height+randrange(self.board.goal_area_height))
+            self.place()
+        else:
+            self.move(randrange(self.board.board_width),randrange(self.board.goal_area_height))
+            self.place()
