@@ -22,20 +22,19 @@ public class PlayerTests {
 
     @Test
     void testNullPiece() {
-        assertNull(player.testPiece(null));
+        assertNull(player.testPiece());
     }
 
     @Test
     void testCorrectPiece() {
-        Piece piece = new Piece(0.5);
-        player.testPiece(piece);
+        Piece piece = new Piece(0);
+        player.setPiece(piece);
+        player.testPiece();
         assertTrue(piece.getTestedPlayers().contains(player));
     }
 
     @Test
     void testPieceAgain() {
-        Piece piece = new Piece(0.5);
-        player.testPiece(piece);
-        assertNull(player.testPiece(piece));
+        assertNull(player.testPiece());
     }
 }

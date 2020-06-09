@@ -21,7 +21,7 @@ public class Board {
     @JsonDeserialize(keyUsing = PositionKeyDeserializer.class)
     @JsonIgnore
     protected Map<Position, Cell> cells;
-    protected int width, height;
+    protected int boardWidth, height;
     protected int goalAreaHeight;
     protected int taskAreaHeight;
 
@@ -29,7 +29,7 @@ public class Board {
     public Board(GameMasterConfiguration config) {
         goalAreaHeight = config.getBoardGoalHeight();
         taskAreaHeight = config.getBoardTaskHeight();
-        width = config.getBoardWidth();
+        boardWidth = config.getBoardWidth();
         height = 2 * goalAreaHeight + taskAreaHeight;
 
         generateCells();
@@ -38,7 +38,7 @@ public class Board {
     public void configure(GameMasterConfiguration config) {
         goalAreaHeight = config.getBoardGoalHeight();
         taskAreaHeight = config.getBoardTaskHeight();
-        width = config.getBoardWidth();
+        boardWidth = config.getBoardWidth();
         height = 2 * goalAreaHeight + taskAreaHeight;
 
         generateCells();
@@ -51,7 +51,7 @@ public class Board {
     protected void generateCells() {
         cells = new HashMap<>();
 
-        for (int w = 0; w < width; w++) {
+        for (int w = 0; w < boardWidth; w++) {
             for (int h = 0; h < height; h++) {
                 var position = new Position(w, h);
                 cells.put(position, new Cell(position));

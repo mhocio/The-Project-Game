@@ -22,9 +22,10 @@ def firstBot():
     # dist_to_blue_goal_area = 36
     
     team_color = my_player.team
-    if team_color == "RED":
+    if team_color == "Red":
+        sleep(15)
         my_player.discover()
-        my_player.move(15, 15)
+        my_player.move(9, 9)
         my_player.discover()
         my_player.move(1, 1)
         my_player.discover()

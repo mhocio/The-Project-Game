@@ -34,6 +34,12 @@ public class CommunicationServerDiscoverTests {
     private BufferedReader in;
     private ObjectMapper mapper;
 
+    /**
+     * In case of the discover messages,
+     * they are bigger than 1024 bytes
+     */
+    private final int BUFFER_SIZE = 5012;
+
     private MasterBoard testBoard;
     private Position testPosition;
     private Player testPlayer = new Player();
@@ -66,7 +72,7 @@ public class CommunicationServerDiscoverTests {
         gameMaster.setMasterBoard(testBoard);
 
         testPosition = new Position(
-                gameMaster.getMasterBoard().getWidth() / 2,
+                gameMaster.getMasterBoard().getBoardWidth() / 2,
                 gameMaster.getMasterBoard().getGoalAreaHeight() + 4);
         testPlayer.setPosition(testPosition);
 
@@ -87,7 +93,7 @@ public class CommunicationServerDiscoverTests {
         mapper.writeValue(out, testMessage);
         out.flush();
 
-        CharBuffer cb = CharBuffer.allocate(1024);
+        CharBuffer cb = CharBuffer.allocate(BUFFER_SIZE);
         int ret = in.read(cb);
         cb.flip();
 
@@ -103,7 +109,7 @@ public class CommunicationServerDiscoverTests {
         mapper.writeValue(out, testMessage);
         out.flush();
 
-        CharBuffer cb = CharBuffer.allocate(1024);
+        CharBuffer cb = CharBuffer.allocate(BUFFER_SIZE);
         int ret = in.read(cb);
         cb.flip();
 
@@ -118,7 +124,7 @@ public class CommunicationServerDiscoverTests {
         mapper.writeValue(out, testMessage);
         out.flush();
 
-        CharBuffer cb = CharBuffer.allocate(1024);
+        CharBuffer cb = CharBuffer.allocate(BUFFER_SIZE);
         int ret = in.read(cb);
         cb.flip();
 
@@ -132,7 +138,7 @@ public class CommunicationServerDiscoverTests {
         mapper.writeValue(out, testMessage);
         out.flush();
 
-        CharBuffer cb = CharBuffer.allocate(1024);
+        CharBuffer cb = CharBuffer.allocate(BUFFER_SIZE);
         int ret = in.read(cb);
         cb.flip();
 

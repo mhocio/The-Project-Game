@@ -22,6 +22,9 @@ import java.util.*;
 
 @Component
 public class ConnectionHandler {
+
+    private final int MAX_BUFFER_SIZE = 5012;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ServerSocket serverSocket;
     @Getter
@@ -30,7 +33,7 @@ public class ConnectionHandler {
     @Getter
     private final Set<Socket> connections;
     @Getter
-    private final Map<UUID, Socket> conn;
+    private final Map<String, Socket> conn;
     private final GameMaster gameMaster;
     private final ObjectMapper objectMapper;
 
@@ -93,7 +96,7 @@ public class ConnectionHandler {
                 if (reader.ready()) {
                     long startTime = System.nanoTime();
 
-                    CharBuffer cb = CharBuffer.allocate(1024);
+                    CharBuffer cb = CharBuffer.allocate(MAX_BUFFER_SIZE);
                     if (reader.read(cb) < 0) {
                         logger.warn("Error while reading InputStream!");
                         return;
@@ -196,7 +199,7 @@ public class ConnectionHandler {
         switch (action) {
             case "place":
                 return gameMaster.getConfiguration().getDelayPlace();
-            case "pick":
+            case "pickup":
                 return gameMaster.getConfiguration().getDelayPick();
             case "test":
                 return gameMaster.getConfiguration().getDelayTest();

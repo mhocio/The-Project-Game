@@ -73,7 +73,7 @@ public class CommunicationServerPickupTests {
         testMessage = new Message();
 
         gameMaster.getPlayerMap().put(testPlayer.getPlayerUuid(), testPlayer);
-        testMessage.setAction("pickUp");
+        testMessage.setAction("pickup");
         testMessage.setPlayerUuid(testPlayer.getPlayerUuid());
     }
 

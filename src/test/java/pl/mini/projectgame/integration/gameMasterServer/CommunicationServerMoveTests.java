@@ -74,22 +74,7 @@ public class CommunicationServerMoveTests {
 
     @Test
     void testMoveActionMessageUp() throws DeniedMoveException, IOException {
-        message.setDirection(Message.Direction.UP);
-
-        mapper.writeValue(out, message);
-        out.flush();
-
-        CharBuffer cb = CharBuffer.allocate(1024);
-        int ret = in.read(cb);
-        cb.flip();
-
-        Message response = mapper.readValue(cb.toString(), Message.class);
-        assertEquals(new Position(1, 2), response.getPosition());
-    }
-
-    @Test
-    void testMoveActionMessageDown() throws DeniedMoveException, IOException {
-        message.setDirection(Message.Direction.DOWN);
+        message.setDirection(Message.Direction.Up);
 
         mapper.writeValue(out, message);
         out.flush();
@@ -103,8 +88,23 @@ public class CommunicationServerMoveTests {
     }
 
     @Test
+    void testMoveActionMessageDown() throws DeniedMoveException, IOException {
+        message.setDirection(Message.Direction.Down);
+
+        mapper.writeValue(out, message);
+        out.flush();
+
+        CharBuffer cb = CharBuffer.allocate(1024);
+        int ret = in.read(cb);
+        cb.flip();
+
+        Message response = mapper.readValue(cb.toString(), Message.class);
+        assertEquals(new Position(1, 2), response.getPosition());
+    }
+
+    @Test
     void testMoveActionMessageLeft() throws DeniedMoveException, IOException {
-        message.setDirection(Message.Direction.LEFT);
+        message.setDirection(Message.Direction.Left);
 
         mapper.writeValue(out, message);
         out.flush();
@@ -119,7 +119,7 @@ public class CommunicationServerMoveTests {
 
     @Test
     void testMoveActionMessageRight() throws DeniedMoveException, IOException {
-        message.setDirection(Message.Direction.RIGHT);
+        message.setDirection(Message.Direction.Right);
 
         mapper.writeValue(out, message);
         out.flush();

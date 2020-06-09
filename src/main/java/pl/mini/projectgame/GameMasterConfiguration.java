@@ -39,12 +39,12 @@ public class GameMasterConfiguration {
     int DelayPlace;
 
     void defaultConfiguration() {
-        shamProbability = 50;
-        maxTeamSize = 4;
+        shamProbability = 0;
+        maxTeamSize = 1;
         maxPieces = 3;
 
-        boardWidth = 10;
-        boardTaskHeight = 30;
+        boardWidth = 20;
+        boardTaskHeight = 20;
         boardGoalHeight = 5;
 
         DelayDestroyPiece = 2950;
