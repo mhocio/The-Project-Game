@@ -194,12 +194,15 @@ public class GameMasterConfiguration {
             }
 
             PositionsJSONArray = (JSONArray) jsonObject.get("predefinedPiecePositions");
-            goalPositionsIterator = PositionsJSONArray.iterator();
 
-            while (goalPositionsIterator.hasNext()) {
-                JSONObject PosJSON = goalPositionsIterator.next();
-                Position pos = new Position(Math.toIntExact((long) PosJSON.get("x")), Math.toIntExact((long) PosJSON.get("y")));
-                predefinedPiecePositions.add(pos);
+            if (PositionsJSONArray != null) {
+                goalPositionsIterator = PositionsJSONArray.iterator();
+
+                while (goalPositionsIterator.hasNext()) {
+                    JSONObject PosJSON = goalPositionsIterator.next();
+                    Position pos = new Position(Math.toIntExact((long) PosJSON.get("x")), Math.toIntExact((long) PosJSON.get("y")));
+                    predefinedPiecePositions.add(pos);
+                }
             }
 
         } catch (FileNotFoundException e) {

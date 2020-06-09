@@ -134,6 +134,7 @@ public class ConnectionHandler {
                         }
                     }
                     objectMapper.writeValue(writer, message);
+                    writer.write("\n");
                     writer.flush();
                 }
             } catch (IOException e) {
@@ -148,6 +149,7 @@ public class ConnectionHandler {
         connections.forEach(socket -> {
             try {
                 objectMapper.writeValue(socket.getOutputStream(), message);
+                socket.getOutputStream().write('\n');
             } catch (IOException e) {
                 logger.warn(e.getMessage());
             }
@@ -158,6 +160,7 @@ public class ConnectionHandler {
         try {
             var socket = conn.get(message.getPlayerUuid());
             objectMapper.writeValue(socket.getOutputStream(), message);
+            socket.getOutputStream().write('\n');
         } catch (IOException e) {
             logger.warn(e.getMessage());
         }

@@ -2,12 +2,13 @@ import socket
 import json
 import string
 import random
+import uuid
 from threading import get_ident
 from enum import Enum
 from threading import Thread
 from time import sleep 
 
-BUFFER_SIZE = 50000
+BUFFER_SIZE = 5000
 
 def bot_function(addr):
     print("I'm " + str(get_ident()))
@@ -52,7 +53,7 @@ class Player:
     writing = True
     is_carrying_piece = False
 
-    def __init__(self, _host = '127.0.0.1', _port = 8080):
+    def __init__(self, _host = '127.0.0.1', _port = 1300):
         self.HOST = _host
         self.PORT = _port
         self.GUID = '0000'
@@ -287,47 +288,17 @@ class Player:
 
     def send(self, message):
         print("\n@@@@@ sending @@@@@ : ", message)
-        self.socket.sendall(bytes(json.JSONEncoder().encode(message), "utf-8"))
+        self.socket.sendall(bytes(json.JSONEncoder().encode(message) + '\n', "utf-8"))
+        self.socket.sendmsg
 
     def recv(self):
-        message_string = self.socket.recv(BUFFER_SIZE)
-        return json.loads(message_string)
-
-    def init_config(self):
-        print(self.get_guid())
-        print(self.get_host())
-
-        message = {
-                "action" : "start",
-                "playerGuid": self.get_guid()
-            }
-        config = {"status": "DENIED"}     
-
-        # wait until all the players are ready
-        
-        while config["status"] != "OK":
-            sleep(5)
-            '''if self.get_host() == True:
-                self.send(message)
-                print("SEND")
-                print(message)'''
-            config = self.recv()
-            print("CONFIG while")
-            print(config)
-
-        if config["action"] == "start":
-                self.set_board(config["board"]["boardWidth"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
-                self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
-
-                if config['status'] == 'OK':
-                    self.x = Thread(target = self.reading_thread)
-                    self.x.start()
-
+        # message_string = self.socket.recv(BUFFER_SIZE)
+        return json.loads(self.socket.recv(BUFFER_SIZE))
 
     def start(self):
         message = {
             "action" : "connect",
-            # "playerGuid" : randomString(),
+            "playerGuid" : str(uuid.uuid1()),
         }
 
         self.send(message)
@@ -337,10 +308,10 @@ class Player:
         print("CONNECTED")
         print(connected)
         
-        config = {"status": "DENIED"}     
+        config = {"action": "DUPA"}     
         # wait for start
         
-        while config["status"] != "OK":
+        while config["action"] != "start":
             sleep(1)
             config = self.recv()
             print("startMessage while")
@@ -353,28 +324,6 @@ class Player:
                 self.set_team(config["team"])
                 self.set_guid(config["playerGuid"])
 
-                if config['status'] == 'OK':
-                    self.x = Thread(target = self.reading_thread)
-                    self.x.start()
-
-        '''if "status" in connected and connected["status"] == "OK":
-            self.set_guid(connected["playerGuid"])
-            self.set_role(connected["teamRole"])
-            self.set_team(connected["teamColor"])
-            self.set_host(connected["host"])
-
-            print(self.get_guid())
-            message = {
-                "action" : "ready",
-                "playerGuid": self.get_guid(),
-                "status" : "YES"
-            }
-            
-            self.send(message)
-
-            ready = self.recv()
-            print("READY")
-            print(ready)
-
-            if "status" in ready and ready["status"] == "OK":
-                self.init_config()'''
+                # if config['status'] == 'OK':
+                self.x = Thread(target = self.reading_thread)
+                self.x.start()

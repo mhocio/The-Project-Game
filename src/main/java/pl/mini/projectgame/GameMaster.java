@@ -77,6 +77,7 @@ public class GameMaster {
 
         try {
             File configFromResourcesFile = ResourceUtils.getFile("gameMasterScenarioConfig1.json");
+            //File configFromResourcesFile = ResourceUtils.getFile("shortConfig.json");
 
             if (configFromResourcesFile.exists()) {
                 config.configureFromFile(configFromResourcesFile.getPath());
