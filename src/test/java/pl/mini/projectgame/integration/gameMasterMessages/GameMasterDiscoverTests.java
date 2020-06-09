@@ -1,7 +1,6 @@
 package pl.mini.projectgame.integration.gameMasterMessages;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,7 +43,7 @@ public class GameMasterDiscoverTests {
         gameMaster.setMasterBoard(testBoard);
 
         testPosition = new Position(
-                gameMaster.getMasterBoard().getWidth() / 2,
+                gameMaster.getMasterBoard().getBoardWidth() / 2,
                 gameMaster.getMasterBoard().getGoalAreaHeight() + 4);
         testPlayer.setPosition(testPosition);
 

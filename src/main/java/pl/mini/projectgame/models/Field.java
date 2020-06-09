@@ -12,11 +12,16 @@ import lombok.Setter;
 public class Field {
 
     private int x, y;
+    private Position position;
     private Cell cell;
 
     public Field(Cell cell) {
         this.x = cell.getPosition().getX();
         this.y = cell.getPosition().getY();
         this.cell = cell;
+
+        position = new Position();
+        position.setX(x);
+        position.setY(y);
     }
 }

@@ -3,13 +3,12 @@ package pl.mini.projectgame.unit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.ResourceUtils;
 import pl.mini.projectgame.GameMasterConfiguration;
-import pl.mini.projectgame.ProjectGameApplication;
 import pl.mini.projectgame.models.Position;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,11 +20,16 @@ import static org.junit.Assert.assertTrue;
 public class GameMasterConfigurationTests {
 
     GameMasterConfiguration createTestConfigFromFile() {
-        File file = new File(
-                ProjectGameApplication.class.getClassLoader().getResource("gameMasterTestConfiguration.json").getFile()
-        );
+        File file;
         GameMasterConfiguration configFromFile = new GameMasterConfiguration();
-        configFromFile.configureFromFile(file.getPath());
+        try {
+            file = ResourceUtils.getFile("gameMasterTestConfiguration.json");
+
+            System.out.println(file.getAbsolutePath());
+            configFromFile.configureFromFile(file.getAbsolutePath());
+        } catch (Exception e) {
+            System.out.println("error reading config in test: " + e.getMessage());
+        }
 
         return configFromFile;
     }

@@ -1,4 +1,4 @@
-package pl.mini.projectgame.server;
+package pl.mini.projectgame;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -7,8 +7,7 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import pl.mini.projectgame.GameMaster;
+import org.springframework.stereotype.Component;
 import pl.mini.projectgame.models.Message;
 
 import java.io.*;
@@ -21,30 +20,34 @@ import java.util.*;
  * @author buensons
  */
 
-@Service
-public class CommunicationServer {
+@Component
+public class ConnectionHandler {
 
-    @Getter
-    private Thread listeningThread;
-    @Getter
-    private Set<Socket> connections;
-    @Getter
-    private Map<UUID, Socket> conn;
-    private ServerSocket serverSocket;
-    private ObjectMapper objectMapper;
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private GameMaster gameMaster;
-    private List<Thread> clientHandles;
+    private final int MAX_BUFFER_SIZE = 5012;
 
-    public CommunicationServer(@Autowired GameMaster gameMaster) throws IOException {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final ServerSocket serverSocket;
+    @Getter
+    private final Thread listeningThread;
+    private final List<Thread> threads;
+    @Getter
+    private final Set<Socket> connections;
+    @Getter
+    private final Map<String, Socket> conn;
+    private final GameMaster gameMaster;
+    private final ObjectMapper objectMapper;
+
+    @Autowired
+    public ConnectionHandler(GameMaster gameMaster) throws IOException {
         JsonFactory jsonFactory = new JsonFactory();
         jsonFactory.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
         objectMapper = new ObjectMapper(jsonFactory);
-        serverSocket = new ServerSocket(8080);
+
+        this.gameMaster = gameMaster;
+        serverSocket = new ServerSocket(8000);
+        threads = new ArrayList<>();
         connections = new HashSet<>();
         conn = new HashMap<>();
-        this.gameMaster = gameMaster;
-        clientHandles = new ArrayList<>();
 
         listeningThread = new Thread(this::listen);
         listeningThread.setName("Listening");
@@ -52,7 +55,7 @@ public class CommunicationServer {
     }
 
     private void listen() {
-        logger.info("Server is listening on port 8080...");
+        logger.info("Connection handler is running on port 8000...");
         while (true) {
             try {
                 if (!serverSocket.isClosed()) {
@@ -61,7 +64,7 @@ public class CommunicationServer {
                     var thread = new Thread(() -> handle(client));
                     thread.setName("Handle for " + client.getInetAddress().toString());
                     thread.start();
-                    clientHandles.add(thread);
+                    threads.add(thread);
                     logger.info("New player connected from " + client.getInetAddress().toString());
                 }
             } catch (IOException e) {
@@ -70,19 +73,18 @@ public class CommunicationServer {
         }
     }
 
-    private void handle(Socket socket) {
-        BufferedReader in;
-        BufferedWriter out;
-        Message message;
+    private void handle(Socket client) {
+        BufferedReader reader;
+        BufferedWriter writer;
 
         try {
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            writer = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+
         } catch (IOException e) {
             logger.warn(e.getMessage());
             try {
-                connections.remove(socket);
-                socket.close();
+                client.close();
             } catch (IOException ex) {
                 logger.warn(ex.getMessage());
             }
@@ -91,23 +93,23 @@ public class CommunicationServer {
 
         while (true) {
             try {
-                if (in.ready()) {
+                if (reader.ready()) {
                     long startTime = System.nanoTime();
 
-                    CharBuffer cb = CharBuffer.allocate(1024);
-                    if (in.read(cb) < 0) {
+                    CharBuffer cb = CharBuffer.allocate(MAX_BUFFER_SIZE);
+                    if (reader.read(cb) < 0) {
                         logger.warn("Error while reading InputStream!");
-                        continue;
+                        return;
                     }
                     cb.flip();
 
-                    message = objectMapper.readValue(cb.toString(), Message.class);
+                    var message = objectMapper.readValue(cb.toString(), Message.class);
 
                     if (message == null || message.getAction() == null) {
                         message = new Message();
                         message.setAction("error");
-                        objectMapper.writeValue(out, message);
-                        out.flush();
+                        objectMapper.writeValue(writer, message);
+                        writer.flush();
                         logger.warn("Could not process client's message!");
                         continue;
                     }
@@ -118,26 +120,24 @@ public class CommunicationServer {
                     message = gameMaster.processAndReturn(message);
 
                     if (message.getAction().equals("connect")) {
-                        conn.put(message.getPlayerUuid(), socket);
+                        conn.put(message.getPlayerUuid(), client);
                     }
 
                     long endTime = System.nanoTime();
                     long remTime = (endTime - startTime) / 1000000;
 
-                    if (responseTime > 0 && (remTime < responseTime))
+                    if (responseTime > 0 && (remTime < responseTime)) {
                         try {
                             Thread.sleep(responseTime - remTime);
                         } catch(InterruptedException ex) {
                             Thread.currentThread().interrupt();
                         }
-
-                    objectMapper.writeValue(out, message);
-                    out.flush();
+                    }
+                    objectMapper.writeValue(writer, message);
+                    writer.flush();
                 }
-
             } catch (IOException e) {
                 logger.warn(e.getMessage());
-                connections.remove(socket);
                 Thread.currentThread().interrupt();
             }
         }
@@ -173,7 +173,7 @@ public class CommunicationServer {
             }
         });
 
-        clientHandles.forEach(Thread::interrupt);
+        threads.forEach(Thread::interrupt);
 
         listeningThread.interrupt();
         try {
@@ -199,7 +199,7 @@ public class CommunicationServer {
         switch (action) {
             case "place":
                 return gameMaster.getConfiguration().getDelayPlace();
-            case "pick":
+            case "pickup":
                 return gameMaster.getConfiguration().getDelayPick();
             case "test":
                 return gameMaster.getConfiguration().getDelayTest();

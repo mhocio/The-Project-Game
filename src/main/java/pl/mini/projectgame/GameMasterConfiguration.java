@@ -8,6 +8,7 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Component;
 import pl.mini.projectgame.models.Position;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -38,12 +39,12 @@ public class GameMasterConfiguration {
     int DelayPlace;
 
     void defaultConfiguration() {
-        shamProbability = 50;
-        maxTeamSize = 4;
+        shamProbability = 0;
+        maxTeamSize = 1;
         maxPieces = 3;
 
-        boardWidth = 10;
-        boardTaskHeight = 30;
+        boardWidth = 20;
+        boardTaskHeight = 20;
         boardGoalHeight = 5;
 
         DelayDestroyPiece = 2950;
@@ -185,20 +186,21 @@ public class GameMasterConfiguration {
 
             JSONArray PositionsJSONArray = (JSONArray) jsonObject.get("predefinedGoalPositions");
             Iterator<JSONObject> goalPositionsIterator = PositionsJSONArray.iterator();
-
             while (goalPositionsIterator.hasNext()) {
                 JSONObject PosJSON = goalPositionsIterator.next();
                 Position pos = new Position(Math.toIntExact((long) PosJSON.get("x")), Math.toIntExact((long) PosJSON.get("y")));
                 predefinedGoalPositions.add(pos);
             }
 
-            PositionsJSONArray = (JSONArray) jsonObject.get("predefinedPiecePositions");
-            goalPositionsIterator = PositionsJSONArray.iterator();
+            JSONArray PiecesJSONArray = (JSONArray) jsonObject.get("predefinedPiecePositions");
+            if (PiecesJSONArray != null) {
+                Iterator<JSONObject> piecePositionsIterator = PiecesJSONArray.iterator();
 
-            while (goalPositionsIterator.hasNext()) {
-                JSONObject PosJSON = goalPositionsIterator.next();
-                Position pos = new Position(Math.toIntExact((long) PosJSON.get("x")), Math.toIntExact((long) PosJSON.get("y")));
-                predefinedPiecePositions.add(pos);
+                while (piecePositionsIterator.hasNext()) {
+                    JSONObject PosJSON = piecePositionsIterator.next();
+                    Position pos = new Position(Math.toIntExact((long) PosJSON.get("x")), Math.toIntExact((long) PosJSON.get("y")));
+                    predefinedPiecePositions.add(pos);
+                }
             }
 
         } catch (FileNotFoundException e) {

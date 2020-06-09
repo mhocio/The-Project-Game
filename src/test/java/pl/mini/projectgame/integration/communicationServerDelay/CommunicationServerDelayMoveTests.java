@@ -41,7 +41,7 @@ public class CommunicationServerDelayMoveTests {
 
     @BeforeEach
     void initTeam() throws IOException {
-        client = new Socket(InetAddress.getLocalHost().getHostName(), 8080);
+        client = new Socket(InetAddress.getLocalHost().getHostName(), 8000);
         out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
@@ -75,13 +75,13 @@ public class CommunicationServerDelayMoveTests {
 
         System.out.println("config delay: " + gameMaster.getConfiguration().getDelayMove());
         int originalDelay = gameMaster.getConfiguration().getDelayMove();
-        int numOfRuns = 50;
+        int numOfRuns = 20;
         long sum = 0;
 
         for (int i = 0; i < numOfRuns; i++) {
             message = new Message();
             message.setAction("move");
-            message.setDirection(Message.Direction.UP);
+            message.setDirection(Message.Direction.Down);
             message.setPlayerUuid(player.getPlayerUuid());
             message.setPosition(player.getPosition());
 
