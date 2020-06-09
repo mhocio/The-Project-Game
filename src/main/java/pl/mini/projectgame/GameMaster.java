@@ -88,16 +88,20 @@ public class GameMaster {
         }
 
         try {
-            String path = System.getenv("HOME")
-                    + "/develop/gameMasterScenarioConfig1.json";
+            //String path = System.getenv("PWD") + "/gameMasterConfig.json";
+            String path = System.getenv("PWD") + "/gameMasterScenarioConfig1.json";
             String context = System.getProperty("config-path");
             logger.info("Reading config from file, context: " + context);
             if (context != null)
                 path = context;
 
             File configFromPathFile = new File(path);
-            if (configFromPathFile.exists())
+            if (configFromPathFile.exists()) {
                 config.configureFromFile(path);
+                logger.info("Reading config from: " + path);
+            } else {
+                logger.warn("Error while reading config from: " + path);
+            }
         } catch (Exception e) {
             logger.error("error reading config from file: " + e.toString());
         }
