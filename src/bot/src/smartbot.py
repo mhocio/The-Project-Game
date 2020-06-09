@@ -2,27 +2,16 @@ import socket
 import json
 import string
 import random
+import uuid
 from threading import get_ident
 from enum import Enum
 from threading import Thread
 from time import sleep 
 from random import randrange
 
-BUFFER_SIZE = 50000
+BUFFER_SIZE = 5012
 
-def bot_function(addr):
-    # print("I'm " + str(get_ident()))
-    # my_player = Player(_host=addr)
-    
-    # my_player.start()
-    # my_player.move_right()
-    # my_player.move_left()
-    # my_player.move_down()
-    # my_player.move_up()
-    # my_player.finish()
-    # my_player.close()
-    # print("END BOT FUNCTION")
-
+def bot_function(addr = '127.0.0.1'):
     print("I'm " + str(get_ident()))
     my_player = Player(_host=addr)
     my_player.start()
@@ -31,7 +20,7 @@ def bot_function(addr):
         my_player.leaveGoalArea()
         my_player.discoverAndTryToPickUpAll()
         if(my_player.is_carrying_piece):
-            my_player.test()
+            my_player.test()  # do not test if player is close to the base?
             if(my_player.is_carrying_piece):
                 my_player.goAndPlacePiece()
     
@@ -304,54 +293,25 @@ class Player:
         message_string = self.socket.recv(BUFFER_SIZE)
         return json.loads(message_string)
 
-    def init_config(self):
-        print(self.get_guid())
-        print(self.get_host())
-
-        message = {
-                "action" : "start",
-                "playerGuid": self.get_guid()
-            }
-        config = {"status": "DENIED"}     
-
-        # wait until all the players are ready
-        
-        while config["status"] != "OK":
-            sleep(5)
-            '''if self.get_host() == True:
-                self.send(message)
-                print("SEND")
-                print(message)'''
-            config = self.recv()
-            print("CONFIG while")
-            print(config)
-
-        if config["action"] == "start":
-                self.set_board(config["board"]["boardWidth"], config["board"]["taskAreaHeight"] + config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
-                self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
-
-                if config['status'] == 'OK':
-                    self.x = Thread(target = self.reading_thread)
-                    self.x.start()
-
-
     def start(self):
         message = {
             "action" : "connect",
-            "playerGuid" : randomString(),
+            # "playerGuid" : randomString(),
+            "playerGuid" : str(uuid.uuid1()),
         }
+        
+        print(f"connecting to {self.HOST} on {self.PORT}")
 
         self.send(message)
-        print("sent")
+        print("sent connect message")
 
         connected = self.recv()
         print("CONNECTED")
         print(connected)
         
-        config = {"status": "DENIED"}     
+        config = {"action": "DENIED"}     
         # wait for start
-        
-        while config["status"] != "OK":
+        while config["action"] != "start":
             sleep(1)
             config = self.recv()
             print("startMessage while")
@@ -367,25 +327,6 @@ class Player:
                 if config['status'] == 'OK':
                     self.x = Thread(target = self.reading_thread)
                     self.x.start()
-
-        '''if "status" in connected and connected["status"] == "OK":
-            self.set_guid(connected["playerGuid"])
-            self.set_role(connected["teamRole"])
-            self.set_team(connected["teamColor"])
-            self.set_host(connected["host"])
-            print(self.get_guid())
-            message = {
-                "action" : "ready",
-                "playerGuid": self.get_guid(),
-                "status" : "YES"
-            }
-            
-            self.send(message)
-            ready = self.recv()
-            print("READY")
-            print(ready)
-            if "status" in ready and ready["status"] == "OK":
-                self.init_config()'''
 
     def discoverAndTryToPickUpAll(self):
         self.discover()
@@ -418,10 +359,10 @@ class Player:
         
     def leaveGoalArea(self):
         while(self.get_pos_y()<self.board.goal_area_height):
-            self.move_down()
+            self.move_down()  # may be blocked by player from the same team
 
         while(self.get_pos_y()>=self.board.board_height-self.board.goal_area_height):
-            self.move_up()
+            self.move_up()  # may be blocked by player from the same team
 
     def goAndPlacePiece(self):
         if self.team == "RED":
