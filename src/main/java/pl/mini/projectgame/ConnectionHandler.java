@@ -24,6 +24,7 @@ import java.util.*;
 public class ConnectionHandler {
 
     private final int MAX_BUFFER_SIZE = 5012;
+    private final int GAME_MASTER_PORT = 5555;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ServerSocket serverSocket;
@@ -44,7 +45,7 @@ public class ConnectionHandler {
         objectMapper = new ObjectMapper(jsonFactory);
 
         this.gameMaster = gameMaster;
-        serverSocket = new ServerSocket(8000);
+        serverSocket = new ServerSocket(GAME_MASTER_PORT);
         threads = new ArrayList<>();
         connections = new HashSet<>();
         conn = new HashMap<>();
@@ -55,7 +56,7 @@ public class ConnectionHandler {
     }
 
     private void listen() {
-        logger.info("Connection handler is running on port 8000...");
+        logger.info("Connection handler is running on port " + GAME_MASTER_PORT + "...");
         while (true) {
             try {
                 if (!serverSocket.isClosed()) {
