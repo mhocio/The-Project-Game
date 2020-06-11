@@ -89,7 +89,8 @@ public class GameMaster {
 
         try {
             //String path = System.getenv("PWD") + "/gameMasterConfig.json";
-            String path = System.getenv("PWD") + "/gameMasterScenarioConfig1.json";
+            //String path = System.getenv("PWD") + "/gameMasterScenarioConfig1.json";
+            String path = System.getenv("PWD") + "/smallConfig.json";
             String context = System.getProperty("config-path");
             logger.info("Reading config from file, context: " + context);
             if (context != null)
