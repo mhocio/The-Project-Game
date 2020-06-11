@@ -296,7 +296,6 @@ class Player:
     def start(self):
         message = {
             "action" : "connect",
-            # "playerGuid" : randomString(),
             "playerGuid" : str(uuid.uuid1()),
         }
         

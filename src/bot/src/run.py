@@ -1,5 +1,5 @@
 import sys
-import smartbot as bot
+import bot as bot
 from threading import Thread
 
 # threads = list()
