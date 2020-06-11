@@ -84,8 +84,6 @@ class Player:
             if(rv['action'] == "end"):
                 break
             elif rv['action'] == 'discover':
-                print("XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
-                print(str(rv))
                 for field in rv['fields']:
                     self.board.set_cell(field['position']['x'], field['position']['y'], field['cell']['distance'])
             elif rv['action'] == 'test' and rv['status'] == "OK":
