@@ -67,7 +67,7 @@ class Player:
     writing = True
     is_carrying_piece = False
 
-    def __init__(self, _host = '127.0.0.1', _port = 8080):
+    def __init__(self, _host = '127.0.0.1', _port = 7654):
         self.HOST = _host
         self.PORT = _port
         self.GUID = '0000'
@@ -83,14 +83,9 @@ class Player:
             print("RECV: ", rv)
             if(rv['action'] == "end"):
                 break
-            # elif rv['action'] == 'start' and rv['status'] == "OK":
-            #     print("BOT_READ start")
-            #     self.writing = False
-            #     pass
-            # response for start message from host
-            elif rv['action'] == 'discover' and rv['status'] == "OK":
+            elif rv['action'] == 'discover':
                 for field in rv['fields']:
-                    self.board.set_cell(field['x'], field['y'], field['cell']['distance'])
+                    self.board.set_cell(field['position']['x'], field['position']['y'], field['cell']['distance'])
             elif rv['action'] == 'test' and rv['status'] == "OK":
                 # TODO test piece status update
                 pass
@@ -264,6 +259,10 @@ class Player:
         MoveMessage={
             "action": "discover",
             "playerGuid": self.get_guid(),
+            "position" : {
+                "x" : self.get_pos_x(),
+                "y" : self.get_pos_y()
+            }
         }
         self.send(MoveMessage)
         self.writing = False
@@ -324,9 +323,8 @@ class Player:
                 self.set_team(config["team"])
                 self.set_guid(config["playerGuid"])
 
-                if config['status'] == 'OK':
-                    self.x = Thread(target = self.reading_thread)
-                    self.x.start()
+                self.x = Thread(target = self.reading_thread)
+                self.x.start()
 
     def discoverAndTryToPickUpAll(self):
         self.discover()
@@ -366,8 +364,8 @@ class Player:
             self.pickup()
         else:
             for i in range(0,minVal+1):
-                if(self.get_pos_x()+(px-discover_pos_x)*i<0 or self.get_pos_x()+(px-discover_pos_x)*i > self.board.board_width 
-                or self.get_pos_y()+(py-discover_pos_y*(minVal-i))< 0 or self.get_pos_y()+(py-discover_pos_y)*(minVal-i) > self.board.board_height):
+                if(self.get_pos_x()+(px-discover_pos_x)*i<0 or self.get_pos_x()+(px-discover_pos_x)*i >= self.board.board_width 
+                or self.get_pos_y()+(py-discover_pos_y*(minVal-i))< 0 or self.get_pos_y()+(py-discover_pos_y)*(minVal-i) >= self.board.board_height):
                     continue
                 print("D Move to: x:",self.get_pos_x()+(px-discover_pos_x)*i,"y:",self.get_pos_y()+(py-discover_pos_y)*(minVal-i))
                 self.move(self.get_pos_x()+(px-discover_pos_x)*i, self.get_pos_y()+(py-discover_pos_y)*(minVal-i))

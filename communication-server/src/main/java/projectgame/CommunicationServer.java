@@ -17,11 +17,11 @@ import java.util.*;
 @Service
 public class CommunicationServer {
 
-    private final int GAME_MASTER_PORT = 8000;
+    private final int GAME_MASTER_PORT = 5555;
     private final String GAME_MASTER_IP = "127.0.0.1";
     private final int MAX_BUFFER_SIZE = 5012;
 
-    private final int COMMUNICATION_SERVER_PORT = 8080;
+    private final int COMMUNICATION_SERVER_PORT = 7654;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ServerSocket serverSocket;
