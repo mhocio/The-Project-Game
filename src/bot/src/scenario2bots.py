@@ -1,6 +1,5 @@
 import sys
 import bot as bot
-import bot as bot
 from threading import Thread
 from threading import get_ident
 from time import sleep
