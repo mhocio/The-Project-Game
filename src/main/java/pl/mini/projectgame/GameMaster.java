@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Setter
 public class GameMaster {
 
-    private int CS_PORT_NUMBER = 8080;
+    private int CS_PORT_NUMBER = 7654;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -89,8 +89,8 @@ public class GameMaster {
 
         try {
             //String path = System.getenv("PWD") + "/gameMasterConfig.json";
-            //String path = System.getenv("PWD") + "/gameMasterScenarioConfig1.json";
-            String path = System.getenv("PWD") + "/smallConfig.json";
+            String path = System.getenv("PWD") + "/gameMasterScenarioConfig1.json";
+            //String path = System.getenv("PWD") + "/smallConfig.json";
             String context = System.getProperty("config-path");
             logger.info("Reading config from file, context: " + context);
             if (context != null)
