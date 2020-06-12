@@ -405,10 +405,18 @@ class Player:
         if self.goal_area_position_iter < len(self.goal_area_positions):
             self.goal_area_position_iter += 1
             return self.goal_area_positions[self.goal_area_position_iter]
+        
+    def pickup_wait(self):
+        self.pickup()
+        self.wait()
+    
+    def generate_dx_dy(self, closest_field):
+        dx = closest_field[0] - self.pos_x
+        dy = closest_field[1] - self.pos_y
+        return (dx, dy)
 
     def discoverAndTryToPickUpAll(self):
-        picked_piece = False
-        while not picked_piece:
+        while not self.is_carrying_piece:
             self.discover()
             self.wait()
             if len(self.discovered_fields) == 0:
@@ -424,15 +432,12 @@ class Player:
                     min_distance = field['cell']['distance']
                     closest_field = (field['position']['x'], field['position']['y'])
             
-            dx = closest_field[0] - self.pos_x
-            dy = closest_field[1] - self.pos_y
+            (dx, dy) = self.generate_dx_dy(closest_field)
             print("after discover: ", closest_field, dy, dx, min_distance)
             
             if standing_on_piece:
-                self.pickup()
-                self.wait()
-                if self.is_carrying_piece:
-                    picked_piece = True
+                self.pickup_wait()
+            # TODO: else if 3 times failed to pickup move the hell out
             
             if min_distance == 9999:  # no piece at the board
                 # TODO: move to the center - players center so as every bot is responsible
@@ -440,77 +445,23 @@ class Player:
                 # self.move_to_center()
                 continue
             
-            if not picked_piece and min_distance == 0:  # piece is just nearby
+            if not self.is_carrying_piece and min_distance == 0:  # piece is just nearby
                 self.move(self.pos_x + dx, self.pos_y + dy)
-                self.pickup()
-                self.wait()
-                if self.is_carrying_piece:
-                    picked_piece = True
-            elif not picked_piece and closest_field[0] == self.pos_x:  # we know where is the piece - vertical movement
+                self.pickup_wait()
+            if not self.is_carrying_piece and closest_field[0] == self.pos_x:  # we know where is the piece - vertical movement
+                (dx, dy) = self.generate_dx_dy(closest_field)
                 self.move(self.pos_x, self.pos_y + dy * (min_distance+1))
-                self.pickup()
-                self.wait()
-                if self.is_carrying_piece:
-                    picked_piece = True
-            elif not picked_piece and closest_field[1] == self.pos_y:  # we know where is the piece - horizontal movement
+                self.pickup_wait()
+            if not self.is_carrying_piece and closest_field[1] == self.pos_y:  # we know where is the piece - horizontal movement
+                (dx, dy) = self.generate_dx_dy(closest_field)
                 self.move(self.pos_x + dx * (min_distance + 1), self.pos_y)
-                self.pickup()
-                self.wait()
-                if self.is_carrying_piece:
-                    picked_piece = True
-            elif not picked_piece:
+                self.pickup_wait()
+            if not self.is_carrying_piece:
                 x_di = min_distance // 2
                 y_di = x_di
                 if x_di + y_di != min_distance:
                     x_di += 1
                 self.move(self.pos_x + dx*x_di, self.pos_y + dy*y_di)
-                
-        '''
-        px=self.get_pos_x()
-        py=self.get_pos_y()
-        self.board.show()
-        self.board.set_cell(px,py,int((self.board.get_cell(px,py-1)+self.board.get_cell(px,py+1))/2))
-        # minVal = self.board.get_cell(self.get_pos_x(),self.get_pos_y())
-        minVal = self.board.board_height * self.board.board_width
-        minx=self.get_pos_x()-1
-        miny=self.get_pos_y()-1
-        maxx=self.get_pos_x()+1
-        maxy=self.get_pos_y()+1
-        if(minx<0):
-            minx=0
-        if(miny<0):
-            miny=0
-        if(maxx>self.board.board_width-1):
-            maxx=self.board.board_width-1
-
-        if(maxy>self.board.board_height-1):
-            maxy=self.board.board_height-1
-
-        for ix in range(minx,maxx+1):
-            for iy in range(miny,maxy+1):
-                if self.board.get_cell(ix,iy)<minVal:
-                    px=ix
-                    py=iy
-                    minVal=self.board.get_cell(ix,iy)
-        print("MINVAL:", minVal, " AT:", px, py)
-        discover_pos_x = self.get_pos_x()
-        discover_pos_y = self.get_pos_y()
-        self.move(px,py)
-        if((abs(discover_pos_x-px)+abs(discover_pos_y-py))<2):
-            print("H Move to: x:", self.get_pos_x()+(px-discover_pos_x)*minVal," y:",self.get_pos_y()+(py-discover_pos_y)*minVal)
-            self.move(self.get_pos_x()+(px-discover_pos_x)*minVal,self.get_pos_y()+(py-discover_pos_y)*minVal)
-            self.pickup()
-        else:
-            for i in range(0,minVal+1):
-                if(self.get_pos_x()+(px-discover_pos_x)*i<0 or self.get_pos_x()+(px-discover_pos_x)*i >= self.board.board_width 
-                or self.get_pos_y()+(py-discover_pos_y*(minVal-i))< 0 or self.get_pos_y()+(py-discover_pos_y)*(minVal-i) >= self.board.board_height):
-                    continue
-                print("D Move to: x:",self.get_pos_x()+(px-discover_pos_x)*i,"y:",self.get_pos_y()+(py-discover_pos_y)*(minVal-i))
-                self.move(self.get_pos_x()+(px-discover_pos_x)*i, self.get_pos_y()+(py-discover_pos_y)*(minVal-i))
-                self.pickup()
-                if(self.is_carrying_piece):
-                    break
-        '''
         
     def leaveGoalArea(self):
         while(self.get_pos_y()<self.board.goal_area_height):
@@ -527,14 +478,6 @@ class Player:
             
 
     def goAndPlacePiece(self):
-        '''
-        if self.team == "Red":
-            self.move(randrange(self.board.board_width),self.board.board_height-self.board.goal_area_height+randrange(self.board.goal_area_height))
-            self.place()
-        else:
-            self.move(randrange(self.board.board_width),randrange(self.board.goal_area_height))
-            self.place()
-        '''
         pos = self.get_next_free_goal_area_position()
         self.move(pos[0], pos[1])
         self.place()
