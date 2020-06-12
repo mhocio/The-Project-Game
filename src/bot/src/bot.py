@@ -67,10 +67,18 @@ class Player:
     writing = True
     is_carrying_piece = False
 
-    def __init__(self, _host = '127.0.0.1', _port = 7654):
+    def __init__(self, _host = '127.0.0.1', _port = 7654, _player_num = 0):
         self.HOST = _host
         self.PORT = _port
         self.GUID = '0000'
+        self.last_action = 'none'
+        self.last_status = 'none'
+        self.player_num = _player_num  # used for tactics
+        self.team_size = 4
+        self.goal_area_positions = []
+        self.discovered_fields = []
+        self.goal_area_position_iter = -1
+        self.num_of_denies = 0
         self.connect()
         
     def set_guid(self, guid):
@@ -79,14 +87,23 @@ class Player:
     def reading_thread(self):
         while(True):
             rv = self.recv()
+            self.last_action = rv['action']
+            self.last_status = rv['status']
+            if self.last_status == 'DENIED':
+                self.num_of_denies += 1
+            else:
+                self.num_of_denies = 0
             rv = {k: v for k, v in rv.items() if v is not None}  # remove Nones from dict
             print("RECV: ", rv)
             if(rv['action'] == "end"):
                 break
             elif rv['action'] == 'discover':
+                self.discovered_fields = rv['fields']
                 for field in rv['fields']:
                     self.board.set_cell(field['position']['x'], field['position']['y'], field['cell']['distance'])
-            elif rv['action'] == 'test' and rv['status'] == "OK":
+            elif rv['action'] == 'test':
+                if rv['test'] == 'false':
+                    self.is_carrying_piece = False
                 # TODO test piece status update
                 pass
             elif rv['action'] == 'move':
@@ -194,8 +211,17 @@ class Player:
         }
         self.send(MoveMessage)
         self.writing = False
+        
+    def was_denied(self):
+        return self.last_status == "DENIED"
+    
+    def move_random_direction(self):
+        # TODO: remove last move from below list
+        print("MOVING RANDOMLY!")
+        random.choice([self.move_up, self.move_down, self.move_left, self.move_right])()
 
     def move(self, x, y):
+        # TODO: check if you dont want to leave the borders also!!!
 
         x_direction = x - self.get_pos_x()
         y_direction = y - self.get_pos_y()
@@ -220,12 +246,44 @@ class Player:
                 self.move_down()
             elif not horizontal_mode and y_direction < 0:
                 self.move_up()
+                
+            self.wait()
+            print("num of denies: ", self.num_of_denies)
+            while self.num_of_denies > 2:
+                self.move_random_direction()
+                self.wait()
 
             # after_pos = (self.get_pos_x(), self.get_pos_y())
             # TODO: checking if someone blocked, now going like zigzag
             horizontal_mode = not horizontal_mode
 
-            self.board.show()
+            # self.board.show()
+            
+    def move_horizontal(self):
+        next_move = 'none'
+        if self.pos_x >= self.allocation_x_end:
+            next_move = 'LEFT'
+        elif self.pos_x <= self.allocation_x_begin:
+            next_move = 'RIGHT'
+        else:  # inside the players area
+            dist_end = self.allocation_x_end - self.pos_x
+            dist_begin = self.pos_x - self.allocation_x_begin
+            if dist_end < dist_begin:
+                next_move = 'LEFT'
+            else:
+                next_move = 'RIGHT'
+                
+        # checking if not blocked below...    
+        if next_move == 'LEFT':
+            self.move_left()
+            self.wait()
+            if self.was_denied():
+                self.move_right()
+        else:
+            self.move_right()
+            self.wait()
+            if self.was_denied():
+                self.move_left()
 
     def pickup(self):
         self.wait()
@@ -317,17 +375,97 @@ class Player:
             print(config)
             
         if config["action"] == "start":
+                print(config)
                 self.set_board(config["board"]["boardWidth"], config["board"]["taskAreaHeight"] + 2 * config["board"]["goalAreaHeight"], config["board"]["goalAreaHeight"])
                 self.set_pos(int(config["position"]["x"]), int(config["position"]["y"]))
                 print(config["team"])
                 self.set_team(config["team"])
                 self.set_guid(config["playerGuid"])
+                
+                self.team_size = config["teamSize"]
+                
+                # creating the players horizontal area...
+                player_area_width = self.board.board_width // self.team_size  # assume we can devide the board equaly here!
+                self.allocation_x_begin = player_area_width * self.player_num
+                self.allocation_x_end = self.allocation_x_begin + player_area_width - 1
+                if self.team == "Blue":
+                    self.goal_area_positions = [(x,y) for x in range(self.allocation_x_end, self.allocation_x_begin-1, -1)
+                                                for y in range(self.board.goal_area_height)]
+                else:
+                    self.goal_area_positions = [(x,y) for x in range(self.allocation_x_end, self.allocation_x_begin-1, -1)
+                        for y in range(self.board.board_height-1, self.board.board_height-self.board.goal_area_height-1, -1)]
+                    
+                print(self.goal_area_positions)
+                # sleep(150)
 
                 self.x = Thread(target = self.reading_thread)
                 self.x.start()
+    
+    def get_next_free_goal_area_position(self):
+        if self.goal_area_position_iter < len(self.goal_area_positions):
+            self.goal_area_position_iter += 1
+            return self.goal_area_positions[self.goal_area_position_iter]
 
     def discoverAndTryToPickUpAll(self):
-        self.discover()
+        picked_piece = False
+        while not picked_piece:
+            self.discover()
+            self.wait()
+            if len(self.discovered_fields) == 0:
+                self.leaveGoalArea()
+            
+            min_distance = 9999
+            closest_field= (-1, -1)
+            standing_on_piece = True
+            for field in self.discovered_fields:
+                if (field['position']['x'] == self.pos_x or field['position']['y'] == self.pos_y) and field['cell']['distance'] != 1:
+                    standing_on_piece = False
+                if field['cell']['distance'] > -1 and field['cell']['distance'] < min_distance:
+                    min_distance = field['cell']['distance']
+                    closest_field = (field['position']['x'], field['position']['y'])
+            
+            dx = closest_field[0] - self.pos_x
+            dy = closest_field[1] - self.pos_y
+            print("after discover: ", closest_field, dy, dx, min_distance)
+            
+            if standing_on_piece:
+                self.pickup()
+                self.wait()
+                if self.is_carrying_piece:
+                    picked_piece = True
+            
+            if min_distance == 9999:  # no piece at the board
+                # TODO: move to the center - players center so as every bot is responsible
+                # for his area
+                # self.move_to_center()
+                continue
+            
+            if not picked_piece and min_distance == 0:  # piece is just nearby
+                self.move(self.pos_x + dx, self.pos_y + dy)
+                self.pickup()
+                self.wait()
+                if self.is_carrying_piece:
+                    picked_piece = True
+            elif not picked_piece and closest_field[0] == self.pos_x:  # we know where is the piece - vertical movement
+                self.move(self.pos_x, self.pos_y + dy * (min_distance+1))
+                self.pickup()
+                self.wait()
+                if self.is_carrying_piece:
+                    picked_piece = True
+            elif not picked_piece and closest_field[1] == self.pos_y:  # we know where is the piece - horizontal movement
+                self.move(self.pos_x + dx * (min_distance + 1), self.pos_y)
+                self.pickup()
+                self.wait()
+                if self.is_carrying_piece:
+                    picked_piece = True
+            elif not picked_piece:
+                x_di = min_distance // 2
+                y_di = x_di
+                if x_di + y_di != min_distance:
+                    x_di += 1
+                self.move(self.pos_x + dx*x_di, self.pos_y + dy*y_di)
+                
+        '''
         px=self.get_pos_x()
         py=self.get_pos_y()
         self.board.show()
@@ -372,18 +510,33 @@ class Player:
                 self.pickup()
                 if(self.is_carrying_piece):
                     break
+        '''
         
     def leaveGoalArea(self):
         while(self.get_pos_y()<self.board.goal_area_height):
             self.move_down()
+            self.wait()
+            if self.was_denied():
+                self.move_horizontal()
 
         while(self.get_pos_y()>=(self.board.board_height-self.board.goal_area_height)):
             self.move_up()
+            self.wait()
+            if self.was_denied():
+                self.move_horizontal()
+            
 
     def goAndPlacePiece(self):
-        if self.team == "RED":
+        '''
+        if self.team == "Red":
             self.move(randrange(self.board.board_width),self.board.board_height-self.board.goal_area_height+randrange(self.board.goal_area_height))
             self.place()
         else:
             self.move(randrange(self.board.board_width),randrange(self.board.goal_area_height))
             self.place()
+        '''
+        pos = self.get_next_free_goal_area_position()
+        self.move(pos[0], pos[1])
+        self.place()
+        self.is_carrying_piece = False
+        self.wait()
