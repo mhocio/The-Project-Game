@@ -11,9 +11,9 @@ from random import randrange
 
 BUFFER_SIZE = 5012
 
-def bot_function(addr):
+def bot_function(addr, player_num):
     print("I'm " + str(get_ident()))
-    my_player = Player(_host=addr)
+    my_player = Player(_host=addr, _player_num = player_num)
     my_player.start()
 
     while(True):
@@ -79,6 +79,8 @@ class Player:
         self.discovered_fields = []
         self.goal_area_position_iter = -1
         self.num_of_denies = 0
+        self.last_action_move = None
+        print("player num: ", self.player_num)
         self.connect()
         
     def set_guid(self, guid):
@@ -166,6 +168,7 @@ class Player:
                 "y" : self.get_pos_y()
             }
         }
+        self.last_action_move = self.move_right
         self.send(MoveMessage)
         self.writing = False
 
@@ -180,6 +183,7 @@ class Player:
                 "y" : self.get_pos_y()
             }
         }
+        self.last_action_move = self.move_left
         self.send(MoveMessage)
         self.writing = False
 
@@ -195,6 +199,7 @@ class Player:
                 "y" : self.get_pos_y()
             }
         }
+        self.last_action_move = self.move_down
         self.send(MoveMessage)
         self.writing = False
         
@@ -209,6 +214,7 @@ class Player:
                 "y" : self.get_pos_y()
             }
         }
+        self.last_action_move = self.move_up
         self.send(MoveMessage)
         self.writing = False
         
@@ -216,9 +222,11 @@ class Player:
         return self.last_status == "DENIED"
     
     def move_random_direction(self):
-        # TODO: remove last move from below list
         print("MOVING RANDOMLY!")
-        random.choice([self.move_up, self.move_down, self.move_left, self.move_right])()
+        random_moves = [self.move_up, self.move_down, self.move_left, self.move_right]
+        if self.last_action_move in random_moves:
+            random_moves.remove(self.last_action_move)
+        random.choice(random_moves)()
 
     def move(self, x, y):
         # TODO: check if you dont want to leave the borders also!!!
@@ -350,6 +358,17 @@ class Player:
     def recv(self):
         message_string = self.socket.recv(BUFFER_SIZE)
         return json.loads(message_string)
+    
+    def get_player_goal_area_positions(self, _player):
+        allocation_x_begin = self.player_area_width * self.player_num
+        allocation_x_end = self.allocation_x_begin + self.player_area_width - 1
+        if self.team == "Blue":
+            goal_area_positions = [(x,y) for x in range(allocation_x_end, allocation_x_begin-1, -1)
+                                        for y in range(self.board.goal_area_height)]
+        else:
+            goal_area_positions = [(x,y) for x in range(allocation_x_end, allocation_x_begin-1, -1)
+                for y in range(self.board.board_height-1, self.board.board_height-self.board.goal_area_height-1, -1)]
+        return goal_area_positions
 
     def start(self):
         message = {
@@ -385,15 +404,34 @@ class Player:
                 self.team_size = config["teamSize"]
                 
                 # creating the players horizontal area...
-                player_area_width = self.board.board_width // self.team_size  # assume we can devide the board equaly here!
-                self.allocation_x_begin = player_area_width * self.player_num
-                self.allocation_x_end = self.allocation_x_begin + player_area_width - 1
-                if self.team == "Blue":
-                    self.goal_area_positions = [(x,y) for x in range(self.allocation_x_end, self.allocation_x_begin-1, -1)
-                                                for y in range(self.board.goal_area_height)]
-                else:
-                    self.goal_area_positions = [(x,y) for x in range(self.allocation_x_end, self.allocation_x_begin-1, -1)
-                        for y in range(self.board.board_height-1, self.board.board_height-self.board.goal_area_height-1, -1)]
+                self.player_area_width = self.board.board_width // self.team_size  # assume we can devide the board equaly here!
+                self.allocation_x_begin = self.player_area_width * self.player_num
+                self.allocation_x_end = self.allocation_x_begin + self.player_area_width - 1
+                self.goal_area_positions = self.get_player_goal_area_positions(self.player_num)
+                
+                if self.team_size > 1:
+                    next_player_num = 0
+                    if self.player_num % 2 == 0:
+                        next_player_num = self.player_num + 1
+                    else:
+                        next_player_num = self.player_num - 1
+                    print(self.get_player_goal_area_positions(next_player_num))
+                    print(self.get_player_goal_area_positions(next_player_num).reverse())
+                    self.goal_area_positions.extend(self.get_player_goal_area_positions(next_player_num)[::-1])
+                
+                if self.team_size == 4:
+                    if self.player_num == 0:
+                        self.goal_area_positions.extend(self.get_player_goal_area_positions(2)[::-1])
+                        self.goal_area_positions.extend(self.get_player_goal_area_positions(3)[::-1])
+                    elif self.player_num == 1:
+                        self.goal_area_positions.extend(self.get_player_goal_area_positions(3)[::-1])
+                        self.goal_area_positions.extend(self.get_player_goal_area_positions(2)[::-1])
+                    elif self.player_num == 2:
+                        self.goal_area_positions.extend(self.get_player_goal_area_positions(0)[::-1])
+                        self.goal_area_positions.extend(self.get_player_goal_area_positions(1)[::-1])
+                    elif self.player_num == 3:
+                        self.goal_area_positions.extend(self.get_player_goal_area_positions(1)[::-1])
+                        self.goal_area_positions.extend(self.get_player_goal_area_positions(0)[::-1])
                     
                 print(self.goal_area_positions)
                 # sleep(150)
@@ -402,9 +440,10 @@ class Player:
                 self.x.start()
     
     def get_next_free_goal_area_position(self):
-        if self.goal_area_position_iter < len(self.goal_area_positions):
+        if self.goal_area_position_iter + 1 < len(self.goal_area_positions):
             self.goal_area_position_iter += 1
             return self.goal_area_positions[self.goal_area_position_iter]
+        return None
         
     def pickup_wait(self):
         self.pickup()
@@ -416,6 +455,7 @@ class Player:
         return (dx, dy)
 
     def discoverAndTryToPickUpAll(self):
+        number_of_pickups_underneath = 0
         while not self.is_carrying_piece:
             self.discover()
             self.wait()
@@ -479,7 +519,8 @@ class Player:
 
     def goAndPlacePiece(self):
         pos = self.get_next_free_goal_area_position()
-        self.move(pos[0], pos[1])
-        self.place()
-        self.is_carrying_piece = False
-        self.wait()
+        if pos is not None: 
+            self.move(pos[0], pos[1])
+            self.place()
+            self.is_carrying_piece = False
+            self.wait()
