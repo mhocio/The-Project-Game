@@ -13,10 +13,11 @@ PYTHON PROJECT GAME BOT
 HOW TO USE
 ---------------------------------------------------
 First argument -> number of the bot in a team (starting from zero)\n
-e.g. python3 master_bot.py 
+e.g. python3 run.py 0 
 ---------------------------------------------------
 """)
-x = Thread(target = bot.bot_function, args = [addr, player_num])
-x.start()
-x.join()
+# x = Thread(target = bot.bot_function, args = [addr, player_num])
+# x.start()
+# x.join()
+bot.bot_function(addr, player_num)
 print("END BOT")
