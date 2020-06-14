@@ -1,8 +1,11 @@
 import socket
 import json
 import string
+import math
 import random
+import signal
 import uuid
+import os, sys
 from threading import get_ident
 from enum import Enum
 from threading import Thread
@@ -10,23 +13,57 @@ from time import sleep
 from random import randrange
 
 BUFFER_SIZE = 5012
+NO_PRINT = True
+
+def blockPrint():
+    sys.stdout = open(os.devnull, 'w')
+
+def enablePrint():
+    sys.stdout = sys.__stdout__
+
+class ExitCommand(Exception):
+    pass
+
+def signal_handler(signal, frame):
+    raise ExitCommand()
 
 def bot_function(addr, player_num):
-    print("I'm " + str(get_ident()))
-    my_player = Player(_host=addr, _player_num = player_num)
-    my_player.start()
+    try:
+        print("I'm " + str(get_ident()))
+        my_player = Player(_host=addr, _player_num = player_num)
+        my_player.start()
+        
+        if my_player.board.board_height == my_player.board.board_width == 20:
+            if player_num == 2:
+                if my_player.team == "Red":
+                    my_player.move(9,9)
+                else:
+                    my_player.move(10, 10)
+                my_player.pickup()
+                my_player.test()
+            elif player_num == 3:
+                if my_player.team == "Blue":
+                    my_player.move(9,9)
+                else:
+                    my_player.move(10, 10)
+                my_player.pickup()
+                my_player.test()
+            else:
+                sleep(0.2)
 
-    while(True):
-        my_player.leaveGoalArea()
-        if(my_player.is_carrying_piece):
-            my_player.test()
-            if(my_player.is_carrying_piece):
-                my_player.goAndPlacePiece()
-        else:
-            my_player.discoverAndTryToPickUpAll()
-    
-    my_player.finish()
-    my_player.close()
+        while True:
+            my_player.leaveGoalArea()
+            if my_player.is_carrying_piece:
+                my_player.test()
+                my_player.wait()
+                if my_player.is_carrying_piece:
+                    my_player.goAndPlacePiece()
+            else:
+                my_player.discoverAndTryToPickUpAll()
+                
+    except ExitCommand:
+        # my_player.finish()
+        my_player.close()
 
 def randomString(stringLength = 8):
     letters = string.ascii_letters
@@ -89,25 +126,36 @@ class Player:
     def reading_thread(self):
         while(True):
             rv = self.recv()
+            if rv is None:
+                os.kill(os.getpid(), signal.SIGUSR1)
+                break
+            if(rv['action'] == "end"):
+                enablePrint()
+                print(rv)
+                os.kill(os.getpid(), signal.SIGUSR1)
+                break
+            
             self.last_action = rv['action']
             self.last_status = rv['status']
             if self.last_status == 'DENIED':
                 self.num_of_denies += 1
             else:
                 self.num_of_denies = 0
+            
             rv = {k: v for k, v in rv.items() if v is not None}  # remove Nones from dict
             print("RECV: ", rv)
-            if(rv['action'] == "end"):
-                break
-            elif rv['action'] == 'discover':
+ 
+            if rv['action'] == 'discover':
                 self.discovered_fields = rv['fields']
-                for field in rv['fields']:
-                    self.board.set_cell(field['position']['x'], field['position']['y'], field['cell']['distance'])
+                # for field in rv['fields']:
+                    # self.board.set_cell(field['position']['x'], field['position']['y'], field['cell']['distance'])
             elif rv['action'] == 'test':
-                if rv['test'] == 'false':
+                if rv['status'] == 'DENIED':
                     self.is_carrying_piece = False
-                # TODO test piece status update
-                pass
+                elif rv['test'] == 'False':
+                    self.is_carrying_piece = False
+                elif rv['test'] == 'True':
+                    self.is_carrying_piece = True
             elif rv['action'] == 'move':
                 if rv['status'] == "OK":
                     self.set_pos(rv['position']['x'], rv['position']['y'])
@@ -228,15 +276,36 @@ class Player:
             random_moves.remove(self.last_action_move)
         random.choice(random_moves)()
 
-    def move(self, x, y):
-        # TODO: check if you dont want to leave the borders also!!!
+    def move(self, x, y, go_for_piece = False):
+        if x < 0:
+            x = 0
+        elif x >= self.board.board_width:
+            x = self.board.board_width - 1
+        elif self.team == "Blue" and y >= self.board.board_height - self.board.goal_area_height:
+            y = self.board.board_height - self.board.goal_area_height - 1
+        elif self.team == "Red" and y <= self.board.goal_area_height:
+            y = self.board.goal_area_height
+            
+        # if player is discovering he does not need to go to goal area
+        if go_for_piece:
+            if self.team == "Red" and y >= self.board.board_height - self.board.goal_area_height:
+                y = self.board.board_height - self.board.goal_area_height - 1
+            if self.team == "Blue" and y <= self.board.goal_area_height:
+                y = self.board.goal_area_height
 
         x_direction = x - self.get_pos_x()
         y_direction = y - self.get_pos_y()
         horizontal_mode = True
+        move_index = 0
 
         while abs(x_direction) > 0 or abs(y_direction) > 0:
             self.wait()
+            move_index += 1
+            
+            if move_index >= self.board.board_height + self.board.board_width + 5:
+                self.leave_towards_center()
+                return False
+            
             x_direction = x - self.get_pos_x()
             y_direction = y - self.get_pos_y()
 
@@ -354,14 +423,18 @@ class Player:
     def send(self, message):
         print("\n@@@@@ sending @@@@@ : ", message)
         self.socket.sendall(bytes(json.JSONEncoder().encode(message) + '\n', "utf-8"))
+        sleep(0.02)
 
     def recv(self):
-        message_string = self.socket.recv(BUFFER_SIZE)
-        return json.loads(message_string)
+        try:
+            message_string = self.socket.recv(BUFFER_SIZE)
+            return json.loads(message_string)
+        except:
+            return None
     
     def get_player_goal_area_positions(self, _player):
-        allocation_x_begin = self.player_area_width * self.player_num
-        allocation_x_end = self.allocation_x_begin + self.player_area_width - 1
+        allocation_x_begin = self.player_area_width * _player
+        allocation_x_end = allocation_x_begin + self.player_area_width - 1
         if self.team == "Blue":
             goal_area_positions = [(x,y) for x in range(allocation_x_end, allocation_x_begin-1, -1)
                                         for y in range(self.board.goal_area_height)]
@@ -388,7 +461,7 @@ class Player:
         config = {"action": "DENIED"}     
         # wait for start
         while config["action"] != "start":
-            sleep(1)
+            sleep(0.5)
             config = self.recv()
             print("startMessage while")
             print(config)
@@ -415,8 +488,9 @@ class Player:
                         next_player_num = self.player_num + 1
                     else:
                         next_player_num = self.player_num - 1
-                    print(self.get_player_goal_area_positions(next_player_num))
-                    print(self.get_player_goal_area_positions(next_player_num).reverse())
+                    print(self.player_num, next_player_num)
+                    print(self.goal_area_positions)
+                    print(self.get_player_goal_area_positions(next_player_num)[::-1])
                     self.goal_area_positions.extend(self.get_player_goal_area_positions(next_player_num)[::-1])
                 
                 if self.team_size == 4:
@@ -434,8 +508,11 @@ class Player:
                         self.goal_area_positions.extend(self.get_player_goal_area_positions(0)[::-1])
                     
                 print(self.goal_area_positions)
-                # sleep(150)
+                # sleep(400)
 
+                if NO_PRINT:
+                    blockPrint()
+                signal.signal(signal.SIGUSR1, signal_handler)
                 self.x = Thread(target = self.reading_thread)
                 self.x.start()
     
@@ -444,9 +521,31 @@ class Player:
             self.goal_area_position_iter += 1
             return self.goal_area_positions[self.goal_area_position_iter]
         return None
+    
+    def calculate_distance(self, x, y):
+        return math.sqrt( (x - self.pos_x)**2 + (y - self.pos_y)**2 )
+    
+    def leave_towards_center(self):
+        x_dir = self.board.board_width // 3
+        y_dir = (self.board.board_height - self.board.goal_area_height*2) // 3
+        
+        if self.pos_x >= (self.board.board_width // 2):
+            x_dir *= -1
+        if self.pos_y >= (self.board.board_height // 2):
+            y_dir *= -1
+            
+        # some random direction factor
+        if abs(self.pos_x - self.board.board_width) <= 2 and random.uniform(0, 1) > 0.5:
+            x_dir *= -1
+        if abs(self.pos_x - self.board.board_width) <= 2 and random.uniform(0, 1) > 0.5:
+            y_dir *= -1
+
+        self.move(self.pos_x + x_dir, self.pos_y + y_dir)
         
     def pickup_wait(self):
         self.pickup()
+        self.wait()
+        self.test()
         self.wait()
     
     def generate_dx_dy(self, closest_field):
@@ -455,7 +554,7 @@ class Player:
         return (dx, dy)
 
     def discoverAndTryToPickUpAll(self):
-        number_of_pickups_underneath = 0
+        # number_of_pickups_underneath = 0
         while not self.is_carrying_piece:
             self.discover()
             self.wait()
@@ -465,24 +564,32 @@ class Player:
             min_distance = 9999
             closest_field= (-1, -1)
             standing_on_piece = True
+            
             for field in self.discovered_fields:
-                if (field['position']['x'] == self.pos_x or field['position']['y'] == self.pos_y) and field['cell']['distance'] != 1:
+                if (field['position']['x'] == self.pos_x or field['position']['y'] == self.pos_y) and field['cell']['distance'] > 1:
+                    print("NOT STANDING", field)
                     standing_on_piece = False
                 if field['cell']['distance'] > -1 and field['cell']['distance'] < min_distance:
                     min_distance = field['cell']['distance']
                     closest_field = (field['position']['x'], field['position']['y'])
             
             (dx, dy) = self.generate_dx_dy(closest_field)
-            print("after discover: ", closest_field, dy, dx, min_distance)
+            # print("after discover: ", closest_field, dy, dx, min_distance)
             
             if standing_on_piece:
+                # print("STANDING ON THE PIECE")
                 self.pickup_wait()
-            # TODO: else if 3 times failed to pickup move the hell out
+                self.test()
+                self.wait()
+                if not self.is_carrying_piece:
+                    self.leave_towards_center()
+                continue
             
-            if min_distance == 9999:  # no piece at the board
+            if not self.is_carrying_piece and min_distance == 9999:  # no piece at the board
                 # TODO: move to the center - players center so as every bot is responsible
                 # for his area
                 # self.move_to_center()
+                self.leave_towards_center()
                 continue
             
             if not self.is_carrying_piece and min_distance == 0:  # piece is just nearby
@@ -501,16 +608,25 @@ class Player:
                 y_di = x_di
                 if x_di + y_di != min_distance:
                     x_di += 1
-                self.move(self.pos_x + dx*x_di, self.pos_y + dy*y_di)
+                self.move(self.pos_x + dx*x_di, self.pos_y + dy*y_di, go_for_piece=True)
         
     def leaveGoalArea(self):
+        move_iter = 0
         while(self.get_pos_y()<self.board.goal_area_height):
+            move_iter += 1
+            if move_iter > 4:
+                self.leave_towards_center()
+                continue
             self.move_down()
             self.wait()
             if self.was_denied():
                 self.move_horizontal()
 
         while(self.get_pos_y()>=(self.board.board_height-self.board.goal_area_height)):
+            move_iter += 1
+            if move_iter > 4:
+                self.leave_towards_center()
+                continue
             self.move_up()
             self.wait()
             if self.was_denied():
@@ -518,6 +634,9 @@ class Player:
             
 
     def goAndPlacePiece(self):
+        self.wait()
+        if not self.is_carrying_piece:
+            return False
         pos = self.get_next_free_goal_area_position()
         if pos is not None: 
             self.move(pos[0], pos[1])
